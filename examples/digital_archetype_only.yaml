@@ -1,0 +1,7 @@
+version: "0.1.0"
+profile:
+  name: "Digital Guide"
+  description: "Minimal digital guide profile using only the archetype properties"
+  archetype:
+    primary: "guide"
+    description: "A simple digital guide that helps users navigate digital interfaces and tools"
