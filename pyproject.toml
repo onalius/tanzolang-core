@@ -40,7 +40,7 @@ ruff = "^0.0.285"
 pre-commit = "^3.4"
 
 [tool.poetry.scripts]
-tanzo-cli = "cli.tanzo-cli:cli"
+tanzo-cli = "cli.tanzo_cli:cli"
 
 [build-system]
 requires = ["poetry-core"]

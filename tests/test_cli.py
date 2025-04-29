@@ -12,7 +12,7 @@ from io import StringIO
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from cli.tanzo-cli import cli  # This assumes the CLI uses click for commands
+from cli.tanzo_cli import cli  # This assumes the CLI uses click for commands
 
 
 class TestTanzoCLI(unittest.TestCase):
@@ -105,6 +105,17 @@ class TestTanzoCLI(unittest.TestCase):
         self.assertIn("validate", result.output)
         self.assertIn("simulate", result.output)
         self.assertIn("export", result.output)
+    
+    def test_cli_help(self):
+        """Test that the CLI help command works"""
+        from click.testing import CliRunner
+        
+        runner = CliRunner()
+        result = runner.invoke(cli, ["--help"])
+        
+        # Check exit code and output
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Usage:", result.output)
 
 
 if __name__ == "__main__":

@@ -20,8 +20,40 @@ TanzoLang is the open schema specification for defining digital archetypes and t
 
 ### Python
 
+#### Using pip
+
 ```bash
 pip install tanzo-schema
+```
+
+After installation, you can use the `tanzo-cli` command from your terminal:
+
+```bash
+# Show help
+tanzo-cli --help
+
+# Validate a profile
+tanzo-cli validate profile.yaml
+
+# Run a simulation
+tanzo-cli simulate profile.yaml
+
+# Export a profile
+tanzo-cli export profile.yaml
+```
+
+#### Using Poetry (recommended for development)
+
+```bash
+# Clone the repository
+git clone https://github.com/onalius/tanzo-lang-core.git
+cd tanzo-lang-core
+
+# Install with Poetry
+poetry install
+
+# Use the CLI through Poetry
+poetry run tanzo-cli --help
 ```
 
 ### 🐍 Manual Installation (if Poetry fails)
@@ -40,6 +72,12 @@ Alternatively, you can use the provided requirements.txt file:
 
 ```bash
 pip install -r requirements.txt
+```
+
+Note: If you encounter dependency errors with `annotated-types` or other packages, you may need to install them explicitly:
+
+```bash
+pip install annotated-types pydantic click jsonschema pyyaml
 ```
 
 This approach ensures NumPy is installed as a binary wheel, avoiding compiler issues on systems without native build tools.

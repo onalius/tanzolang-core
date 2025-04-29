@@ -77,9 +77,38 @@ Alternatively, you can use the provided requirements.txt file:
 pip install -r requirements.txt
 ```
 
+If you're still encountering issues with dependencies, you may need to install specific packages manually:
+
+```bash
+pip install annotated-types pydantic click jsonschema pyyaml
+```
+
 3. Run the tests
 
 ```bash
 pytest
+```
+
+4. Using the CLI
+
+**With Poetry:**
+
+```bash
+# Run the CLI directly
+poetry run tanzo-cli --help
+
+# Or activate the Poetry shell first
+poetry shell
+tanzo-cli --help
+```
+
+**With pip installation:**
+
+```bash
+# Make sure you're in the virtual environment
+tanzo-cli --help
+
+# Or specify the module path
+python -m cli.tanzo_cli --help
 ```
 
