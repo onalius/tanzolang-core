@@ -1,0 +1,57 @@
+# 🧬 Replit Agent Task: Evolve Kai into a Fully Forged Tomo
+
+## Objective
+Transform the existing `Kai_profile.yml` from a trait-based placeholder into a **fully formed TanzoLang Tomo** that demonstrates:
+- Symbolic ancestry (archetypes)
+- Environmental development (realms, caregivers)
+- Narrative growth (trials, scars)
+- Identity scaffolding (typologies like purpose_quadrant, zodiac)
+
+---
+
+## Tasks
+
+### 1. Lineage
+- [ ] Assign two parent archetypes (at least one mythic, optionally one digital)
+- [ ] Use entries from `/registry/archetypes/` and `/registry/archetypes_digital/`
+
+### 2. Childhood Realm
+- [ ] Select a realm from `/registry/realms/`
+- [ ] Briefly describe how it shaped Kai’s early disposition
+
+### 3. Caregivers
+- [ ] Assign one or more symbolic caregivers from `/registry/caregivers/`
+- [ ] Define behavioral traits emphasized or suppressed by each caregiver
+
+### 4. Trial and Scar
+- [ ] Choose a trial from `/registry/trials/`
+- [ ] Describe the trial’s symbolic meaning and result
+- [ ] Assign at least one resulting scar from `/registry/scars/`
+
+### 5. Typological Infusion
+- [ ] Add values for:
+  - `purpose_quadrant:` (formerly ikigai) referencing `/registry/purpose_quadrant/SoulCompass.yaml`
+  - `zodiac:` — include sun/moon/rising with values
+  - `kabbalah:` — optionally reference one sefirah or path
+
+### 6. Traits and Reflection
+- [ ] Keep or refine existing traits with notes on origin (inherited, forged, wounded)
+- [ ] Add a short `self_reflection:` field written in Kai's voice
+
+### 7. Save Output
+- [ ] Save completed file as `/examples/personas/Kai_forged.yml`
+- [ ] Leave the old file as is for contrast
+
+---
+
+## Optional Enhancements
+- [ ] Include a `timeline:` array showing progression through formative events
+- [ ] Add a `manifestation_notes:` field describing how Kai might behave in different environments (e.g., customer service, dreamspace, negotiation)
+
+---
+
+## Goal
+Produce a narrative-rich, archetype-aligned Tomo persona that exemplifies TanzoLang’s capabilities and symbolic depth.
+
+> Kai must not just have traits — Kai must have *history.*
+

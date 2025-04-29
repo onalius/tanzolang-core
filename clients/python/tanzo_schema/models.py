@@ -87,11 +87,59 @@ class Archetype(BaseModel):
     attributes: List[Attribute]
 
 
+class ZodiacTypology(BaseModel):
+    """Astrological archetypes and their traits"""
+    reference: str
+    sun: str
+    moon: Optional[str] = None
+    rising: Optional[str] = None
+    description: Optional[str] = None
+
+
+class KabbalahTypology(BaseModel):
+    """Mystical framework of divine emanations"""
+    reference: str
+    primary_sefira: str
+    secondary_sefira: Optional[str] = None
+    path: Optional[str] = None
+    description: Optional[str] = None
+
+
+class PurposeQuadrantTypology(BaseModel):
+    """Framework for aligning passion, expertise, contribution, and sustainability"""
+    reference: Optional[str] = None
+    passion: str
+    expertise: str
+    contribution: str
+    sustainability: str
+
+
+class ParentArchetype(BaseModel):
+    """A parent archetype with influence on the personality"""
+    name: str
+    influence: float = Field(ge=0.0, le=1.0)
+    reference: Optional[str] = None
+    description: Optional[str] = None
+
+
+class Typologies(BaseModel):
+    """Optional typology systems that provide additional symbolic structure"""
+    zodiac: Optional[ZodiacTypology] = None
+    kabbalah: Optional[KabbalahTypology] = None
+    purpose_quadrant: Optional[PurposeQuadrantTypology] = None
+    
+    # Allow additional typologies beyond the predefined ones
+    class Config:
+        extra = "allow"
+
+
 class Profile(BaseModel):
     """The main profile section in a TanzoLang profile"""
     name: str
     description: Optional[str] = None
     archetypes: List[Archetype]
+    parent_archetypes: Optional[List[ParentArchetype]] = None
+    typologies: Optional[Typologies] = None
 
 
 class TanzoProfile(BaseModel):

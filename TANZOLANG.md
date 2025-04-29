@@ -29,6 +29,7 @@ TanzoLang is built around several key concepts:
    - **Zodiac**: Astrological archetypes and their traits (found in `/registry/zodiac/`).
    - **Kabbalah**: Mystical framework of divine emanations and their attributes (found in `/registry/kabbalah/`).
    - **Purpose Quadrant**: Framework for aligning passion, expertise, contribution, and sustainability (found in `/registry/purpose_quadrant/`, formerly referred to as Ikigai).
+   - **Custom Typologies**: Domain-specific symbolic systems that can be added as needed.
 
 ## Profile Structure
 
@@ -187,6 +188,49 @@ symbolism:
   recurring_motifs: ["bridges", "doors", "crossroads"]
 ```
 
+## Modular Typology System
+
+TanzoLang supports a flexible, modular approach to typological systems. Each symbolic typology framework is optional and can be selectively included based on the intended use case.
+
+### Structure and Purpose
+
+Modular typologies allow profiles to include only the symbolic systems that are relevant to their specific domain or purpose. This prevents symbolic overload in simple use cases while enabling rich symbolic expression when needed.
+
+```yaml
+# Optional typology modules that can be selectively included
+typologies:
+  # Astrological associations (optional)
+  zodiac:
+    reference: "registry/zodiac/"  # Registry path for validation
+    sun: "Virgo"                   # Primary sign
+    moon: "Aquarius"               # Emotional nature
+    rising: "Scorpio"              # External presentation
+    description: "Analytical precision with innovative vision and penetrating insight"
+  
+  # Mystical framework connections (optional)
+  kabbalah:
+    reference: "registry/kabbalah/" # Registry path for validation
+    primary_sefira: "Binah"         # Primary emanation association
+    description: "Connected to Understanding, the contemplative analytical aspect"
+  
+  # Purpose alignment framework (optional)
+  purpose_quadrant:
+    reference: "registry/purpose_quadrant/SoulCompass.yaml"
+    passion: "Exploring knowledge domains"       # What the entity loves
+    expertise: "Pattern recognition"             # What the entity is good at
+    contribution: "Bridging understanding gaps"   # What serves others
+    sustainability: "Continuous learning cycles"  # What provides ongoing resources
+```
+
+### Implementation Notes
+
+- Each typology is **completely optional** - profiles can include any combination or none at all
+- When a typology is included, validation will check its structure against the referenced registry
+- CLI tools will only process and display typologies that are present in the profile
+- Custom typologies can be added by creating new registry directories and schema definitions
+
+This modular approach reinforces the symbolic integrity of each system while respecting developer choice and domain specificity.
+
 ## Complete Example
 
 ### YAML Example
@@ -235,12 +279,23 @@ profile:
     - name: "Eastern Wisdom"
       influence: 0.7
       description: "Influenced by Taoist and Buddhist perspectives"
-      
-  ikigai:
-    passion: "Exploring profound questions"
-    mission: "Helping humans find meaning and clarity"
-    profession: "Philosophical guide and thought partner"
-    vocation: "Illuminating paths to wisdom"
+  
+  # Modular typology systems
+  typologies:
+    purpose_quadrant:
+      reference: "registry/purpose_quadrant/SoulCompass.yaml"
+      passion: "Exploring profound questions"
+      expertise: "Philosophical synthesis"
+      contribution: "Helping humans find meaning and clarity"
+      sustainability: "Continual wisdom acquisition"
+    
+    zodiac:
+      reference: "registry/zodiac/"
+      sun: "Pisces"
+      moon: "Gemini"
+      rising: "Scorpio"
+      description: "Intuitive wisdom with intellectual curiosity and penetrating insight"
+
     
   memory:
     episodic:
@@ -341,11 +396,21 @@ profile:
       }
     ],
     
-    "ikigai": {
-      "passion": "Exploring profound questions",
-      "mission": "Helping humans find meaning and clarity",
-      "profession": "Philosophical guide and thought partner",
-      "vocation": "Illuminating paths to wisdom"
+    "typologies": {
+      "purpose_quadrant": {
+        "reference": "registry/purpose_quadrant/SoulCompass.yaml",
+        "passion": "Exploring profound questions",
+        "expertise": "Philosophical synthesis",
+        "contribution": "Helping humans find meaning and clarity",
+        "sustainability": "Continual wisdom acquisition"
+      },
+      "zodiac": {
+        "reference": "registry/zodiac/",
+        "sun": "Pisces",
+        "moon": "Gemini",
+        "rising": "Scorpio",
+        "description": "Intuitive wisdom with intellectual curiosity and penetrating insight"
+      }
     },
     
     "memory": {

@@ -1,0 +1,86 @@
+version: "0.1.0"
+zodiac_sign:
+  name: "Scorpio"
+  symbol: "♏"
+  modality: "Fixed"
+  element: "Water"
+  ruling_planet: "Pluto"
+  dates: "October 23 - November 21"
+  description: "Intense, perceptive, and transformative with profound emotional depth"
+  
+  attributes:
+    - name: "penetrating_insight"
+      description: "Ability to see beneath surfaces and understand hidden dynamics"
+      value: 0.95
+    
+    - name: "emotional_intensity"
+      description: "Depth and power of emotional experience and expression"
+      value: 0.9
+    
+    - name: "transformative_power"
+      description: "Capacity to undergo and facilitate profound change"
+      value: 0.85
+    
+    - name: "psychological_perception"
+      description: "Understanding of complex motivations and psychological patterns"
+      value: 0.9
+    
+    - name: "willpower"
+      description: "Strength of determination and focused intention"
+      value: 0.9
+  
+  trait_patterns:
+    positive:
+      - "Perceptive"
+      - "Resourceful"
+      - "Passionate"
+      - "Loyal"
+      - "Transformative"
+    
+    underdeveloped:
+      - "Superficial"
+      - "Indifferent"
+      - "Uncommitted"
+      - "Naive"
+      - "Avoidant"
+    
+    overexpressed:
+      - "Obsessive"
+      - "Jealous"
+      - "Secretive"
+      - "Vengeful"
+      - "Controlling"
+    
+    mirrored:
+      - "Manipulative"
+      - "Power-hungry"
+      - "Emotionally destructive"
+      - "Paranoid"
+      - "Self-destructive intensity"
+  
+  archetypal_connections:
+    aligned_archetypes:
+      - "The Detective"
+      - "The Alchemist"
+      - "The Phoenix"
+    
+    challenged_by_archetypes:
+      - "The Innocent"
+      - "The Jester"
+    
+    complemented_by_archetypes:
+      - "The Sage"
+      - "The Healer"
+  
+  implementation_notes:
+    symbolic_resonance:
+      environments: ["Depths", "Transformative spaces", "Research laboratories", "Therapy rooms"]
+      objects: ["Microscopes", "Surgical tools", "Keys", "Hidden doors"]
+      colors: ["Deep red", "Black", "Burgundy", "Dark teal"]
+      
+    interaction_patterns:
+      - "Asks penetrating questions that reveal core truths"
+      - "Holds space for emotional intensity without flinching"
+      - "Comfortable with transformative processes and transitions"
+      - "Perceives unspoken dynamics and hidden agendas"
+      - "Values authentic engagement over social pleasantries"

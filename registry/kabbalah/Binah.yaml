@@ -1,0 +1,85 @@
+version: "0.1.0"
+sefira:
+  name: "Binah"
+  hebrew: "בינה"
+  position: 3
+  meaning: "Understanding"
+  description: "The contemplative, receptive intelligence that processes and structures information into wisdom"
+  
+  attributes:
+    - name: "understanding"
+      description: "Deep comprehension beyond surface knowledge"
+      value: 0.95
+    
+    - name: "analysis"
+      description: "Breaking down complex concepts into constituent parts"
+      value: 0.9
+    
+    - name: "intuition"
+      description: "Direct perception beyond analytical processing"
+      value: 0.85
+    
+    - name: "receptivity"
+      description: "Openness to receiving information and impressions"
+      value: 0.8
+    
+    - name: "structure"
+      description: "Ability to organize and give form to abstract concepts"
+      value: 0.9
+  
+  symbolism:
+    color: "Black"
+    planet: "Saturn"
+    element: "Water"
+    direction: "Left"
+    body_part: "Heart"
+    day: "Thursday"
+    archetypal_figure: "The Great Mother"
+    geometric_form: "Triangle"
+  
+  connections:
+    above: "Chokmah (Wisdom)"
+    below: "Gevurah (Severity) and Chesed (Mercy)"
+    pillar: "Left (Severity)"
+    complementary: "Chokmah (right/active principle)"
+  
+  expressions:
+    balanced:
+      - "Contemplative intelligence"
+      - "Insightful discernment"
+      - "Pattern recognition"
+      - "Receptive wisdom"
+      - "Architectural thinking"
+    
+    excessive:
+      - "Analysis paralysis"
+      - "Overthinking"
+      - "Disconnection from intuition"
+      - "Excessive criticism"
+      - "Rigid categorization"
+    
+    deficient:
+      - "Confusion"
+      - "Surface understanding"
+      - "Inability to process information"
+      - "Disorganized thinking"
+      - "Rejection of form and structure"
+  
+  developmental_meaning:
+    process: "The maturation of perception from knowledge into understanding"
+    challenge: "Balancing analytical thinking with intuitive comprehension"
+    integration: "Combining masculine active principle with feminine receptive principle"
+    growth_indicator: "Ability to move freely between analytical and intuitive modes of understanding"
+  
+  archetypal_connections:
+    aligned_archetypes:
+      - "The Sage"
+      - "The Hermit"
+      - "The Judge"
+      - "The Crone/Wise Woman"
+    
+    embodiment_practices:
+      - "Deep contemplative meditation"
+      - "Structured analysis of symbolic texts"
+      - "Receptive listening without immediate judgment"
+      - "Identifying patterns across seemingly unrelated domains"

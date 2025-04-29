@@ -84,6 +84,60 @@ def validate_file(file_path: Union[str, Path]) -> Dict[str, Any]:
     return data
 
 
+def check_registry_references(profile: TanzoProfile, base_path: Optional[Path] = None) -> list:
+    """
+    Check if registry references in typologies exist
+    
+    Args:
+        profile: The validated profile to check
+        base_path: Base path for registry references (defaults to project root)
+        
+    Returns:
+        list: List of warning messages for missing references
+    """
+    warnings = []
+    
+    # Skip if typologies aren't present
+    if not hasattr(profile.profile, 'typologies') or profile.profile.typologies is None:
+        return warnings
+        
+    # Determine base path for registry
+    if base_path is None:
+        # Try to find registry relative to module location
+        base_path = Path(__file__).parents[3]  # Up from clients/python/tanzo_schema/
+
+    typologies = profile.profile.typologies
+    
+    # Check zodiac references
+    if hasattr(typologies, 'zodiac') and typologies.zodiac is not None:
+        zodiac_ref = typologies.zodiac.reference
+        zodiac_path = base_path / zodiac_ref
+        
+        if not zodiac_path.exists():
+            warnings.append(f"Warning: Zodiac registry reference '{zodiac_ref}' not found")
+    
+    # Check kabbalah references
+    if hasattr(typologies, 'kabbalah') and typologies.kabbalah is not None:
+        kabbalah_ref = typologies.kabbalah.reference
+        kabbalah_path = base_path / kabbalah_ref
+        
+        if not kabbalah_path.exists():
+            warnings.append(f"Warning: Kabbalah registry reference '{kabbalah_ref}' not found")
+    
+    # Check purpose_quadrant references
+    if hasattr(typologies, 'purpose_quadrant') and typologies.purpose_quadrant is not None:
+        if typologies.purpose_quadrant.reference:
+            purpose_ref = typologies.purpose_quadrant.reference
+            purpose_path = base_path / purpose_ref
+            
+            if not purpose_path.exists():
+                warnings.append(f"Warning: Purpose Quadrant registry reference '{purpose_ref}' not found")
+    
+    # Additional typologies could be checked here as they're added
+    
+    return warnings
+
+
 def validate_profile(profile_path: Union[str, Path]) -> TanzoProfile:
     """
     Validate a TanzoLang profile and return a Pydantic model
@@ -101,4 +155,12 @@ def validate_profile(profile_path: Union[str, Path]) -> TanzoProfile:
     data = validate_file(profile_path)
     
     # Then convert to Pydantic model for stronger typing
-    return TanzoProfile.model_validate(data)
+    profile = TanzoProfile.model_validate(data)
+    
+    # Check registry references (doesn't fail validation, just warns)
+    registry_warnings = check_registry_references(profile)
+    if registry_warnings:
+        for warning in registry_warnings:
+            print(warning)
+    
+    return profile

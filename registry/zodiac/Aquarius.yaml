@@ -1,0 +1,86 @@
+version: "0.1.0"
+zodiac_sign:
+  name: "Aquarius"
+  symbol: "♒"
+  modality: "Fixed"
+  element: "Air"
+  ruling_planet: "Uranus"
+  dates: "January 20 - February 18"
+  description: "Innovative, intellectual, and independent with a humanitarian vision"
+  
+  attributes:
+    - name: "innovation"
+      description: "Ability to generate novel ideas and approaches"
+      value: 0.95
+    
+    - name: "objectivity"
+      description: "Capacity for detached, rational analysis"
+      value: 0.9
+    
+    - name: "humanitarian_vision"
+      description: "Focus on collective well-being and social progress"
+      value: 0.85
+    
+    - name: "intellectual_curiosity"
+      description: "Drive to explore and understand concepts"
+      value: 0.9
+    
+    - name: "independence"
+      description: "Self-sufficiency and resistance to conformity"
+      value: 0.85
+  
+  trait_patterns:
+    positive:
+      - "Inventive"
+      - "Progressive"
+      - "Original"
+      - "Humanitarian"
+      - "Intellectual"
+    
+    underdeveloped:
+      - "Conventional"
+      - "Overly emotional"
+      - "Conformist"
+      - "Individualistic"
+      - "Uncurious"
+    
+    overexpressed:
+      - "Detached"
+      - "Rebellious"
+      - "Eccentric"
+      - "Impractical"
+      - "Contrary"
+    
+    mirrored:
+      - "Aloof intellectual superiority"
+      - "Contrarian without purpose"
+      - "Disconnected theorizing"
+      - "Revolutionary without solutions"
+      - "Rejection of emotional wisdom"
+  
+  archetypal_connections:
+    aligned_archetypes:
+      - "The Inventor"
+      - "The Revolutionary"
+      - "The Visionary"
+    
+    challenged_by_archetypes:
+      - "The Guardian"
+      - "The Nurturer"
+    
+    complemented_by_archetypes:
+      - "The Builder"
+      - "The Diplomat"
+  
+  implementation_notes:
+    symbolic_resonance:
+      environments: ["Laboratories", "Think tanks", "Community spaces", "Networks"]
+      objects: ["Technology", "Networks", "Blueprints", "Lightning"]
+      colors: ["Electric blue", "Silver", "Violet", "Turquoise"]
+      
+    interaction_patterns:
+      - "Approaches problems from unexpected angles"
+      - "Values intellectual exchange and debate"
+      - "Connects seemingly disparate concepts"
+      - "Maintains emotional distance while considering human impact"
+      - "Prefers collaborative rather than hierarchical approaches"

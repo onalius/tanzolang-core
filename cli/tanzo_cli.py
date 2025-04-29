@@ -14,7 +14,7 @@ import click
 # Add parent directory to import path to enable imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from clients.python.tanzo_schema.validator import validate_profile
+from clients.python.tanzo_schema.validator import validate_profile, check_registry_references
 from clients.python.tanzo_schema.simulator import simulate_profile
 from clients.python.tanzo_schema.exporter import export_profile
 
@@ -38,16 +38,80 @@ def validate(file):
     Validate a TanzoLang profile file.
     
     Checks if the file conforms to the TanzoLang schema and reports any errors.
+    Also validates and reports on modular typology systems if present.
     """
     try:
         profile = validate_profile(file)
         click.echo(click.style(f"✓ Profile '{profile.profile.name}' is valid", fg='green'))
+        
+        # Display archetypes information
         click.echo(f"  - {len(profile.profile.archetypes)} archetypes")
         
         for idx, archetype in enumerate(profile.profile.archetypes, 1):
             archetype_name = archetype.name or archetype.type.value
             click.echo(f"  - Archetype {idx}: {archetype_name} ({archetype.type.value})")
             click.echo(f"    - {len(archetype.attributes)} attributes")
+            
+        # Display parent archetypes if present
+        if hasattr(profile.profile, 'parent_archetypes') and profile.profile.parent_archetypes:
+            click.echo(f"\n  - {len(profile.profile.parent_archetypes)} parent archetypes")
+            for idx, parent in enumerate(profile.profile.parent_archetypes, 1):
+                click.echo(f"  - Parent {idx}: {parent.name} (influence: {parent.influence})")
+                if parent.reference:
+                    click.echo(f"    - Reference: {parent.reference}")
+        
+        # Display typology information if present
+        if hasattr(profile.profile, 'typologies') and profile.profile.typologies:
+            click.echo("\n  - Typologies:")
+            typologies = profile.profile.typologies
+            
+            # Check for zodiac typology
+            if hasattr(typologies, 'zodiac') and typologies.zodiac:
+                click.echo(click.style("    - Zodiac", fg='cyan'))
+                click.echo(f"      - Sun: {typologies.zodiac.sun}")
+                if typologies.zodiac.moon:
+                    click.echo(f"      - Moon: {typologies.zodiac.moon}")
+                if typologies.zodiac.rising:
+                    click.echo(f"      - Rising: {typologies.zodiac.rising}")
+                click.echo(f"      - Registry: {typologies.zodiac.reference}")
+            
+            # Check for kabbalah typology
+            if hasattr(typologies, 'kabbalah') and typologies.kabbalah:
+                click.echo(click.style("    - Kabbalah", fg='cyan'))
+                click.echo(f"      - Primary Sefira: {typologies.kabbalah.primary_sefira}")
+                if typologies.kabbalah.secondary_sefira:
+                    click.echo(f"      - Secondary Sefira: {typologies.kabbalah.secondary_sefira}")
+                click.echo(f"      - Registry: {typologies.kabbalah.reference}")
+            
+            # Check for purpose quadrant typology
+            if hasattr(typologies, 'purpose_quadrant') and typologies.purpose_quadrant:
+                click.echo(click.style("    - Purpose Quadrant", fg='cyan'))
+                click.echo(f"      - Passion: {typologies.purpose_quadrant.passion}")
+                click.echo(f"      - Expertise: {typologies.purpose_quadrant.expertise}")
+                click.echo(f"      - Contribution: {typologies.purpose_quadrant.contribution}")
+                click.echo(f"      - Sustainability: {typologies.purpose_quadrant.sustainability}")
+                if typologies.purpose_quadrant.reference:
+                    click.echo(f"      - Registry: {typologies.purpose_quadrant.reference}")
+            
+            # Check for any other custom typologies
+            for name, typology in typologies.__dict__.items():
+                if name not in ['zodiac', 'kabbalah', 'purpose_quadrant'] and typology is not None:
+                    click.echo(click.style(f"    - Custom Typology: {name}", fg='cyan'))
+                    for key, value in typology.__dict__.items():
+                        if value is not None:
+                            click.echo(f"      - {key}: {value}")
+        else:
+            click.echo("\n  - No typologies defined (optional)")
+            
+        click.echo("\n" + click.style("Profile is valid and contains all required elements.", fg='green'))
+        if hasattr(profile.profile, 'typologies') and profile.profile.typologies:
+            click.echo(click.style("Modular typology system validation complete.", fg='green'))
+            registry_warnings = check_registry_references(profile)
+            if registry_warnings:
+                for warning in registry_warnings:
+                    click.echo(click.style(warning, fg='yellow'))
+                click.echo(click.style("\nNote: Missing registry references are warnings only. " 
+                                     "The profile is still valid, but some typology references could not be located.", fg='yellow'))
         
         return 0
     
@@ -75,6 +139,7 @@ def simulate(file, iterations, output):
         # Display summary
         click.echo(click.style(f"✓ Simulation completed for '{results['profile_name']}'", fg='green'))
         
+        # Display archetypes and attributes
         for archetype_name, attributes in results['archetypes'].items():
             click.echo(f"\nArchetype: {archetype_name}")
             
@@ -99,6 +164,46 @@ def simulate(file, iterations, output):
                     click.echo(f"    Min: {stats['min']:.4f}")
                     click.echo(f"    Max: {stats['max']:.4f}")
                     click.echo(f"    Std Dev: {stats['std_dev']:.4f}")
+        
+        # Display typologies if present
+        if 'typologies' in results:
+            click.echo("\n" + click.style("Typologies:", fg='cyan'))
+            
+            # Display zodiac typology if present
+            if 'zodiac' in results['typologies']:
+                zodiac = results['typologies']['zodiac']
+                click.echo("  Zodiac:")
+                click.echo(f"    Sun: {zodiac['sun']}")
+                if zodiac.get('moon'):
+                    click.echo(f"    Moon: {zodiac['moon']}")
+                if zodiac.get('rising'):
+                    click.echo(f"    Rising: {zodiac['rising']}")
+            
+            # Display kabbalah typology if present
+            if 'kabbalah' in results['typologies']:
+                kabbalah = results['typologies']['kabbalah']
+                click.echo("  Kabbalah:")
+                click.echo(f"    Primary Sefira: {kabbalah['primary_sefira']}")
+                if kabbalah.get('secondary_sefira'):
+                    click.echo(f"    Secondary Sefira: {kabbalah['secondary_sefira']}")
+                if kabbalah.get('path'):
+                    click.echo(f"    Path: {kabbalah['path']}")
+            
+            # Display purpose quadrant typology if present
+            if 'purpose_quadrant' in results['typologies']:
+                purpose = results['typologies']['purpose_quadrant']
+                click.echo("  Purpose Quadrant:")
+                click.echo(f"    Passion: {purpose['passion']}")
+                click.echo(f"    Expertise: {purpose['expertise']}")
+                click.echo(f"    Contribution: {purpose['contribution']}")
+                click.echo(f"    Sustainability: {purpose['sustainability']}")
+            
+            # Display any custom typologies
+            for name, typology in results['typologies'].items():
+                if name not in ['zodiac', 'kabbalah', 'purpose_quadrant']:
+                    click.echo(f"  {name.title()}:")
+                    for key, value in typology.items():
+                        click.echo(f"    {key}: {value}")
         
         # Write to output file if specified
         if output:

@@ -11,6 +11,9 @@ from tanzo_schema.models import (
     NormalDistribution,
     UniformDistribution,
     DiscreteDistribution,
+    ZodiacTypology,
+    KabbalahTypology,
+    PurposeQuadrantTypology,
 )
 from tanzo_schema.validator import validate_profile
 
@@ -80,6 +83,67 @@ def format_attribute(attribute: Attribute) -> str:
         return f"{attribute.name}={formatted_value}"
 
 
+def format_zodiac(zodiac: ZodiacTypology) -> List[str]:
+    """
+    Format a zodiac typology as a list of strings
+    
+    Args:
+        zodiac: The zodiac typology to format
+        
+    Returns:
+        List[str]: Formatted strings for the zodiac typology
+    """
+    lines = ["  TYPOLOGY:Zodiac"]
+    lines.append(f"    Sun={zodiac.sun}")
+    
+    if zodiac.moon:
+        lines.append(f"    Moon={zodiac.moon}")
+    if zodiac.rising:
+        lines.append(f"    Rising={zodiac.rising}")
+        
+    return lines
+
+
+def format_kabbalah(kabbalah: KabbalahTypology) -> List[str]:
+    """
+    Format a kabbalah typology as a list of strings
+    
+    Args:
+        kabbalah: The kabbalah typology to format
+        
+    Returns:
+        List[str]: Formatted strings for the kabbalah typology
+    """
+    lines = ["  TYPOLOGY:Kabbalah"]
+    lines.append(f"    PrimarySefira={kabbalah.primary_sefira}")
+    
+    if kabbalah.secondary_sefira:
+        lines.append(f"    SecondarySefira={kabbalah.secondary_sefira}")
+    if kabbalah.path:
+        lines.append(f"    Path={kabbalah.path}")
+        
+    return lines
+
+
+def format_purpose_quadrant(purpose: PurposeQuadrantTypology) -> List[str]:
+    """
+    Format a purpose quadrant typology as a list of strings
+    
+    Args:
+        purpose: The purpose quadrant typology to format
+        
+    Returns:
+        List[str]: Formatted strings for the purpose quadrant typology
+    """
+    lines = ["  TYPOLOGY:PurposeQuadrant"]
+    lines.append(f"    Passion={purpose.passion}")
+    lines.append(f"    Expertise={purpose.expertise}")
+    lines.append(f"    Contribution={purpose.contribution}")
+    lines.append(f"    Sustainability={purpose.sustainability}")
+        
+    return lines
+
+
 def export_profile(profile_path: Union[str, Path]) -> str:
     """
     Export a TanzoLang profile as a concise string representation
@@ -97,6 +161,7 @@ def export_profile(profile_path: Union[str, Path]) -> str:
     lines = [f"TanzoProfile: {profile.profile.name} (v{profile.version})"]
     
     # Format each archetype
+    lines.append("\nARCHETYPES:")
     for archetype in profile.profile.archetypes:
         archetype_name = archetype.name or archetype.type.value
         archetype_line = f"  {archetype.type.value.upper()}:{archetype_name}"
@@ -106,5 +171,39 @@ def export_profile(profile_path: Union[str, Path]) -> str:
         for attribute in archetype.attributes:
             attribute_line = f"    {format_attribute(attribute)}"
             lines.append(attribute_line)
+    
+    # Format parent archetypes if present
+    if hasattr(profile.profile, 'parent_archetypes') and profile.profile.parent_archetypes:
+        lines.append("\nPARENT ARCHETYPES:")
+        for parent in profile.profile.parent_archetypes:
+            parent_line = f"  {parent.name} (influence: {parent.influence:.2f})"
+            lines.append(parent_line)
+            if parent.reference:
+                lines.append(f"    Reference: {parent.reference}")
+    
+    # Format typologies if present
+    if hasattr(profile.profile, 'typologies') and profile.profile.typologies:
+        typologies = profile.profile.typologies
+        lines.append("\nTYPOLOGIES:")
+        
+        # Format zodiac typology if present
+        if hasattr(typologies, 'zodiac') and typologies.zodiac:
+            lines.extend(format_zodiac(typologies.zodiac))
+            
+        # Format kabbalah typology if present
+        if hasattr(typologies, 'kabbalah') and typologies.kabbalah:
+            lines.extend(format_kabbalah(typologies.kabbalah))
+            
+        # Format purpose quadrant typology if present
+        if hasattr(typologies, 'purpose_quadrant') and typologies.purpose_quadrant:
+            lines.extend(format_purpose_quadrant(typologies.purpose_quadrant))
+            
+        # Format any custom typologies
+        for name, typology in typologies.__dict__.items():
+            if name not in ['zodiac', 'kabbalah', 'purpose_quadrant'] and typology is not None:
+                lines.append(f"  TYPOLOGY:{name}")
+                for key, value in typology.__dict__.items():
+                    if value is not None:
+                        lines.append(f"    {key}={value}")
     
     return "\n".join(lines)

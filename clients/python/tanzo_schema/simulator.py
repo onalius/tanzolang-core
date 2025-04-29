@@ -13,6 +13,9 @@ from tanzo_schema.models import (
     UniformDistribution,
     DiscreteDistribution,
     AttributeValue,
+    ZodiacTypology,
+    KabbalahTypology,
+    PurposeQuadrantTypology,
 )
 from tanzo_schema.validator import validate_profile
 
@@ -67,6 +70,63 @@ def simulate_attribute(attribute: Attribute) -> Tuple[str, Any]:
     return attribute.name, simulated_value
 
 
+def extract_typologies(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
+    """
+    Extract typology information from a profile
+    
+    Args:
+        profile: The profile containing typologies
+        
+    Returns:
+        Dict[str, Dict[str, Any]]: Typology data organized by system
+    """
+    result = {}
+    
+    # Skip if typologies aren't present
+    if not hasattr(profile.profile, 'typologies') or profile.profile.typologies is None:
+        return result
+    
+    typologies = profile.profile.typologies
+    
+    # Extract zodiac typology if present
+    if hasattr(typologies, 'zodiac') and typologies.zodiac:
+        result['zodiac'] = {
+            'sun': typologies.zodiac.sun,
+            'moon': typologies.zodiac.moon,
+            'rising': typologies.zodiac.rising
+        }
+    
+    # Extract kabbalah typology if present
+    if hasattr(typologies, 'kabbalah') and typologies.kabbalah:
+        result['kabbalah'] = {
+            'primary_sefira': typologies.kabbalah.primary_sefira,
+            'secondary_sefira': typologies.kabbalah.secondary_sefira,
+            'path': typologies.kabbalah.path
+        }
+    
+    # Extract purpose quadrant typology if present
+    if hasattr(typologies, 'purpose_quadrant') and typologies.purpose_quadrant:
+        result['purpose_quadrant'] = {
+            'passion': typologies.purpose_quadrant.passion,
+            'expertise': typologies.purpose_quadrant.expertise,
+            'contribution': typologies.purpose_quadrant.contribution,
+            'sustainability': typologies.purpose_quadrant.sustainability
+        }
+    
+    # Extract any custom typologies
+    for name, typology in typologies.__dict__.items():
+        if name not in ['zodiac', 'kabbalah', 'purpose_quadrant'] and typology is not None:
+            custom_typology = {}
+            for key, value in typology.__dict__.items():
+                if value is not None:
+                    custom_typology[key] = value
+            
+            if custom_typology:  # Only add if not empty
+                result[name] = custom_typology
+    
+    return result
+
+
 def simulate_profile_once(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
     """
     Perform a single simulation of a TanzoLang profile
@@ -79,6 +139,7 @@ def simulate_profile_once(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
     """
     result = {}
     
+    # Simulate archetypes and their attributes
     for archetype in profile.profile.archetypes:
         archetype_name = archetype.name or archetype.type.value
         archetype_result = {}
@@ -88,6 +149,11 @@ def simulate_profile_once(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
             archetype_result[name] = value
         
         result[archetype_name] = archetype_result
+    
+    # Extract typologies (no simulation needed as they're not probabilistic)
+    typologies = extract_typologies(profile)
+    if typologies:
+        result['typologies'] = typologies
     
     return result
 
@@ -115,6 +181,11 @@ def simulate_profile(profile_path: str, iterations: int = 100) -> Dict[str, Any]
         "iterations": iterations,
         "archetypes": {}
     }
+    
+    # Add typologies if present (these don't need statistics as they're deterministic)
+    typologies = extract_typologies(profile)
+    if typologies:
+        summary["typologies"] = typologies
     
     # For each archetype
     for archetype in profile.profile.archetypes:

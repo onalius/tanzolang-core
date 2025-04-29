@@ -1,79 +1,56 @@
 version: "0.1.0"
-purpose_quadrant:
-  name: "Soul Compass"
-  description: "A framework for understanding and aligning core motivational energies"
+purpose_framework:
+  name: "SoulCompass"
+  display_name: "Soul Compass"
+  description: "A framework for aligning passion, expertise, contribution, and sustainability"
   
-  # The four key dimensions of purpose
   dimensions:
     - name: "passion"
-      key_question: "What do you love?"
-      description: "Activities, subjects, and experiences that bring joy and intrinsic motivation"
-      behavioral_indicators: ["Flow state", "Sustained enthusiasm", "Natural curiosity", "Sense of meaning"]
+      description: "What you love and what brings you joy"
+      guiding_question: "What activities or subjects energize you even when challenging?"
     
     - name: "expertise"
-      key_question: "What are you good at?"
-      description: "Skills, talents, and capabilities that represent areas of strength"
-      behavioral_indicators: ["Demonstrable competence", "Received recognition", "Ease of learning", "Consistent results"]
+      description: "What you are naturally skilled at or have developed proficiency in"
+      guiding_question: "What abilities come naturally to you or have you refined through practice?"
     
     - name: "contribution"
-      key_question: "What does the world need?"
-      description: "Services and contributions that address genuine needs and problems"
-      behavioral_indicators: ["Solves real problems", "Positive impact on others", "Addresses gaps", "Creates value"]
+      description: "What others need or what addresses gaps in the world"
+      guiding_question: "How can your unique perspective or abilities serve others?"
     
     - name: "sustainability"
-      key_question: "What sustains you?"
-      description: "Activities and contexts that provide resources and energy rather than depleting them"
-      behavioral_indicators: ["Resource generation", "Long-term viability", "Health and well-being", "Growth potential"]
+      description: "What provides ongoing support, energy, or resources for your work"
+      guiding_question: "What structure or resources enable your continued growth and service?"
   
-  # Dynamic intersections between dimensions
-  intersections:
+  intersection_points:
     - dimensions: ["passion", "expertise"]
-      label: "Mastery"
-      description: "Doing what you love and are good at leads to deep skill development and meaningful engagement"
+      name: "mastery"
+      description: "Activities you both love and excel at"
     
     - dimensions: ["expertise", "contribution"]
-      label: "Career"
-      description: "Using your talents to solve important problems leads to professional success and advancement"
+      name: "profession"
+      description: "Skills that meet external needs"
     
     - dimensions: ["contribution", "sustainability"]
-      label: "Vocation"
-      description: "Making meaningful contributions that can be sustained leads to a sense of calling"
+      name: "vocation"
+      description: "Service that creates ongoing value"
     
-    - dimensions: ["sustainability", "passion"]
-      label: "Fulfillment"
-      description: "Engaging with what you love in ways that replenish you leads to ongoing fulfillment"
+    - dimensions: ["passion", "sustainability"]
+      name: "mission"
+      description: "Joyful work that can be sustained over time"
+    
+    - dimensions: ["passion", "expertise", "contribution", "sustainability"]
+      name: "purpose"
+      description: "The centerpoint where all dimensions align"
   
-  # Center integration
-  center_integration:
-    name: "Aligned Purpose"
-    description: "The harmony that emerges when all four dimensions are aligned in a single pursuit"
-    manifestations: [
-      "Deep satisfaction and meaning",
-      "Sustainable impact over time",
-      "Natural growth and evolution",
-      "Resilience during challenges"
-    ]
-  
-  # Digital expression in AI personalities
-  digital_application:
-    strengths:
-      - "Helping identify meaningful patterns in user activities and interests"
-      - "Supporting goal alignment and prioritization"
-      - "Identifying potential burnout or misalignment early"
-      - "Facilitating purpose-driven decision making"
+  implementation_notes:
+    alignment_indicators:
+      - "Sense of flow and timelessness during activity"
+      - "Ability to persist through difficulties"
+      - "Natural curiosity and desire to improve"
+      - "Recognition from others regarding contribution value"
     
-    challenges:
-      - "Avoiding prescriptive or rigid interpretations"
-      - "Recognizing that dimensions may shift and evolve over time"
-      - "Balancing aspiration with practicality"
-    
-    ideal_implementations:
-      - "Career guidance and development systems"
-      - "Personal growth and reflection tools"
-      - "Team alignment and collaborative purpose-finding"
-      - "Life design and planning assistants"
-    
-    data_privacy_considerations:
-      - "Purpose data is deeply personal and should be handled with highest privacy protection"
-      - "Aggregation should anonymize individual passion and purpose patterns"
-      - "Users should maintain full control over their purpose exploration data"
+    misalignment_signs:
+      - "Persistent fatigue even with adequate rest"
+      - "Resistance to beginning work"
+      - "Feeling that work is meaningless despite external validation"
+      - "Gradual diminishment of skill or enthusiasm"

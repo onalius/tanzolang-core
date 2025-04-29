@@ -30,6 +30,92 @@ properties:
         minItems: 1
         items:
           $ref: '#/definitions/archetype'
+      # Optional parent archetypes
+      parent_archetypes:
+        type: array
+        description: The foundational archetypal patterns that form the personality's core
+        items:
+          $ref: '#/definitions/parent_archetype'
+      # Optional developmental narrative
+      development:
+        type: object
+        description: The formative journey that shaped the personality
+        properties:
+          nurturing_influences:
+            type: array
+            items:
+              type: object
+          formative_trials:
+            type: array
+            items:
+              type: object
+          integrated_scars:
+            type: array
+            items:
+              type: object
+      # Optional modular typology systems
+      typologies:
+        type: object
+        description: Optional typological systems that provide additional symbolic structure
+        properties:
+          zodiac:
+            type: object
+            description: Astrological archetypes and their traits
+            properties:
+              reference:
+                type: string
+                description: Path to the zodiac registry for validation
+              sun:
+                type: string
+                description: Primary zodiac sign representing core essence
+              moon:
+                type: string
+                description: Secondary zodiac sign representing emotional nature
+              rising:
+                type: string
+                description: Tertiary zodiac sign representing external presentation
+              description:
+                type: string
+                description: Summary of the combined astrological influence
+          kabbalah:
+            type: object
+            description: Mystical framework of divine emanations
+            properties:
+              reference:
+                type: string
+                description: Path to the kabbalah registry for validation
+              primary_sefira:
+                type: string
+                description: Primary sefira (emanation) association
+              secondary_sefira:
+                type: string
+                description: Secondary sefira association
+              path:
+                type: string
+                description: Path between sefirot that holds significance
+              description:
+                type: string
+                description: Explanation of the kabbalistic significance
+          purpose_quadrant:
+            type: object
+            description: Framework for aligning passion, expertise, contribution, and sustainability
+            properties:
+              reference:
+                type: string
+                description: Path to the purpose_quadrant registry for validation
+              passion:
+                type: string
+                description: What the entity loves or enjoys
+              expertise:
+                type: string
+                description: What the entity is skilled at or has mastered
+              contribution:
+                type: string
+                description: How the entity serves or meets external needs
+              sustainability:
+                type: string
+                description: What provides ongoing resources or energy
+        additionalProperties: true  # Allows for custom typology systems
 definitions:
   archetype:
     type: object
@@ -147,3 +233,23 @@ definitions:
           type: number
           minimum: 0
           maximum: 1
+  parent_archetype:
+    type: object
+    required:
+      - name
+      - influence
+    properties:
+      name:
+        type: string
+        description: The name of the parent archetype
+      influence:
+        type: number
+        description: The strength of influence (0-1)
+        minimum: 0
+        maximum: 1
+      reference:
+        type: string
+        description: Path to the canonical archetype definition in the registry
+      description:
+        type: string
+        description: Description of how this archetype influences the personality

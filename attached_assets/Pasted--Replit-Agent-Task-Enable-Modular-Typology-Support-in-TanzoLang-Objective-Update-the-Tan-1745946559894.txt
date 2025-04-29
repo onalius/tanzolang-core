@@ -1,0 +1,61 @@
+# 🧩 Replit Agent Task: Enable Modular Typology Support in TanzoLang
+
+## Objective
+Update the TanzoLang specification and schema system to support **modular, optional typologies**. This allows developers to selectively include symbolic systems (e.g., zodiac, kabbalah, purpose_quadrant) based on the intended use case, without enforcing unnecessary symbolic layers in all Tomo profiles.
+
+---
+
+## Motivation
+- Prevents symbolic overload in simple or domain-specific use cases
+- Enables pluggable symbolic systems
+- Keeps core profile structure flexible and interoperable
+
+---
+
+## Tasks
+
+### 1. Update `TANZOLANG.md`
+- [ ] Add a section titled `Modular Typology System`
+- [ ] Describe that each typology is:
+  - Optional
+  - Referenced by registry path
+  - Interpretable by CLI tools and validators only if present
+
+#### Example structure:
+```yaml
+typologies:
+  purpose_quadrant:
+    loves: "pattern recognition"
+    serves: "dialogue across boundaries"
+  zodiac:
+    sun: "Pisces"
+    moon: "Gemini"
+    rising: "Scorpio"
+  kabbalah:
+    sefirah: "Tiferet"
+```
+
+---
+
+### 2. Update Schema Validation
+- [ ] Ensure all typologies are treated as optional schema blocks
+- [ ] If a typology is present, validate its keys against the corresponding registry (e.g., `/registry/zodiac/`, `/registry/purpose_quadrant/`, etc.)
+- [ ] Include field descriptions to help contributors understand which registries to reference
+
+---
+
+### 3. CLI and Tooling Compatibility
+- [ ] Update `tanzo-cli validate` to:
+  - Accept profiles with any subset of typologies
+  - Warn if referenced registry keys are missing
+  - Do **not** require unused typologies
+
+---
+
+## Deliverables
+- Updated `TANZOLANG.md` specification with modular typology documentation
+- Adjusted schema validator to allow optional symbolic systems
+- Registry-referenced enforcement for each included typology
+
+**This change reinforces the symbolic integrity of each system while respecting developer choice and domain specificity.**
+
