@@ -155,7 +155,7 @@ def validate_profile(profile_path: Union[str, Path]) -> TanzoProfile:
     data = validate_file(profile_path)
     
     # Then convert to Pydantic model for stronger typing
-    profile = TanzoProfile.model_validate(data)
+    profile = TanzoProfile.parse_obj(data)
     
     # Check registry references (doesn't fail validation, just warns)
     registry_warnings = check_registry_references(profile)
