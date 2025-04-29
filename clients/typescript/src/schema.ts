@@ -1,136 +1,143 @@
 /**
- * Zod schema definitions for TanzoLang
+ * TanzoLang schema definitions using Zod
  */
+
 import { z } from 'zod';
 
-// Define the personality trait schema
-export const personalityTrait = z.object({
-  name: z.string().describe('Name of the personality trait'),
-  value: z.number()
-    .min(0)
-    .max(1)
-    .describe('Strength of the trait between 0 and 1'),
-  variance: z.number()
-    .min(0)
-    .max(1)
-    .describe('Variance of the trait value (for simulation)')
-    .optional(),
+// Define enums
+export const TraitTypeEnum = z.enum([
+  'numeric',
+  'categorical',
+  'boolean',
+  'range',
+  'distribution',
+]);
+
+export const DistributionTypeEnum = z.enum([
+  'normal',
+  'uniform',
+  'exponential',
+  'poisson',
+  'custom',
+]);
+
+// Define value types
+export const NumericValueSchema = z.number();
+export const CategoricalValueSchema = z.string();
+export const BooleanValueSchema = z.boolean();
+
+export const RangeValueSchema = z.object({
+  min: z.number(),
+  max: z.number(),
+  step: z.number().positive().optional(),
+}).refine(data => data.min < data.max, {
+  message: "Min must be less than max",
+  path: ["min", "max"]
 });
 
-export type PersonalityTraitType = z.infer<typeof personalityTrait>;
-
-// Define the personality schema
-export const personality = z.object({
-  traits: z.array(personalityTrait).describe('Personality traits'),
-  values: z.array(z.string())
-    .describe('Core values that guide the archetype\'s behavior')
-    .optional(),
-  background: z.string()
-    .describe('Backstory or origin of the archetype')
-    .optional(),
+export const DistributionParametersSchema = z.object({
+  mean: z.number().optional(),
+  std_dev: z.number().optional(),
+  min_val: z.number().optional(),
+  max_val: z.number().optional(),
+  rate: z.number().optional(),
+  lambda_val: z.number().optional(),
+  custom_params: z.record(z.string(), z.any()).optional(),
 });
 
-export type PersonalityType = z.infer<typeof personality>;
-
-// Define appearance schemas
-export const physicalAppearance = z.object({
-  height: z.string().optional(),
-  build: z.string().optional(),
-  age: z.number().optional(),
-  features: z.array(z.string()).optional(),
+export const DistributionBoundsSchema = z.object({
+  min: z.number().optional(),
+  max: z.number().optional(),
 });
 
-export type PhysicalAppearanceType = z.infer<typeof physicalAppearance>;
-
-export const digitalAppearance = z.object({
-  avatar: z.string()
-    .describe('Description of digital avatar')
-    .optional(),
-  style: z.string()
-    .describe('Visual style of digital representation')
-    .optional(),
+export const DistributionValueSchema = z.object({
+  distribution_type: DistributionTypeEnum,
+  parameters: DistributionParametersSchema,
+  bounds: DistributionBoundsSchema.optional(),
 });
 
-export type DigitalAppearanceType = z.infer<typeof digitalAppearance>;
-
-export const appearance = z.object({
-  physical: physicalAppearance.optional(),
-  digital: digitalAppearance.optional(),
+// Define trait schemas
+export const TraitBaseSchema = z.object({
+  type: TraitTypeEnum,
+  description: z.string().optional(),
+  tags: z.array(z.string()).optional(),
 });
 
-export type AppearanceType = z.infer<typeof appearance>;
-
-// Define behavior schemas
-export const behaviorPattern = z.object({
-  name: z.string().describe('Name of the behavior pattern'),
-  description: z.string().describe('Description of the behavior pattern'),
-  triggers: z.array(z.string())
-    .describe('Events that trigger this behavior')
-    .optional(),
-  probability: z.number()
-    .min(0)
-    .max(1)
-    .describe('Probability of exhibiting this behavior when triggered')
-    .optional(),
+export const NumericTraitSchema = TraitBaseSchema.extend({
+  type: z.literal(TraitTypeEnum.enum.numeric),
+  value: NumericValueSchema,
 });
 
-export type BehaviorPatternType = z.infer<typeof behaviorPattern>;
-
-export const behavior = z.object({
-  patterns: z.array(behaviorPattern).optional(),
-  reactions: z.record(z.string(), z.string())
-    .describe('How the archetype reacts to different stimuli')
-    .optional(),
+export const CategoricalTraitSchema = TraitBaseSchema.extend({
+  type: z.literal(TraitTypeEnum.enum.categorical),
+  value: CategoricalValueSchema,
 });
 
-export type BehaviorType = z.infer<typeof behavior>;
-
-// Define archetype schemas
-export const archetypeType = z.enum(['digital', 'physical', 'hybrid']);
-
-export type ArchetypeType = z.infer<typeof archetypeType>;
-
-export const archetypeAttributes = z.object({
-  personality: personality.describe('Personality attributes'),
-  appearance: appearance.optional().describe('Appearance attributes'),
-  capabilities: z.array(z.string())
-    .describe('Capabilities of the archetype')
-    .optional(),
-  behavior: behavior.optional().describe('Behavior attributes'),
+export const BooleanTraitSchema = TraitBaseSchema.extend({
+  type: z.literal(TraitTypeEnum.enum.boolean),
+  value: BooleanValueSchema,
 });
 
-export type ArchetypeAttributesType = z.infer<typeof archetypeAttributes>;
-
-export const archetype = z.object({
-  type: archetypeType.describe('The type of archetype'),
-  attributes: archetypeAttributes.describe('Attributes of the archetype'),
+export const RangeTraitSchema = TraitBaseSchema.extend({
+  type: z.literal(TraitTypeEnum.enum.range),
+  value: RangeValueSchema,
 });
 
-// Define profile schema
-export const profile = z.object({
-  name: z.string().describe('The name of the profile'),
-  description: z.string()
-    .describe('A description of the profile')
-    .optional(),
-  archetype: archetype.describe('The archetype definition'),
-  parameters: z.record(z.string(), z.any())
-    .describe('Custom parameters that affect the behavior of the profile')
-    .optional(),
-  metadata: z.record(z.string(), z.any())
-    .describe('Additional metadata about the profile')
-    .optional(),
+export const DistributionTraitSchema = TraitBaseSchema.extend({
+  type: z.literal(TraitTypeEnum.enum.distribution),
+  value: DistributionValueSchema,
 });
 
-export type ProfileType = z.infer<typeof profile>;
+// Union of all trait types
+export const TraitSchema = z.discriminatedUnion('type', [
+  NumericTraitSchema,
+  CategoricalTraitSchema,
+  BooleanTraitSchema,
+  RangeTraitSchema,
+  DistributionTraitSchema,
+]);
 
-// Define the top-level schema
-export const tanzoSchema = z.object({
-  version: z.string()
-    .describe('The version of the TanzoLang schema being used')
-    .refine(v => v === '0.1.0', {
-      message: "Only version '0.1.0' is currently supported",
-    }),
-  profile: profile.describe('The profile definition'),
+// Define archetype schema
+export const ArchetypeSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+  traits: z.record(z.string().regex(/^[a-zA-Z][a-zA-Z0-9_]*$/), TraitSchema),
+  parent: z.string().optional(),
 });
 
-export type TanzoSchemaType = z.infer<typeof tanzoSchema>;
+// Define profile info schema
+export const ProfileInfoSchema = z.object({
+  name: z.string(),
+  version: z.string().regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/),
+  description: z.string().optional(),
+  author: z.string().optional(),
+  created_at: z.string().datetime().optional(),
+});
+
+// Define full profile schema
+export const ProfileSchema = z.object({
+  profile: ProfileInfoSchema,
+  archetypes: z.array(ArchetypeSchema).min(1),
+  metadata: z.record(z.string(), z.any()).optional(),
+});
+
+// Create exported types from schemas
+export type TraitType = z.infer<typeof TraitTypeEnum>;
+export type DistributionType = z.infer<typeof DistributionTypeEnum>;
+export type NumericValue = z.infer<typeof NumericValueSchema>;
+export type CategoricalValue = z.infer<typeof CategoricalValueSchema>;
+export type BooleanValue = z.infer<typeof BooleanValueSchema>;
+export type RangeValue = z.infer<typeof RangeValueSchema>;
+export type DistributionParameters = z.infer<typeof DistributionParametersSchema>;
+export type DistributionBounds = z.infer<typeof DistributionBoundsSchema>;
+export type DistributionValue = z.infer<typeof DistributionValueSchema>;
+export type Trait = z.infer<typeof TraitSchema>;
+export type NumericTrait = z.infer<typeof NumericTraitSchema>;
+export type CategoricalTrait = z.infer<typeof CategoricalTraitSchema>;
+export type BooleanTrait = z.infer<typeof BooleanTraitSchema>;
+export type RangeTrait = z.infer<typeof RangeTraitSchema>;
+export type DistributionTrait = z.infer<typeof DistributionTraitSchema>;
+export type Archetype = z.infer<typeof ArchetypeSchema>;
+export type ProfileInfo = z.infer<typeof ProfileInfoSchema>;
+export type Profile = z.infer<typeof ProfileSchema>;

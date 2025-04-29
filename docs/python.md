@@ -1,6 +1,6 @@
 # Python SDK
 
-The Python SDK provides a Pydantic-based implementation of the TanzoLang schema, with utilities for validation, loading, exporting, and simulating profiles.
+The TanzoLang Python SDK provides a set of tools for working with TanzoLang profiles in Python applications.
 
 ## Installation
 

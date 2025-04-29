@@ -1,34 +1,42 @@
-version: "0.1.0"
-profile:
-  name: "Digital Personality"
-  description: "A purely digital identity focused on online interactions"
-  archetypes:
-    - type: "digital"
-      weight: 1.0
-      traits:
-        - name: "tech_proficiency"
-          value: 0.95
-          variance: 0.03
-          description: "Expert-level understanding of technology"
-        - name: "digital_creativity"
-          value: 0.85
-          variance: 0.05
-          description: "Ability to create digital content"
-        - name: "information_processing"
-          value: 0.90
-          variance: 0.04
-          description: "Speed and efficiency in processing information"
-        - name: "digital_ethics"
-          value: 0.75
-          variance: 0.1
-          description: "Adherence to ethical standards in digital spaces"
-      attributes:
-        digital_footprint: "Extensive"
-        preferred_medium: ["Text", "Code", "Visual"]
-        online_communities: ["Tech forums", "Open source projects", "Digital art collectives"]
-        privacy_stance: "Selective sharing with strong boundaries"
+metadata:
+  version: "0.1.0"
+  name: "Minimal Example"
+  description: "A minimal digital archetype example focusing only on required elements"
+  created_at: "2023-10-10T09:00:00Z"
+
+digital_archetype:
+  traits:
+    openness:
+      value: 65
+    conscientiousness:
+      value: 70
+    extraversion:
+      value: 45
+    agreeableness:
+      value: 60
+    neuroticism:
+      value: 40
   
-  metadata:
-    created_at: "2023-06-10"
-    purpose: "Demonstrate a pure digital archetype"
-    tags: ["AI", "digital", "virtual", "online"]
+  attributes:
+    cognitive_style:
+      analytical:
+        value: 75
+      creative:
+        value: 60
+    
+    communication_style:
+      direct:
+        value: 80
+      verbose:
+        value: 35
+    
+    interests:
+      - name: "Problem Solving"
+        level: 8
+      - name: "Data Analysis"
+        level: 7
+    
+    values:
+      - "Precision"
+      - "Clarity"
+      - "Efficiency"

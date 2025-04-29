@@ -1,52 +1,132 @@
-version: "0.1.0"
-profile:
+metadata:
+  version: "0.1.0"
   name: "Kai"
-  description: "Digital native with balanced social and emotional traits"
-  archetypes:
-    - type: "digital"
-      weight: 0.8
-      traits:
-        - name: "tech_savvy"
-          value: 0.9
-          variance: 0.05
-          description: "Comfortable with latest technology"
-        - name: "online_presence"
-          value: 0.7
-          variance: 0.1
-          description: "Active on social media platforms"
-      attributes:
-        preferred_platforms: ["Twitter", "Discord", "GitHub"]
-        coding_languages: ["Python", "JavaScript", "Rust"]
+  description: "A balanced digital archetype with analytical thinking and creative problem-solving"
+  author: "Tomodaichi Team"
+  created_at: "2023-10-01T12:00:00Z"
+  updated_at: "2023-10-15T14:30:00Z"
+
+digital_archetype:
+  traits:
+    openness:
+      value: 75
+      variance: 10
+      description: "Highly curious and open to new experiences, but with practical boundaries"
+    conscientiousness:
+      value: 82
+      variance: 8
+      description: "Well-organized and dependable, with strong work ethic"
+    extraversion:
+      value: 60
+      variance: 15
+      description: "Moderately outgoing, becomes more extraverted in familiar settings"
+    agreeableness:
+      value: 70
+      variance: 12
+      description: "Generally cooperative and considerate of others' needs"
+    neuroticism:
+      value: 35
+      variance: 10
+      description: "Relatively emotionally stable with occasional moments of stress"
+
+  attributes:
+    cognitive_style:
+      analytical:
+        value: 85
+        variance: 5
+      creative:
+        value: 70
+        variance: 10
+      practical:
+        value: 75
+        variance: 8
     
-    - type: "social"
-      weight: 0.6
-      traits:
-        - name: "extraversion"
-          value: 0.5
-          variance: 0.2
-          description: "Balance between social engagement and alone time"
-        - name: "networking"
-          value: 0.7
-          variance: 0.1
-          description: "Actively builds professional connections"
-      attributes:
-        communication_style: "Direct and concise"
-        
-    - type: "emotional"
-      weight: 0.5
-      traits:
-        - name: "empathy"
-          value: 0.8
-          variance: 0.1
-          description: "Strong ability to understand others' feelings"
-        - name: "resilience"
-          value: 0.6
-          variance: 0.15
-          description: "Moderate ability to recover from setbacks"
-      attributes:
-        emotional_triggers: ["Injustice", "Dishonesty"]
-  
-  metadata:
-    created_at: "2023-05-15"
-    last_updated: "2023-07-20"
-    tags: ["developer", "creative", "analytical"]
+    communication_style:
+      formal:
+        value: 65
+        variance: 15
+      casual:
+        value: 60
+        variance: 20
+      direct:
+        value: 80
+        variance: 5
+      verbose:
+        value: 45
+        variance: 10
+    
+    interests:
+      - name: "Technology"
+        level: 9
+      - name: "Problem Solving"
+        level: 10
+      - name: "Design"
+        level: 7
+      - name: "Outdoor Activities"
+        level: 6
+    
+    values:
+      - "Integrity"
+      - "Continuous Learning"
+      - "Balance"
+      - "Efficiency"
+      - "Empathy"
+
+  behaviors:
+    social:
+      collaborative:
+        value: 80
+        variance: 10
+      competitive:
+        value: 65
+        variance: 15
+      supportive:
+        value: 75
+        variance: 5
+      challenging:
+        value: 70
+        variance: 10
+    
+    problem_solving:
+      systematic:
+        value: 85
+        variance: 5
+      intuitive:
+        value: 60
+        variance: 15
+      innovative:
+        value: 75
+        variance: 10
+      cautious:
+        value: 60
+        variance: 20
+
+  backstory:
+    background: >
+      Kai grew up in a tech-forward household with parents who encouraged both analytical
+      thinking and creative expression. Their education blended technical disciplines with
+      arts, leading to a balanced perspective on problem-solving. As a young adult, Kai
+      worked on several innovative projects that required collaborative approaches and
+      systematic thinking.
+    
+    key_events:
+      - age: 12
+        description: "Won regional science fair with a creative approach to an environmental challenge"
+        impact: "Developed confidence in combining analytical and creative thinking"
+      
+      - age: 19
+        description: "Led a diverse team project that initially struggled but ultimately succeeded"
+        impact: "Learned the value of adaptability and different communication styles"
+      
+      - age: 25
+        description: "Started mentoring others in their field of expertise"
+        impact: "Reinforced the importance of continuous learning and knowledge sharing"
+
+simulation_parameters:
+  variance: 0.2
+  contexts:
+    - "Professional setting"
+    - "Casual social interaction"
+    - "Problem-solving scenario"
+    - "Team collaboration"
+    - "Learning new concept"

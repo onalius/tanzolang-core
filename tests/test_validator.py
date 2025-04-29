@@ -1,91 +1,110 @@
 """
-Tests for the validator module of the tanzo_schema package.
+Tests for the validator module of the Python SDK.
 """
 
 import os
-import pytest
 from pathlib import Path
-
-from clients.python.tanzo_schema import validate_document
-from clients.python.tanzo_schema.validator import load_schema, load_document
-
-
-def test_load_schema():
-    """Test loading the schema."""
-    schema = load_schema()
-    assert isinstance(schema, dict)
-    assert "$schema" in schema
-    assert "properties" in schema
-    assert "profile" in schema["properties"]
+import pytest
+import yaml
+from clients.python.tanzo_schema import SchemaValidator, ValidationResult
+from clients.python.tanzo_schema.models import Profile
 
 
-def test_load_document_yaml(example_file_path):
-    """Test loading a YAML document."""
-    document = load_document(example_file_path)
-    assert isinstance(document, dict)
-    assert "profile" in document
-    assert "version" in document
+class TestValidator:
+    """Tests for the SchemaValidator class."""
 
+    def test_validate_valid_json(self, schema_validator, example_profile_path):
+        """Test validating valid JSON data."""
+        with open(example_profile_path, 'r') as f:
+            profile = yaml.safe_load(f)
+        
+        result = schema_validator.validate_json(profile)
+        assert isinstance(result, ValidationResult)
+        assert result.is_valid
+        assert not result.errors
 
-def test_load_document_json(example_json_path):
-    """Test loading a JSON document."""
-    document = load_document(example_json_path)
-    assert isinstance(document, dict)
-    assert "profile" in document
-    assert "version" in document
-
-
-def test_load_document_nonexistent_file():
-    """Test loading a nonexistent file."""
-    with pytest.raises(FileNotFoundError):
-        load_document("nonexistent.yaml")
-
-
-def test_load_document_invalid_yaml(invalid_yaml_path):
-    """Test loading an invalid YAML document."""
-    with pytest.raises(ValueError):
-        load_document(invalid_yaml_path)
-
-
-def test_validate_document_valid(example_file_path):
-    """Test validating a valid document."""
-    errors = validate_document(example_file_path)
-    assert errors == []
-
-
-def test_validate_document_invalid(invalid_schema_path):
-    """Test validating an invalid document."""
-    errors = validate_document(invalid_schema_path)
-    assert len(errors) > 0
-
-
-def test_validate_document_dict():
-    """Test validating a document provided as a dictionary."""
-    document = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Test Profile",
-            "archetypes": [
-                {
-                    "type": "digital",
-                    "weight": 0.8
-                }
-            ]
+    def test_validate_invalid_json(self, schema_validator):
+        """Test validating invalid JSON data."""
+        invalid_profile = {
+            "profile": {
+                "name": "Invalid Profile"
+                # Missing required version field
+            },
+            "archetypes": []  # Empty array, requires at least one item
         }
-    }
-    errors = validate_document(document)
-    assert errors == []
+        
+        result = schema_validator.validate_json(invalid_profile)
+        assert isinstance(result, ValidationResult)
+        assert not result.is_valid
+        assert len(result.errors) > 0
+
+    def test_validate_valid_yaml(self, schema_validator, example_profile_path):
+        """Test validating valid YAML data."""
+        with open(example_profile_path, 'r') as f:
+            yaml_string = f.read()
+        
+        result = schema_validator.validate_yaml(yaml_string)
+        assert isinstance(result, ValidationResult)
+        assert result.is_valid
+        assert not result.errors
+
+    def test_validate_invalid_yaml(self, schema_validator):
+        """Test validating invalid YAML data."""
+        invalid_yaml = """
+        profile:
+          name: Invalid Profile
+          # Missing required version field
+        archetypes: []  # Empty array, requires at least one item
+        """
+        
+        result = schema_validator.validate_yaml(invalid_yaml)
+        assert isinstance(result, ValidationResult)
+        assert not result.is_valid
+        assert len(result.errors) > 0
+
+    def test_validate_valid_file(self, schema_validator, example_profile_path):
+        """Test validating a valid file."""
+        result = schema_validator.validate_file(example_profile_path)
+        assert isinstance(result, ValidationResult)
+        assert result.is_valid
+        assert not result.errors
+
+    def test_validate_nonexistent_file(self, schema_validator):
+        """Test validating a nonexistent file."""
+        result = schema_validator.validate_file("nonexistent.yaml")
+        assert isinstance(result, ValidationResult)
+        assert not result.is_valid
+        assert "not found" in result.errors[0]
+
+    def test_validate_pydantic(self, schema_validator, example_profile_path):
+        """Test validating using Pydantic models."""
+        with open(example_profile_path, 'r') as f:
+            profile = yaml.safe_load(f)
+        
+        result = schema_validator.validate_pydantic(profile)
+        assert isinstance(result, ValidationResult)
+        assert result.is_valid
+        assert not result.errors
+
+    def test_bool_conversion(self):
+        """Test that ValidationResult can be used in boolean context."""
+        valid_result = ValidationResult(True)
+        invalid_result = ValidationResult(False, ["Error"])
+        
+        assert bool(valid_result) is True
+        assert bool(invalid_result) is False
+        
+        # Test in if statements
+        if valid_result:
+            pass  # This should execute
+        else:
+            pytest.fail("Valid result evaluated as False")
+        
+        if not invalid_result:
+            pass  # This should execute
+        else:
+            pytest.fail("Invalid result evaluated as True")
 
 
-def test_validate_document_missing_required():
-    """Test validating a document with missing required fields."""
-    document = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Test Profile",
-            "archetypes": []
-        }
-    }
-    errors = validate_document(document)
-    assert len(errors) > 0
-    assert any("archetypes" in error for error in errors)
+if __name__ == "__main__":
+    pytest.main(["-xvs", __file__])

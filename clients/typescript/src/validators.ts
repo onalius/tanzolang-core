@@ -1,72 +1,71 @@
 /**
- * Validation utilities for TanzoLang profiles
+ * Validation utilities for TanzoLang schema.
  */
-import { z } from 'zod';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
-import { TanzoProfileSchema, TanzoProfile } from './schema';
+
+import { readFileSync } from 'fs';
+import { parse } from 'yaml';
+import { TanzoProfile, TanzoProfileSchema } from './models';
 
 /**
- * Validate a TanzoLang profile against the schema
+ * Validate a profile object against the TanzoLang schema.
  * 
- * @param profileData - Either a JSON/YAML string or an object containing the profile data
- * @returns A validated profile object
- * @throws Error if validation fails
+ * @param profile Profile object to validate
+ * @returns The validated profile
+ * @throws If validation fails
  */
-export function validateTanzoProfile(profileData: string | object): TanzoProfile {
-  try {
-    // Convert string to object if needed
-    let profileObj: object;
-    
-    if (typeof profileData === 'string') {
-      try {
-        // Try JSON first
-        profileObj = JSON.parse(profileData);
-      } catch (jsonError) {
-        // Try YAML next
-        try {
-          profileObj = yaml.load(profileData) as object;
-          if (typeof profileObj !== 'object' || profileObj === null) {
-            throw new Error('Invalid YAML: did not result in an object');
-          }
-        } catch (yamlError) {
-          throw new Error(`Invalid profile format (not valid JSON or YAML): ${yamlError}`);
-        }
-      }
-    } else {
-      profileObj = profileData;
-    }
-    
-    // Validate using Zod
-    const result = TanzoProfileSchema.parse(profileObj);
-    return result;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const issues = error.issues.map(issue => 
-        `${issue.path.join('.')}: ${issue.message}`
-      ).join('\n');
-      throw new Error(`Profile validation failed:\n${issues}`);
-    }
-    throw error;
-  }
-}
+export const validateProfile = (profile: TanzoProfile): TanzoProfile => {
+  return TanzoProfileSchema.parse(profile);
+};
 
 /**
- * Load and validate a TanzoLang profile from a YAML file
+ * Load a profile from a YAML or JSON file.
  * 
- * @param yamlPath - Path to the YAML file
- * @returns A validated profile object
- * @throws Error if the file cannot be found or validation fails
+ * @param filePath Path to YAML or JSON file
+ * @returns Validated TanzoProfile object
+ * @throws If the file format is not supported or validation fails
  */
-export function loadProfileFromYaml(yamlPath: string): TanzoProfile {
-  try {
-    const yamlContent = fs.readFileSync(yamlPath, 'utf8');
-    return validateTanzoProfile(yamlContent);
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-      throw new Error(`Profile file not found: ${yamlPath}`);
-    }
-    throw error;
+export const loadProfile = (filePath: string): TanzoProfile => {
+  const content = readFileSync(filePath, 'utf-8');
+  
+  let data: any;
+  if (filePath.endsWith('.json')) {
+    data = JSON.parse(content);
+  } else if (filePath.endsWith('.yml') || filePath.endsWith('.yaml')) {
+    data = parse(content);
+  } else {
+    throw new Error(`Unsupported file format: ${filePath}`);
   }
-}
+  
+  return validateProfile(data);
+};
+
+/**
+ * Save a profile to a YAML file.
+ * 
+ * @param profile TanzoProfile object
+ * @param filePath Output file path
+ */
+export const saveProfileToYaml = (profile: TanzoProfile, filePath: string): void => {
+  const yaml = require('yaml');
+  const fs = require('fs');
+  
+  const validated = validateProfile(profile);
+  const yamlStr = yaml.stringify(validated);
+  
+  fs.writeFileSync(filePath, yamlStr, 'utf-8');
+};
+
+/**
+ * Save a profile to a JSON file.
+ * 
+ * @param profile TanzoProfile object
+ * @param filePath Output file path
+ */
+export const saveProfileToJson = (profile: TanzoProfile, filePath: string): void => {
+  const fs = require('fs');
+  
+  const validated = validateProfile(profile);
+  const jsonStr = JSON.stringify(validated, null, 2);
+  
+  fs.writeFileSync(filePath, jsonStr, 'utf-8');
+};

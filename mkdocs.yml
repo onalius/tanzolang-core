@@ -1,6 +1,6 @@
-site_name: TanzoLang Core
-site_description: Documentation for the TanzoLang Core project
-site_author: Onalius Team
+site_name: TanzoLang Documentation
+site_description: Documentation for the TanzoLang schema and tooling
+site_author: Tomodaichi Tanzo Team
 site_url: https://onalius.github.io/tanzo-lang-core/
 
 repo_name: onalius/tanzo-lang-core
@@ -18,27 +18,27 @@ theme:
     - navigation.expand
     - navigation.indexes
     - content.code.annotate
-    - content.tabs.link
+    - content.code.copy
 
 markdown_extensions:
   - admonition
-  - codehilite
+  - pymdownx.details
+  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
-  - toc:
-      permalink: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
 
 nav:
   - Home: index.md
-  - Getting Started: getting-started.md
-  - Schema: schema.md
-  - CLI Tool: cli.md
-  - SDKs:
-    - Python SDK: python-sdk.md
-    - TypeScript SDK: typescript-sdk.md
+  - Schema Reference: schema.md
+  - CLI Tools: cli.md
+  - GitHub: https://github.com/onalius/tanzo-lang-core
 
-plugins:
-  - search
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/onalius/tanzo-lang-core

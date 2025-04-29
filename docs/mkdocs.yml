@@ -1,11 +1,8 @@
 site_name: TanzoLang Documentation
-site_description: Documentation for the TanzoLang schema specification
-site_author: Onalius
+site_description: Documentation for the TanzoLang schema specification and tools
 site_url: https://onalius.github.io/tanzo-lang-core/
-
-repo_name: onalius/tanzo-lang-core
 repo_url: https://github.com/onalius/tanzo-lang-core
-edit_uri: edit/main/docs/
+repo_name: onalius/tanzo-lang-core
 
 theme:
   name: material
@@ -17,19 +14,22 @@ theme:
     - navigation.tracking
     - navigation.expand
     - navigation.indexes
-    - navigation.top
-    - search.highlight
-    - search.share
+    - content.code.annotate
     - content.code.copy
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
 
 markdown_extensions:
   - admonition
-  - codehilite
+  - pymdownx.details
+  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
   - tables
@@ -40,31 +40,16 @@ nav:
   - Home: index.md
   - Schema:
     - Overview: schema.md
-    - Examples: schema/examples.md
-  - CLI: cli.md
-  - Client SDKs:
-    - Overview: clients.md
-    - Python SDK: clients/python.md
-    - TypeScript SDK: clients/typescript.md
+    - Examples: schema-examples.md
+  - CLI:
+    - Overview: cli.md
+    - Commands: cli-commands.md
+  - SDKs:
+    - Python: python-sdk.md
+    - TypeScript: typescript-sdk.md
   - Contributing: contributing.md
-
-plugins:
-  - search
-  - mkdocstrings:
-      default_handler: python
-      handlers:
-        python:
-          selection:
-            docstring_style: google
-          rendering:
-            show_source: true
-      watch:
-        - clients/python/tanzo_schema/
-        - cli/
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/onalius/tanzo-lang-core
-    - icon: fontawesome/brands/python
-      link: https://pypi.org/project/tanzo-schema/

@@ -1,113 +1,111 @@
 """
-Exporter module for TanzoLang documents.
+Exporter module for TanzoLang profiles.
 
-This module provides functions to export TanzoLang documents to various formats,
+This module provides functions to export TanzoLang profiles in various formats,
 including a shorthand string representation.
 """
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-import yaml
-
-from tanzo_schema.models import TanzoDocument
-from tanzo_schema.validator import validate_and_parse
+from tanzo_schema.validator import load_profile
 
 
-def export_to_json(
-    document: Union[str, Path, Dict[str, Any], TanzoDocument],
-    pretty: bool = True
-) -> str:
+def _get_trait_shorthand(trait_data: Dict[str, Any]) -> str:
     """
-    Export a TanzoLang document to JSON.
+    Convert a trait to shorthand notation.
     
     Args:
-        document: The document to export. Can be a file path, a dictionary,
-                 or a TanzoDocument instance.
-        pretty: Whether to pretty-print the JSON.
-    
-    Returns:
-        A JSON string representation of the document.
-    """
-    # Parse the document if needed
-    if not isinstance(document, TanzoDocument):
-        document = validate_and_parse(document)
-    
-    # Convert to dictionary
-    doc_dict = document.model_dump(exclude_none=True)
-    
-    # Convert to JSON
-    indent = 2 if pretty else None
-    return json.dumps(doc_dict, indent=indent)
-
-
-def export_to_yaml(
-    document: Union[str, Path, Dict[str, Any], TanzoDocument]
-) -> str:
-    """
-    Export a TanzoLang document to YAML.
-    
-    Args:
-        document: The document to export. Can be a file path, a dictionary,
-                 or a TanzoDocument instance.
-    
-    Returns:
-        A YAML string representation of the document.
-    """
-    # Parse the document if needed
-    if not isinstance(document, TanzoDocument):
-        document = validate_and_parse(document)
-    
-    # Convert to dictionary
-    doc_dict = document.model_dump(exclude_none=True)
-    
-    # Convert to YAML
-    return yaml.dump(doc_dict, sort_keys=False)
-
-
-def export_shorthand(
-    document: Union[str, Path, Dict[str, Any], TanzoDocument]
-) -> str:
-    """
-    Export a TanzoLang document to a shorthand string representation.
-    
-    The shorthand format is a concise representation of the profile, including
-    the profile name and key archetype and trait information.
-    
-    Args:
-        document: The document to export. Can be a file path, a dictionary,
-                 or a TanzoDocument instance.
-    
-    Returns:
-        A shorthand string representation of the document.
-    """
-    # Parse the document if needed
-    if not isinstance(document, TanzoDocument):
-        document = validate_and_parse(document)
-    
-    profile = document.profile
-    
-    # Start with the profile name
-    parts = [f"{profile.name}"]
-    
-    # Add archetypes
-    archetype_parts = []
-    for archetype in profile.archetypes:
-        a_part = f"{archetype.type[:3]}:{archetype.weight:.1f}"
+        trait_data (Dict[str, Any]): The trait data.
         
-        # Add traits if available
-        if archetype.traits:
-            trait_parts = []
-            for trait in archetype.traits:
-                t_part = f"{trait.name}:{trait.value:.1f}"
-                trait_parts.append(t_part)
-            
-            if trait_parts:
-                a_part += f"({','.join(trait_parts)})"
+    Returns:
+        str: Shorthand notation for the trait.
+    """
+    value = trait_data.get("value", 50)
+    variance = trait_data.get("variance")
+    
+    if variance is not None:
+        return f"{value}±{variance}"
+    else:
+        return str(value)
+
+
+def _get_trait_summary(
+    traits: Dict[str, Dict[str, Any]]
+) -> str:
+    """
+    Generate a trait summary string.
+    
+    Args:
+        traits (Dict[str, Dict[str, Any]]): Dictionary of traits.
         
-        archetype_parts.append(a_part)
+    Returns:
+        str: Trait summary string.
+    """
+    trait_codes = {
+        "openness": "O",
+        "conscientiousness": "C",
+        "extraversion": "E",
+        "agreeableness": "A",
+        "neuroticism": "N"
+    }
     
-    parts.append("|".join(archetype_parts))
+    parts = []
+    for trait_name, trait_code in trait_codes.items():
+        if trait_name in traits:
+            trait_data = traits[trait_name]
+            shorthand = _get_trait_shorthand(trait_data)
+            parts.append(f"{trait_code}:{shorthand}")
     
-    return " - ".join(parts)
+    return " ".join(parts)
+
+
+def generate_shorthand(profile_data: Dict[str, Any]) -> str:
+    """
+    Generate a shorthand string representation of a profile.
+    
+    Args:
+        profile_data (Dict[str, Any]): The profile data.
+        
+    Returns:
+        str: Shorthand representation.
+    """
+    # Extract profile name
+    name = profile_data.get("metadata", {}).get("name", "Unnamed")
+    
+    # Extract traits
+    traits = profile_data.get("digital_archetype", {}).get("traits", {})
+    trait_summary = _get_trait_summary(traits)
+    
+    # Combine into shorthand
+    return f"{name} [{trait_summary}]"
+
+
+def export_profile(
+    profile_path: Union[str, Path], 
+    output_format: str = "shorthand"
+) -> Union[str, Dict[str, Any]]:
+    """
+    Export a profile in the specified format.
+    
+    Args:
+        profile_path (Union[str, Path]): Path to the profile file.
+        output_format (str, optional): Output format - "shorthand", "json", or "dict". Defaults to "shorthand".
+        
+    Returns:
+        Union[str, Dict[str, Any]]: Exported profile in requested format.
+        
+    Raises:
+        ValueError: If the file format is not supported or output_format is invalid.
+    """
+    profile_data = load_profile(profile_path)
+    
+    if output_format == "shorthand":
+        return generate_shorthand(profile_data)
+    elif output_format == "json":
+        return json.dumps(profile_data, indent=2)
+    elif output_format == "dict":
+        return profile_data
+    else:
+        raise ValueError(f"Unsupported output format: {output_format}")

@@ -1,31 +1,20 @@
 """
-TanzoLang Python SDK - Schema validation and utilities for TanzoLang profiles.
+Tanzo Schema Python SDK for working with TanzoLang digital archetypes.
 
-This package provides tools for working with TanzoLang profiles including:
-- Pydantic models for type-safe access to profile data
-- Validation against the official TanzoLang JSON Schema
-- Simulation utilities for Monte Carlo trials
-- Export functionality for serialization
+This library provides Python models and utilities for validating, simulating,
+and exporting TanzoLang schema definitions.
 """
 
-__version__ = "0.1.0"
-
 from tanzo_schema.models import (
-    Archetype, 
-    Profile, 
-    Trait, 
-    TanzoDocument
+    DigitalArchetype,
+    Metadata,
+    SimulationParameters,
+    TanzoProfile,
+    Trait,
+    Attribute,
 )
-from tanzo_schema.validator import validate_document
-from tanzo_schema.simulator import run_simulation
-from tanzo_schema.exporter import export_shorthand
+from tanzo_schema.validator import validate_profile
+from tanzo_schema.simulator import simulate_profile
+from tanzo_schema.exporter import export_profile
 
-__all__ = [
-    "Archetype", 
-    "Profile", 
-    "Trait", 
-    "TanzoDocument",
-    "validate_document",
-    "run_simulation",
-    "export_shorthand",
-]
+__version__ = "0.1.0"

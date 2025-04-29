@@ -1,106 +1,267 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/onalius/tanzo-lang-core/spec/tanzo-schema.json",
+  "$id": "https://github.com/onalius/tanzo-lang-core/blob/main/spec/tanzo-schema.json",
   "title": "TanzoLang Schema",
-  "description": "Schema specification for Tomodaichi Tanzo ecosystem profiles",
+  "description": "Schema for Tomodaichi Tanzo digital archetype definition language",
   "type": "object",
-  "required": ["profile", "version"],
+  "required": ["metadata", "digital_archetype"],
   "properties": {
-    "version": {
-      "type": "string",
-      "description": "The version of the TanzoLang schema",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "default": "0.1.0"
-    },
-    "profile": {
+    "metadata": {
       "type": "object",
-      "required": ["name", "archetypes"],
+      "required": ["version", "name"],
       "properties": {
+        "version": {
+          "type": "string",
+          "description": "Schema version",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
         "name": {
           "type": "string",
-          "description": "The name of the profile"
+          "description": "Profile name"
         },
         "description": {
           "type": "string",
-          "description": "A description of the profile"
+          "description": "Optional profile description"
         },
-        "archetypes": {
-          "type": "array",
-          "description": "The archetypes defining this profile",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/archetype"
+        "author": {
+          "type": "string",
+          "description": "Optional author information"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp in ISO 8601 format"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp in ISO 8601 format"
+        }
+      }
+    },
+    "digital_archetype": {
+      "type": "object",
+      "required": ["traits", "attributes"],
+      "properties": {
+        "traits": {
+          "type": "object",
+          "description": "Core personality traits on a scale of 0-100",
+          "required": ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"],
+          "properties": {
+            "openness": {
+              "$ref": "#/definitions/trait"
+            },
+            "conscientiousness": {
+              "$ref": "#/definitions/trait"
+            },
+            "extraversion": {
+              "$ref": "#/definitions/trait"
+            },
+            "agreeableness": {
+              "$ref": "#/definitions/trait"
+            },
+            "neuroticism": {
+              "$ref": "#/definitions/trait"
+            }
           }
         },
-        "metadata": {
+        "attributes": {
           "type": "object",
-          "description": "Additional metadata for the profile",
-          "additionalProperties": true
+          "description": "Character attributes and preferences",
+          "properties": {
+            "cognitive_style": {
+              "type": "object",
+              "properties": {
+                "analytical": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "creative": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "practical": {
+                  "$ref": "#/definitions/attribute"
+                }
+              }
+            },
+            "communication_style": {
+              "type": "object",
+              "properties": {
+                "formal": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "casual": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "direct": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "verbose": {
+                  "$ref": "#/definitions/attribute"
+                }
+              }
+            },
+            "interests": {
+              "type": "array",
+              "description": "Topics of interest",
+              "items": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "description": "Interest level from 1-10"
+                  }
+                }
+              }
+            },
+            "values": {
+              "type": "array",
+              "description": "Core values and beliefs",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "behaviors": {
+          "type": "object",
+          "description": "Behavioral tendencies",
+          "properties": {
+            "social": {
+              "type": "object",
+              "properties": {
+                "collaborative": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "competitive": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "supportive": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "challenging": {
+                  "$ref": "#/definitions/attribute"
+                }
+              }
+            },
+            "problem_solving": {
+              "type": "object",
+              "properties": {
+                "systematic": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "intuitive": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "innovative": {
+                  "$ref": "#/definitions/attribute"
+                },
+                "cautious": {
+                  "$ref": "#/definitions/attribute"
+                }
+              }
+            }
+          }
+        },
+        "backstory": {
+          "type": "object",
+          "description": "Character background information",
+          "properties": {
+            "background": {
+              "type": "string",
+              "description": "Backstory narrative"
+            },
+            "key_events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "age": {
+                    "type": "integer",
+                    "description": "Age when event occurred"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Event description"
+                  },
+                  "impact": {
+                    "type": "string",
+                    "description": "How event shaped character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "simulation_parameters": {
+      "type": "object",
+      "description": "Parameters for Monte-Carlo simulation",
+      "properties": {
+        "variance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Variance factor for trait simulation (0-1)"
+        },
+        "contexts": {
+          "type": "array",
+          "description": "Specific contexts to simulate behavior in",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }
   },
   "definitions": {
-    "archetype": {
-      "type": "object",
-      "required": ["type", "weight"],
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "The type of the archetype",
-          "enum": ["digital", "physical", "social", "emotional", "cognitive"]
-        },
-        "weight": {
-          "type": "number",
-          "description": "The weight of this archetype in the profile (0.0-1.0)",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "traits": {
-          "type": "array",
-          "description": "Traits associated with this archetype",
-          "items": {
-            "$ref": "#/definitions/trait"
-          }
-        },
-        "attributes": {
-          "type": "object",
-          "description": "Specific attributes for this archetype",
-          "additionalProperties": {
-            "oneOf": [
-              {"type": "string"},
-              {"type": "number"},
-              {"type": "boolean"},
-              {"type": "object"}
-            ]
-          }
-        }
-      }
-    },
     "trait": {
       "type": "object",
-      "required": ["name", "value"],
+      "required": ["value"],
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the trait"
-        },
         "value": {
-          "type": "number",
-          "description": "The value of the trait (0.0-1.0)",
+          "type": "integer",
           "minimum": 0,
-          "maximum": 1
+          "maximum": 100,
+          "description": "Trait value on scale of 0-100"
         },
         "variance": {
-          "type": "number",
-          "description": "The variance of the trait for simulation (0.0-1.0)",
+          "type": "integer",
           "minimum": 0,
-          "maximum": 1,
-          "default": 0.1
+          "maximum": 50,
+          "description": "Optional variance for simulation (0-50)"
         },
         "description": {
           "type": "string",
-          "description": "A description of the trait"
+          "description": "Optional custom description of trait expression"
+        }
+      }
+    },
+    "attribute": {
+      "type": "object",
+      "required": ["value"],
+      "properties": {
+        "value": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Attribute value on scale of 0-100"
+        },
+        "variance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50,
+          "description": "Optional variance for simulation (0-50)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes about attribute expression"
         }
       }
     }
