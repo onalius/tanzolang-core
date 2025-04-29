@@ -5,8 +5,19 @@
 [![PyPI version](https://badge.fury.io/py/tanzo-schema.svg)](https://badge.fury.io/py/tanzo-schema)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://onalius.github.io/tanzo-lang-core/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](https://github.com/onalius/tanzo-lang-core/blob/main/CONTRIBUTING.md)
 
-TanzoLang is the open schema specification for defining digital archetypes and their attributes in the Tomodaichi Tanzo ecosystem.
+**TanzoLang is an open-source language for giving soul to AI.**
+
+TanzoLang provides a structured framework for encoding AI personality blueprints using archetypal and typological systems. It enables symbolic, archetypal personality definition across platforms, allowing for the creation of rich, nuanced AI personas with depth and meaning.
+
+Visit [TomoTanzo.com](https://tomotanzo.com) for the official UI and marketplace for AI personas.
+
+## 📚 Documentation
+
+- [TANZOLANG.md](./TANZOLANG.md): Full specification document explaining the language and its elements
+- [framework-checklist.md](./framework-checklist.md): Implementation roadmap for the framework
+- [Registry of Archetypes](./registry/archetypes/): Canonical archetype definitions
 
 ## 🌟 Features
 

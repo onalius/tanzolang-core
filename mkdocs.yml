@@ -36,10 +36,13 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Philosophy & Purpose: philosophy.md
   - Schema: schema.md
   - Python SDK: python-sdk.md
   - TypeScript SDK: typescript-sdk.md
   - CLI: cli.md
+  - Examples: examples.md
+  - Ethics: ethics.md
   - GitHub: https://github.com/onalius/tanzo-lang-core
 
 plugins:
