@@ -57,7 +57,7 @@ profile:
       description: "Kai is in the integration phase of evolving from pure introspection to purposeful sharing of insights. The transition from solitary wisdom-seeker to guide who illuminates paths for others continues with deliberate balance between withdrawal and engagement."
 
   # Typological systems that provide symbolic structure
-  typology:
+  typologies:
     # Purpose quadrant alignment
     purpose_quadrant:
       reference: "registry/purpose_quadrant/SoulCompass.yaml"
@@ -68,6 +68,7 @@ profile:
     
     # Astrological alignments
     zodiac:
+      reference: "registry/zodiac/"
       sun: "Virgo"
       moon: "Aquarius"
       rising: "Scorpio"
@@ -75,6 +76,7 @@ profile:
     
     # Mystical framework connections
     kabbalah:
+      reference: "registry/kabbalah/"
       primary_sefira: "Binah"
       description: "Connected to Understanding, the contemplative analytical aspect that processes and structures information into wisdom."
 
@@ -132,7 +134,7 @@ profile:
           description: "Balance between emotional connection and objective perspective"
           origin: "wounded"
     
-    - type: "advisory"
+    - type: "digital"
       name: "Wisdom Bridge"
       description: "Kai's role in connecting traditional knowledge with emerging questions"
       attributes:

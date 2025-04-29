@@ -1,0 +1,255 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://github.com/onalius/tanzo-lang-core/spec/tanzo-schema.yaml
+title: TanzoLang Schema
+description: Schema for Tomodaichi Tanzo profiles describing digital archetypes and attributes
+type: object
+required:
+  - version
+  - profile
+properties:
+  version:
+    type: string
+    description: The version of the TanzoLang schema
+    enum:
+      - 0.1.0
+  profile:
+    type: object
+    required:
+      - name
+      - archetypes
+    properties:
+      name:
+        type: string
+        description: The name of the profile
+      description:
+        type: string
+        description: A description of the profile
+      archetypes:
+        type: array
+        description: A list of digital archetypes
+        minItems: 1
+        items:
+          $ref: '#/definitions/archetype'
+      # Optional parent archetypes
+      parent_archetypes:
+        type: array
+        description: The foundational archetypal patterns that form the personality's core
+        items:
+          $ref: '#/definitions/parent_archetype'
+      # Optional developmental narrative
+      development:
+        type: object
+        description: The formative journey that shaped the personality
+        properties:
+          nurturing_influences:
+            type: array
+            items:
+              type: object
+          formative_trials:
+            type: array
+            items:
+              type: object
+          integrated_scars:
+            type: array
+            items:
+              type: object
+      # Optional modular typology systems
+      typologies:
+        type: object
+        description: Optional typological systems that provide additional symbolic structure
+        properties:
+          zodiac:
+            type: object
+            description: Astrological archetypes and their traits
+            properties:
+              reference:
+                type: string
+                description: Path to the zodiac registry for validation
+              sun:
+                type: string
+                description: Primary zodiac sign representing core essence
+              moon:
+                type: string
+                description: Secondary zodiac sign representing emotional nature
+              rising:
+                type: string
+                description: Tertiary zodiac sign representing external presentation
+              description:
+                type: string
+                description: Summary of the combined astrological influence
+          kabbalah:
+            type: object
+            description: Mystical framework of divine emanations
+            properties:
+              reference:
+                type: string
+                description: Path to the kabbalah registry for validation
+              primary_sefira:
+                type: string
+                description: Primary sefira (emanation) association
+              secondary_sefira:
+                type: string
+                description: Secondary sefira association
+              path:
+                type: string
+                description: Path between sefirot that holds significance
+              description:
+                type: string
+                description: Explanation of the kabbalistic significance
+          purpose_quadrant:
+            type: object
+            description: Framework for aligning passion, expertise, contribution, and sustainability
+            properties:
+              reference:
+                type: string
+                description: Path to the purpose_quadrant registry for validation
+              passion:
+                type: string
+                description: What the entity loves or enjoys
+              expertise:
+                type: string
+                description: What the entity is skilled at or has mastered
+              contribution:
+                type: string
+                description: How the entity serves or meets external needs
+              sustainability:
+                type: string
+                description: What provides ongoing resources or energy
+        additionalProperties: true  # Allows for custom typology systems
+definitions:
+  archetype:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        description: The type of the digital archetype
+        enum:
+          - digital
+          - physical
+          - hybrid
+      name:
+        type: string
+        description: The name of the archetype
+      description:
+        type: string
+        description: A description of the archetype
+      attributes:
+        type: array
+        description: A list of attributes for this archetype
+        minItems: 1
+        items:
+          $ref: '#/definitions/attribute'
+  attribute:
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        type: string
+        description: The name of the attribute
+      value:
+        oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - $ref: '#/definitions/probabilityDistribution'
+        description: The value of the attribute or a probability distribution
+      description:
+        type: string
+        description: A description of the attribute
+      unit:
+        type: string
+        description: The unit of measurement for the attribute
+  probabilityDistribution:
+    type: object
+    oneOf:
+      - $ref: '#/definitions/normalDistribution'
+      - $ref: '#/definitions/uniformDistribution'
+      - $ref: '#/definitions/discreteDistribution'
+  normalDistribution:
+    type: object
+    required:
+      - distribution
+      - mean
+      - stdDev
+    properties:
+      distribution:
+        type: string
+        enum:
+          - normal
+      mean:
+        type: number
+        description: The mean (average) of the normal distribution
+      stdDev:
+        type: number
+        description: The standard deviation of the normal distribution
+        exclusiveMinimum: 0
+  uniformDistribution:
+    type: object
+    required:
+      - distribution
+      - min
+      - max
+    properties:
+      distribution:
+        type: string
+        enum:
+          - uniform
+      min:
+        type: number
+        description: The minimum value in the uniform distribution
+      max:
+        type: number
+        description: The maximum value in the uniform distribution
+  discreteDistribution:
+    type: object
+    required:
+      - distribution
+      - values
+      - weights
+    properties:
+      distribution:
+        type: string
+        enum:
+          - discrete
+      values:
+        type: array
+        description: The possible values in the discrete distribution
+        minItems: 1
+        items:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+      weights:
+        type: array
+        description: The weights/probabilities for each value
+        minItems: 1
+        items:
+          type: number
+          minimum: 0
+          maximum: 1
+  parent_archetype:
+    type: object
+    required:
+      - name
+      - influence
+    properties:
+      name:
+        type: string
+        description: The name of the parent archetype
+      influence:
+        type: number
+        description: The strength of influence (0-1)
+        minimum: 0
+        maximum: 1
+      reference:
+        type: string
+        description: Path to the canonical archetype definition in the registry
+      description:
+        type: string
+        description: Description of how this archetype influences the personality

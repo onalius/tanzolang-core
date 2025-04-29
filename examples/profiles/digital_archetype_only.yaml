@@ -1,0 +1,35 @@
+version: "0.1.0"
+profile:
+  name: "Digital Avatar Only"
+  description: "A purely digital archetype profile without physical attributes"
+  archetypes:
+    - type: "digital"
+      name: "Digital Avatar"
+      description: "A purely digital entity"
+      attributes:
+        - name: "digital_id"
+          value: "DA-27491"
+          description: "Unique digital identifier"
+        - name: "creation_date"
+          value: "2023-04-15"
+          description: "Date of creation"
+        - name: "popularity_score"
+          value:
+            distribution: "normal"
+            mean: 85
+            stdDev: 10
+          description: "Popularity metric"
+          unit: "points"
+        - name: "access_level"
+          value:
+            distribution: "discrete"
+            values: ["basic", "premium", "admin"]
+            weights: [0.7, 0.25, 0.05]
+          description: "System access privilege level"
+        - name: "processing_power"
+          value:
+            distribution: "uniform"
+            min: 1.0
+            max: 5.0
+          description: "Computational resources allocated"
+          unit: "TFlops"

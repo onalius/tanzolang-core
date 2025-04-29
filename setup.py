@@ -1,4 +1,18 @@
 from setuptools import setup, find_packages
+import os
+import shutil
+
+# Create package data directories if they don't exist
+os.makedirs('clients/python/tanzo_schema/schema', exist_ok=True)
+
+# Copy schema files to the package data directory
+shutil.copy('spec/tanzo-schema.json', 'clients/python/tanzo_schema/schema/tanzo-schema.json')
+
+# Copy example profiles to tests directory for test discovery
+os.makedirs('tests/test_data', exist_ok=True)
+for example_file in ['examples/Kai_profile.yaml', 'examples/digital_archetype_only.yaml', 'examples/Hermit_profile.yaml']:
+    if os.path.exists(example_file):
+        shutil.copy(example_file, f"tests/test_data/{os.path.basename(example_file)}")
 
 setup(
     name="tanzo-schema",
@@ -12,18 +26,24 @@ setup(
         "tanzo_schema": "clients/python/tanzo_schema",
         "cli": "cli"
     },
+    package_data={
+        "tanzo_schema": ["schema/*.json", "schema/*.yaml"],
+    },
+    include_package_data=True,
     entry_points={
         "console_scripts": [
             "tanzo-cli=cli.tanzo_cli:cli",
+            "tanzo_cli=cli.tanzo_cli:cli",
         ],
     },
     python_requires=">=3.11",
     install_requires=[
-        "pydantic>=1.10",
+        "pydantic>=1.10,<2.0",  # Pin to <2.0 to avoid API changes
         "jsonschema>=4.19.0",
         "pyyaml>=6.0.1",
         "numpy>=1.25.0",
         "click>=8.1.6",
+        "annotated-types>=0.5.0",
     ],
     extras_require={
         "dev": [

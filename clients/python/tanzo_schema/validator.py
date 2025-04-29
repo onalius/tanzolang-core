@@ -21,18 +21,36 @@ def load_schema() -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: The JSON schema as a dictionary
     """
-    # Find the schema file relative to this file's location
-    schema_path = Path(__file__).parents[3] / "spec" / "tanzo-schema.json"
+    # Search in multiple possible locations for the schema
+    schema_locations = [
+        # Development environment - relative to repo root
+        Path(__file__).parents[3] / "spec" / "tanzo-schema.json",
+        # Installed package - in the schema directory
+        Path(__file__).parent / "schema" / "tanzo-schema.json",
+        # CI environment - copy made during setup.py
+        Path(__file__).parent.parent.parent.parent / "spec" / "tanzo-schema.json",
+    ]
     
-    if not schema_path.exists():
-        # If not found in the repo structure, try to use an installed schema
-        schema_path = Path(__file__).parent / "schema" / "tanzo-schema.json"
-        
-        if not schema_path.exists():
-            raise FileNotFoundError(f"Cannot find the TanzoLang schema file at {schema_path}")
+    for schema_path in schema_locations:
+        if schema_path.exists():
+            with open(schema_path, "r", encoding="utf-8") as f:
+                return json.load(f)
     
-    with open(schema_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    # If we reach this point, try to construct the schema from the YAML if it exists
+    yaml_locations = [
+        Path(__file__).parents[3] / "spec" / "tanzo-schema.yaml",
+        Path(__file__).parent / "schema" / "tanzo-schema.yaml",
+        Path(__file__).parent.parent.parent.parent / "spec" / "tanzo-schema.yaml",
+    ]
+    
+    for yaml_path in yaml_locations:
+        if yaml_path.exists():
+            with open(yaml_path, "r", encoding="utf-8") as f:
+                return yaml.safe_load(f)
+    
+    # If we still don't have a schema, raise an error with more details
+    locations_str = "\n".join([f"- {path}" for path in schema_locations + yaml_locations])
+    raise FileNotFoundError(f"Cannot find the TanzoLang schema file in any of:\n{locations_str}")
 
 
 def load_yaml_file(file_path: Union[str, Path]) -> Dict[str, Any]:

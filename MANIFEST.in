@@ -1,0 +1,8 @@
+include spec/tanzo-schema.json
+include spec/tanzo-schema.yaml
+include clients/python/tanzo_schema/schema/tanzo-schema.json
+include clients/python/tanzo_schema/schema/tanzo-schema.yaml
+include examples/Kai_profile.yaml
+include examples/Hermit_profile.yaml
+include examples/digital_archetype_only.yaml
+recursive-include tests/test_data *.yaml

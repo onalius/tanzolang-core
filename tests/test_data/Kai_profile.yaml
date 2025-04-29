@@ -1,0 +1,46 @@
+version: "0.1.0"
+profile:
+  name: "Kai's Digital Twin"
+  description: "A digital representation of Kai with physical and digital attributes"
+  archetypes:
+    - type: "digital"
+      name: "Online Avatar"
+      description: "Kai's digital persona"
+      attributes:
+        - name: "username"
+          value: "kai_digital"
+          description: "Kai's online username"
+        - name: "screen_time"
+          value:
+            distribution: "normal"
+            mean: 4.5
+            stdDev: 1.2
+          description: "Daily screen time"
+          unit: "hours"
+        - name: "social_influence"
+          value:
+            distribution: "uniform"
+            min: 100
+            max: 1000
+          description: "Number of followers across platforms"
+    - type: "physical"
+      name: "Physical Self"
+      description: "Kai's physical attributes"
+      attributes:
+        - name: "height"
+          value: 175
+          description: "Physical height"
+          unit: "cm"
+        - name: "weight"
+          value:
+            distribution: "normal"
+            mean: 70
+            stdDev: 2
+          description: "Physical weight"
+          unit: "kg"
+        - name: "activity_level"
+          value:
+            distribution: "discrete"
+            values: ["low", "medium", "high"]
+            weights: [0.2, 0.5, 0.3]
+          description: "Physical activity level"
