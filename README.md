@@ -24,15 +24,21 @@ TanzoLang is the open schema specification for defining digital archetypes and t
 pip install tanzo-schema
 ```
 
-### For Developers
+### 🐍 Manual Installation (if Poetry fails)
 
-If you're developing TanzoLang Core or experiencing issues with binary dependencies (like NumPy), use the provided requirements template:
+If Poetry isn't working or you're encountering compiler errors (like with NumPy), you can install manually with pip:
 
 ```bash
-# Rename the template first
-mv requirements_template.txt requirements.txt
+python -m venv .venv
+.venv\Scripts\activate  # On Windows
+pip install -U pip
+pip install numpy==1.26.4 --only-binary=:all:
+pip install -e .[dev]
+```
 
-# Install using pip with binary packages
+Alternatively, you can use the provided requirements.txt file:
+
+```bash
 pip install -r requirements.txt
 ```
 

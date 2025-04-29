@@ -53,15 +53,27 @@ pip install poetry
 poetry install
 ```
 
-**Using Pip with requirements file (alternative):**
+**Using Pip manually (alternative):**
 
 If you're experiencing compilation issues with NumPy or other binary dependencies:
 
 ```bash
-# First rename the template file
-mv requirements_template.txt requirements.txt
+# Create a virtual environment
+python -m venv .venv
 
-# Install using pip with binary wheels
+# Activate the virtual environment
+.venv\Scripts\activate  # On Windows
+source .venv/bin/activate  # On Linux/Mac
+
+# Install dependencies
+pip install -U pip
+pip install numpy==1.26.4 --only-binary=:all:
+pip install -e .[dev]
+```
+
+Alternatively, you can use the provided requirements.txt file:
+
+```bash
 pip install -r requirements.txt
 ```
 
