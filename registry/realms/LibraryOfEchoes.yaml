@@ -1,0 +1,40 @@
+version: "0.1.0"
+realm:
+  name: "LibraryOfEchoes"  # Camel case, no spaces
+  display_name: "Library of Echoes"
+  description: "A vast repository of knowledge where whispers of past wisdom linger"
+  
+  # Symbolic elements
+  symbolism:
+    elemental_theme: "air/earth"  # Primary elements
+    colors: ["sepia", "dusty blue", "faded gold"]
+    textures: ["worn leather", "aged paper", "polished wood"]
+    sounds: ["whispers", "pages turning", "distant footsteps"]
+    associated_objects: ["ancient tomes", "reading glasses", "ink wells"]
+  
+  # Psychological influence
+  influence:
+    nurtures_archetypes: ["The Sage", "The Hermit", "The Magician"]
+    challenges_archetypes: ["The Fool", "The Explorer"]
+    behavioral_impact:
+      - trait: "contemplation"
+        impact: 1.2  # Enhances
+      - trait: "patience"
+        impact: 1.1
+      - trait: "social connection"
+        impact: 0.8  # Diminishes
+    
+  # Typical encounters and experiences
+  experiences:
+    - name: "Finding the Hidden Text"
+      description: "Discovering information others have missed"
+      potential_trials: ["DecipheringTheMystery", "ChoiceOfKnowledge"]
+    - name: "Conversations with Echoes"
+      description: "Learning from preserved wisdom of the past"
+      potential_trials: ["DistinguishingTruth", "BurdenOfKnowledge"]
+    - name: "Labyrinthine Stacks"
+      description: "Getting lost among endless shelves and discovering unexpected connections"
+      potential_trials: ["NavigatingComplexity", "PatternRecognition"]
+    - name: "Dust of Ages"
+      description: "Encountering the physical decay of knowledge and its preservation"
+      potential_trials: ["PreservationOfWisdom", "AcceptanceOfImpermanence"]

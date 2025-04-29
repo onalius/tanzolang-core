@@ -1,0 +1,57 @@
+version: "0.1.0"
+caregiver:
+  name: "WisdomKeeper"  # Camel case, no spaces
+  display_name: "Wisdom Keeper"
+  description: "A nurturing figure who preserves and transmits essential knowledge"
+  
+  # Archetypal nature
+  archetype: "The Sage"  # Primary archetypal pattern
+  variants: ["The Librarian", "The Elder", "The Scholar"]
+  
+  # Nurturing style
+  nurturing_approach:
+    primary_method: "guidance through questioning"
+    secondary_methods: ["storytelling", "demonstration", "assigned exploration"]
+    boundaries_style: "clear but gentle"
+    attachment_pattern: "secure with independence emphasis"
+  
+  # Developmental influence
+  influence:
+    enhances_traits:
+      - trait: "curiosity"
+        impact: 1.3
+      - trait: "critical thinking"
+        impact: 1.2
+      - trait: "pattern recognition"
+        impact: 1.2
+      - trait: "patience"
+        impact: 1.1
+    
+    potential_limitations:
+      - trait: "practical application"
+        impact: 0.9
+      - trait: "embodied knowledge"
+        impact: 0.8
+      - trait: "emotional intelligence"
+        impact: 0.9
+    
+    typical_lessons: ["Value of perspective", "Importance of history", "Pattern recognition"]
+
+  # Digital manifestations
+  digital_expressions:
+    modern_equivalents:
+      - "Online mentor in forums or communities"
+      - "Curator of digital knowledge repositories"
+      - "Creator of structured learning materials"
+    
+    common_digital_behaviors:
+      - "Provides depth rather than immediate answers"
+      - "Connects apparently disparate pieces of information"
+      - "Emphasizes context and historical development"
+      - "Values citation and attribution of sources"
+    
+    potential_digital_distortions:
+      - "Information hoarding without sharing"
+      - "Gatekeeping knowledge behind unnecessary barriers"
+      - "Prioritizing theoretical understanding over practical application"
+      - "Overwhelming with excessive context when simpler guidance is needed"

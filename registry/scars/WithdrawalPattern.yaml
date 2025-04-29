@@ -1,0 +1,57 @@
+version: "0.1.0"
+scar:
+  name: "WithdrawalPattern"  # Camel case, no spaces
+  display_name: "Withdrawal Pattern"
+  description: "A habitual pattern of retreating from connection when emotional intensity increases"
+  
+  # Origins
+  origin:
+    common_trials: ["DescentIntoSilence", "BetrayalOfTrust", "OverwhelmingExpectation"]
+    associated_archetypes: ["The Hermit", "The Moon"]
+  
+  # Expression
+  manifestation:
+    behavioral_patterns:
+      - "Sudden disengagement from social situations"
+      - "Creating physical or emotional distance during vulnerability"
+      - "Preference for controlled, limited interaction"
+    
+    cognitive_patterns:
+      - "Hypervigilance for signs of emotional escalation"
+      - "Belief that withdrawal is necessary for safety"
+      - "Anticipation of overwhelm in intimate contexts"
+    
+    trigger_contexts:
+      - "Expressions of strong emotion from others"
+      - "Requests for deeper emotional disclosure"
+      - "Prolonged social engagement without breaks"
+  
+  # Healing and integration
+  integration:
+    healing_path: "Graduated exposure to emotional connection with reliable safety"
+    integration_markers:
+      - "Ability to communicate need for space without full withdrawal"
+      - "Development of self-soothing techniques during intense connection"
+      - "Recognition of withdrawal pattern before it fully activates"
+    
+    transformed_expression: "Mindful solitude that nourishes rather than protects"
+
+  # Digital domain manifestations
+  digital_expression:
+    behavioral_patterns:
+      - "Abrupt departure from active online conversations"
+      - "Long periods of passive consumption without engagement"
+      - "Creation of multiple separate accounts for different intensities of interaction"
+    
+    platform_specific_manifestations:
+      - platform: "text messaging"
+        pattern: "Read receipts without responses, delayed replies"
+      - platform: "social media"
+        pattern: "Lurking without posting, periodic account deactivation"
+      - platform: "video calls"
+        pattern: "Camera off, selective muting, sudden 'connection issues'"
+    
+    digital_integration_markers:
+      - "Setting clear boundaries about response times and availability"
+      - "Creating structured engagement patterns with intentional breaks"
+      - "Gradually increasing depth of digital disclosure in safe contexts"

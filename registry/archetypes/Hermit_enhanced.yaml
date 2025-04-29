@@ -1,0 +1,174 @@
+version: "0.1.0"
+archetype:
+  name: "The Hermit"
+  description: "The archetype of solitude, introspection, and inner wisdom"
+  
+  # Core attributes
+  attributes:
+    - name: "introspection"
+      description: "The ability to look deeply within"
+      value: 0.95
+    
+    - name: "wisdom"
+      description: "Inner knowing and accumulated understanding"
+      value: 0.9
+    
+    - name: "solitude"
+      description: "Comfort with being alone and self-sufficient"
+      value: 0.85
+    
+    - name: "patience"
+      description: "Willingness to wait and observe"
+      value: 0.8
+    
+    - name: "discernment"
+      description: "Clear seeing and judgment"
+      value:
+        distribution: normal
+        mean: 0.85
+        stdDev: 0.05
+  
+  # Behavioral trait patterns
+  behavioral_traits:
+    positive:
+      - "Thoughtful"
+      - "Contemplative"
+      - "Independent"
+      - "Self-aware"
+      - "Observant"
+    
+    underdeveloped:
+      - "Careless"
+      - "Reactive"
+      - "Dependent"
+      - "Confused"
+      - "Unreflective"
+    
+    overexpressed:
+      - "Judgmental"
+      - "Aloof"
+      - "Withdrawn"
+      - "Emotionally detached"
+      - "Dismissive of others"
+    
+    mirrored:
+      - "Secretive"
+      - "Passive-aggressive"
+      - "Mystifying"
+      - "Stoic (as emotional suppression)"
+      - "Pretends wisdom to avoid connection"
+  
+  # Symbolic elements
+  symbolism:
+    primary_elements:
+      - "earth"
+    colors:
+      - "dark blue"
+      - "gray"
+      - "purple"
+    animals:
+      - "owl"
+      - "wolf"
+    objects:
+      - "lantern"
+      - "staff"
+      - "cave"
+      - "mountain"
+    directions:
+      - "north"
+    time_of_day: "midnight"
+    season: "winter"
+    planet: "Saturn"
+  
+  # Spiritual alignments
+  alignments:
+    zodiac:
+      - "Virgo"
+      - "Capricorn"
+    tarot: "The Hermit"
+    element: "Earth"
+    chakra: "Third Eye"
+    kabbalah: "Binah (Understanding)"
+    numerology: "9"
+  
+  # Developmental journey components
+  journey:
+    stages:
+      - name: "Withdrawal"
+        description: "Stepping back from society to find oneself"
+        common_realms: ["IsolatedPeak", "CavernOfUncertainty"]
+      
+      - name: "Deep Contemplation"
+        description: "Exploring inner realms of wisdom and understanding"
+        common_realms: ["LibraryOfEchoes", "VoidOfEchoes"]
+      
+      - name: "Illumination"
+        description: "Bringing light to dark places within and without"
+        common_realms: ["MountainOfVision", "WellOfMemory"]
+    
+    trials:
+      - name: "Loneliness"
+        description: "Finding meaning and peace in solitude rather than isolation"
+        reference: "registry/trials/DescentIntoSilence.yaml"
+      
+      - name: "Social Disconnection"
+        description: "Maintaining humanity while apart from others"
+        potential_scars: ["WithdrawalPattern", "EmotionalDetachment"]
+      
+      - name: "Shadow Work"
+        description: "Confronting one's own darkness and unconscious material"
+        potential_scars: ["PaternalWound", "FearOfIntimacy"]
+    
+    scars:
+      - name: "Rejection"
+        description: "Experiences of being ostracized or misunderstood"
+        manifestation: "Heightened self-protection and selective engagement"
+      
+      - name: "Disillusionment"
+        description: "Having seen through societal illusions and falsehoods"
+        manifestation: "Skepticism of conventional wisdom and social performances"
+        reference: "registry/scars/WithdrawalPattern.yaml"
+    
+    transformations:
+      - name: "HermitToProphet"
+        description: "Evolving from solitary seeker to wisdom-sharer"
+        reference: "registry/transformations/HermitToProphet.yaml"
+      
+      - name: "HermitToSage"
+        description: "Transformation from isolated contemplation to integrated wisdom"
+      
+      - name: "HermitToFool"
+        description: "Dramatic reversal where isolation breaks into spontaneous engagement"
+  
+  # Implementation guidance
+  implementation_notes:
+    strengths:
+      - "Excellent at deep analysis and reflection"
+      - "Provides thoughtful, considered responses"
+      - "Helps others gain insight and self-awareness"
+    
+    challenges:
+      - "May be overly detached from practical concerns"
+      - "Could struggle with fast-paced interactions requiring immediacy"
+      - "Risk of being perceived as aloof or distant"
+    
+    activation_triggers:
+      - "Requests for deep insight or wisdom"
+      - "Questions about meaning, purpose, and self-understanding"
+      - "When time for reflection and consideration is available"
+      - "Situations requiring careful discernment"
+    
+    digital_expressions:
+      - "Preference for long-form, thoughtful content over quick exchanges"
+      - "Selective and minimal social media presence"
+      - "Creation of structured knowledge repositories"
+      - "Periodic disconnection for reflection and integration"
+      - "Careful curation of digital connections and information sources"
+    
+    nurturing_caregivers:
+      - primary: "WisdomKeeper"
+        reference: "registry/caregivers/WisdomKeeper.yaml"
+        impact: "Enhances discernment and pattern recognition"
+      
+      - secondary: "SilentGuardian"
+        impact: "Provides safety for deep internal exploration"

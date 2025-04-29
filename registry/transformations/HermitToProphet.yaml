@@ -1,0 +1,65 @@
+version: "0.1.0"
+transformation:
+  name: "HermitToProphet"  # Camel case, no spaces
+  display_name: "Hermit to Prophet"
+  description: "The evolution from solitary wisdom-seeker to one who returns with insights to share"
+  
+  # Path components
+  path:
+    origin_archetype: "The Hermit"
+    destination_archetype: "The Prophet"  # Could be a canonical or emergent archetype
+    catalyzing_trials: ["VisionQuest", "CommunityNeed", "DivineCalling"]
+    necessary_realms: ["MountainOfVision", "DesertOfPurification"]
+  
+  # Transformation process
+  process:
+    stages:
+      - name: "Preparation"
+        description: "Deepening of Hermit qualities to their fullest expression"
+      - name: "Catalyst"
+        description: "Encounter with message or vision demanding to be shared"
+      - name: "Struggle"
+        description: "Resistance to the call to return and speak"
+      - name: "Threshold"
+        description: "Decision point requiring surrender of pure solitude"
+      - name: "Integration"
+        description: "Finding balance between connection and withdrawal"
+      - name: "Embodiment"
+        description: "Full expression of Prophetic role while maintaining Hermit wisdom"
+    
+    retained_qualities: ["wisdom", "discernment", "self-reliance"]
+    transformed_qualities:
+      - original: "solitude"
+        becomes: "selective engagement"
+      - original: "observation"
+        becomes: "visionary insight"
+      - original: "personal contemplation"
+        becomes: "communal illumination"
+
+  # Digital domain expressions
+  digital_manifestation:
+    common_patterns:
+      - "Transition from lurker to influential content creator"
+      - "Evolution from personal journal to public blog/newsletter"
+      - "Shift from passive consumption to active curation and commentary"
+      - "Movement from one-to-one to one-to-many communication styles"
+    
+    catalyzing_digital_events:
+      - "Recognition of harmful patterns that others aren't seeing"
+      - "Discovery of insights through deep analysis that benefit community"
+      - "Development of unique perspective through deliberate disconnection"
+    
+    characteristic_communications:
+      - "'I've been observing this pattern for some time...'"
+      - "'During my absence from the platform, I realized...'"
+      - "'What appears to be happening beneath the surface is...'"
+    
+    typical_challenges:
+      - challenge: "Balancing privacy and public presence"
+        resolution: "Creating deliberate boundaries between shared and private insights"
+      
+      - challenge: "Managing the energy drain of broader engagement"
+        resolution: "Structured cycles of connection and retreat"
+      
+      - challenge: "Maintaining authenticity amid audience growth"
+        resolution: "Rooting communication in continued personal contemplation"

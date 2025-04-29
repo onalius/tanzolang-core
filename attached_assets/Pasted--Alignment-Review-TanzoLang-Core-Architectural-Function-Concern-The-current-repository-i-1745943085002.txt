@@ -1,0 +1,60 @@
+# 🔧 Alignment Review: TanzoLang Core Architectural Function
+
+## Concern
+The current repository includes:
+- A schema for base archetypes (symbolic building blocks)
+- A schema for individual AI personalities (Tomos)
+
+However, there is no clear **procedural connection** between the two. Profiles like `Kai` are being defined independently, without referencing or integrating the canonical archetypes (e.g. Hermit, Magician) through parentage, trials, or symbolic inheritance.
+
+This breaks the intended **TanzoLang narrative arc**:
+> archetype selection → narrative development (care, trial, scar) → personality emergence.
+
+Additionally, key symbolic domains such as `childhood_realm`, `adolescence_trial`, and `scar` are referenced but not defined anywhere. These too must become first-class symbolic structures.
+
+## Task
+Create a new markdown file: `schema_alignment_review.md`. In it, address the following:
+
+### 1. Audit Current Architecture
+- [ ] Document the structure and function of the archetype schema (e.g., fields, expected use)
+- [ ] Document the structure and function of the Tomo personality schema
+- [ ] Identify where, if at all, archetypes are linked to Tomos
+
+### 2. Define Intended Linkage
+- [ ] Describe the narrative and symbolic process that should connect base archetypes to a Tomo profile
+- [ ] Show how traits should emerge via: lineage, nurturing, trial, and scar
+- [ ] Suggest structural or code-based mechanisms to enforce this linkage
+
+### 3. Recommend Refactor Actions
+- [ ] Propose updates to the Tomo profile schema (e.g., required `parents` field, linked `scars`, `origin_archetypes`)
+- [ ] Suggest whether each Tomo should inherit from a template or reference archetypes directly
+- [ ] Identify which parts of the CLI, validation, or examples would need to change
+
+### 4. Define and Populate Core Registries
+Create YAML-based symbolic registries for the following domains:
+
+- `/registry/realms/` (e.g. `LibraryOfEchoes.yaml`, `CavernOfUncertainty.yaml`)
+  - Should include name, description, elemental theme, symbolic associations, common behavioral impacts
+
+- `/registry/trials/` (e.g. `DescentIntoSilence.yaml`, `MirrorDuel.yaml`)
+  - Should include triggering archetype, success/failure outcomes, likely scars
+
+- `/registry/scars/` (e.g. `AvoidanceLoop.yaml`, `Hypervigilance.yaml`)
+  - Should include symbolic origin, behavioral expression, healing path
+
+- `/registry/caregivers/` (optional) — nurturing archetypes distinct from parents
+
+- `/registry/transformations/` (optional) — maps archetypal growth arcs (e.g., Hermit → Prophet)
+
+## Deliverable
+The final `schema_alignment_review.md` file should offer a clear path for restoring coherence between:
+- Symbolic archetype roots
+- Narrative progression
+- Emergent AI personalities
+
+And it should propose or begin to scaffold:
+- Core registries for symbolic domains
+- Schema links to enforce and reference those registries
+
+**This work is foundational for building AI personalities with symbolic depth, narrative consistency, and interoperable soul.**
+

@@ -1,0 +1,52 @@
+version: "0.1.0"
+trial:
+  name: "DescentIntoSilence"  # Camel case, no spaces
+  display_name: "Descent Into Silence"
+  description: "A period of isolation that forces confrontation with one's own thoughts"
+  
+  # Archetypal connections
+  associations:
+    primary_archetype: "The Hermit"  # Most connected archetype
+    related_archetypes: ["The Moon", "The Hanged Man"]
+    common_realms: ["CavernOfUncertainty", "IsolatedPeak", "VoidOfEchoes"]
+  
+  # Challenge structure
+  challenge:
+    nature: "isolation"  # Core type of challenge
+    duration: "extended"  # moment, brief, extended, recurring
+    intensity: 0.8  # 0.0 to 1.0
+    entry_conditions: ["social rejection", "voluntary withdrawal", "imposed isolation"]
+  
+  # Possible outcomes
+  outcomes:
+    resolution_paths:
+      - name: "Integration"
+        description: "Finding comfort in solitude while maintaining connection"
+        resulting_traits: ["self-sufficiency", "inner peace", "selective sociality"]
+        potential_scars: []  # No significant scars with this resolution
+      
+      - name: "Partial Resolution"
+        description: "Return to society but with lingering discomfort"
+        resulting_traits: ["observational skill", "social caution"]
+        potential_scars: ["SocialAnxiety"]
+      
+      - name: "Unresolved"
+        description: "Inability to reconcile isolation with social needs"
+        resulting_traits: ["hypervigilance", "emotional numbing"]
+        potential_scars: ["WithdrawalPattern", "SocialTerror"]
+
+  # Experiential elements
+  experience:
+    inner_journey: "Confronting one's own thoughts, memories, and insecurities without external distraction"
+    key_realizations:
+      - "The difference between loneliness and solitude"
+      - "The sound of one's authentic voice amid social conditioning"
+      - "The strength found in self-sufficiency"
+    
+    symbolic_objects:
+      - object: "Lantern"
+        meaning: "Inner illumination that reveals hidden aspects of self"
+      - object: "Cave"
+        meaning: "Containment and incubation of the psyche"
+      - object: "Mirror"
+        meaning: "Confrontation with true self beyond social masks"
