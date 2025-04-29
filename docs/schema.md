@@ -1,143 +1,70 @@
 # TanzoLang Schema
 
-The TanzoLang schema is a JSON Schema that defines the structure of Tomodaichi Tanzo profile documents. It allows for the creation of structured digital character profiles with consistent properties and validation.
+This page documents the TanzoLang schema specification.
+
+## Overview
+
+The TanzoLang schema defines a format for describing profiles with archetypes and traits. The schema is defined using JSON Schema and is available in both JSON and YAML formats.
 
 ## Schema Structure
 
-The root schema object consists of:
+A TanzoLang document consists of:
 
-- `version`: Schema version following semantic versioning format (e.g., "0.1.0")
-- `profile`: The main profile object with all character properties
+- `version`: The version of the schema being used, following semantic versioning.
+- `profile`: The main profile object.
 
-### Profile Object
+### Profile
 
-The profile object is the main container for character information:
+A profile represents a complete set of archetypes and traits that define a personality or identity within the Tomodaichi Tanzo ecosystem.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | string | Profile name (required) |
-| `description` | string | Profile description |
-| `archetype` | object | Character archetype (required) |
-| `behaviors` | array | List of behavior traits |
-| `personality` | object | Personality characteristics |
-| `communication` | object | Communication style & preferences |
-| `knowledge` | object | Knowledge domains & limitations |
-| `preferences` | object | General preferences |
-| `simulation` | object | Simulation parameters |
-| `metadata` | object | Additional custom metadata |
+Properties:
 
-## Archetypes
+- `name` (required): The name of the profile.
+- `description` (optional): A description of the profile.
+- `archetypes` (required): An array of archetype objects that define the profile.
+- `metadata` (optional): Additional metadata for the profile.
 
-The archetype defines the core role or function of a character:
+### Archetype
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `primary` | string | Primary archetype (required) |
-| `secondary` | string | Secondary/hybrid archetype |
-| `description` | string | Custom archetype description |
+An archetype represents a specific aspect or dimension of a profile.
 
-Available archetype values:
+Properties:
 
-- `advisor`
-- `companion`
-- `creator`
-- `educator`
-- `entertainer`
-- `expert`
-- `guide`
+- `type` (required): The type of the archetype. Must be one of:
+  - `digital`
+  - `physical`
+  - `social`
+  - `emotional`
+  - `cognitive`
+- `weight` (required): The weight of this archetype in the profile, from 0.0 to 1.0.
+- `traits` (optional): An array of trait objects associated with this archetype.
+- `attributes` (optional): Additional attributes specific to this archetype.
 
-## Behaviors
+### Trait
 
-Behaviors define specific character traits:
+A trait represents a specific characteristic within an archetype.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | string | Behavior name (required) |
-| `description` | string | Behavior description (required) |
-| `strength` | number | Strength from 0.0-1.0 (required) |
-| `context` | string | Context when behavior applies |
-| `trigger` | string | Trigger pattern for situational behaviors |
+Properties:
 
-Context values:
-- `always` (default)
-- `situational`
-- `triggered` (requires `trigger` property)
+- `name` (required): The name of the trait.
+- `value` (required): The value of the trait, from 0.0 to 1.0.
+- `variance` (optional, default: 0.1): The variance of the trait for simulation, from 0.0 to 1.0.
+- `description` (optional): A description of the trait.
 
-## Personality
+## Example
 
-The personality section defines character traits and values:
+Here's a minimal example of a TanzoLang document:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `traits` | object | OCEAN personality model traits |
-| `values` | array | Core values list |
-| `character` | string | Character description |
-
-The personality traits follow the OCEAN (Big Five) model:
-
-- `openness`: Openness to experience (0.0-1.0)
-- `conscientiousness`: Conscientiousness (0.0-1.0)
-- `extraversion`: Extraversion (0.0-1.0)
-- `agreeableness`: Agreeableness (0.0-1.0)
-- `neuroticism`: Neuroticism (0.0-1.0)
-
-## Communication
-
-Communication defines how the character expresses itself:
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `style` | string | Communication style |
-| `tone` | string | Communication tone |
-| `complexity` | number | Language complexity (0.0-1.0) |
-| `verbosity` | number | Response verbosity (0.0-1.0) |
-
-Available style values:
-- `formal`
-- `casual`
-- `technical`
-- `friendly`
-- `direct`
-- `nurturing`
-- `playful`
-
-Available tone values:
-- `professional`
-- `warm`
-- `enthusiastic`
-- `neutral`
-- `academic`
-- `humorous`
-
-## Schema Example
-
-Here's a simplified example of a TanzoLang profile in JSON format:
-
-```json
-{
-  "version": "0.1.0",
-  "profile": {
-    "name": "Example Assistant",
-    "description": "A helpful digital assistant",
-    "archetype": {
-      "primary": "advisor",
-      "secondary": "companion"
-    },
-    "behaviors": [
-      {
-        "name": "Helpfulness",
-        "description": "Offers assistance proactively",
-        "strength": 0.9
-      }
-    ],
-    "personality": {
-      "traits": {
-        "openness": 0.7,
-        "conscientiousness": 0.8,
-        "extraversion": 0.6,
-        "agreeableness": 0.9,
-        "neuroticism": 0.2
-      }
-    }
-  }
-}
+```yaml
+version: "0.1.0"
+profile:
+  name: "Example Profile"
+  description: "A simple example profile"
+  archetypes:
+    - type: "digital"
+      weight: 0.8
+      traits:
+        - name: "tech_savvy"
+          value: 0.9
+          variance: 0.05
+          description: "Comfortable with latest technology"

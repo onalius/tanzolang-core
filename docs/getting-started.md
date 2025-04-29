@@ -1,12 +1,12 @@
 # Getting Started with TanzoLang
 
-This guide will help you get started with TanzoLang, from installation to creating your first profile.
+This guide will help you get started with the TanzoLang tools and SDK libraries.
 
 ## Installation
 
-### Python Package
+### Python SDK
 
-Install the TanzoLang Python package using pip:
+The TanzoLang Python SDK can be installed using pip:
 
 ```bash
 pip install tanzo-schema

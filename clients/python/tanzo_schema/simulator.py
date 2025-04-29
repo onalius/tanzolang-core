@@ -1,200 +1,144 @@
 """
-Simulator for Tanzo profiles.
+Simulator module for TanzoLang profiles.
+
+This module provides functions to run Monte Carlo simulations on TanzoLang
+profiles, generating variations based on trait variance.
 """
 
-import math
-import random
+import copy
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 
-from .models import (Archetype, Attribute, ComparisonOperator, Effect, Modifier,
-                     OperationType, TanzoProfile)
+from tanzo_schema.models import Archetype, TanzoDocument, Trait
+from tanzo_schema.validator import validate_and_parse
 
 
 @dataclass
-class SimulationState:
-    """State tracked during a simulation run."""
-    archetype_values: Dict[str, float]
-    attribute_values: Dict[str, float]
-    active_modifiers: List[Modifier]
+class SimulationResult:
+    """Results from a Monte Carlo simulation on a TanzoLang profile."""
+    
+    trait_means: Dict[str, Dict[str, float]]
+    trait_std_devs: Dict[str, Dict[str, float]]
+    archetype_weights: Dict[str, float]
+    num_iterations: int
+    
+    def __str__(self) -> str:
+        """Generate a human-readable representation of the simulation results."""
+        lines = [
+            f"Simulation Results ({self.num_iterations} iterations):",
+            "=" * 50,
+            "Archetype Weights:",
+        ]
+        
+        for archetype, weight in self.archetype_weights.items():
+            lines.append(f"  {archetype}: {weight:.2f}")
+        
+        lines.append("\nTrait Statistics by Archetype:")
+        lines.append("=" * 50)
+        
+        for archetype, traits in self.trait_means.items():
+            lines.append(f"\n{archetype}:")
+            for trait_name, mean_val in traits.items():
+                std_dev = self.trait_std_devs[archetype][trait_name]
+                lines.append(f"  {trait_name}:")
+                lines.append(f"    Mean: {mean_val:.2f}")
+                lines.append(f"    Std Dev: {std_dev:.2f}")
+                lines.append(f"    Range: [{max(0.0, mean_val - std_dev):.2f} - {min(1.0, mean_val + std_dev):.2f}]")
+        
+        return "\n".join(lines)
 
 
-def _apply_effect(
-    effect: Effect, 
-    state: SimulationState, 
-    archetypes_by_name: Dict[str, Archetype]
-) -> None:
-    """Apply a modifier effect to the simulation state."""
-    # Check if condition is met (if any)
-    if effect.condition:
-        attr_name = effect.condition.attribute
-        if attr_name not in state.attribute_values:
-            return  # Attribute not found, can't apply condition
-        
-        attr_val = state.attribute_values[attr_name]
-        cond_val = effect.condition.value
-        
-        # Evaluate the condition
-        if effect.condition.operator == ComparisonOperator.EQ and attr_val != cond_val:
-            return
-        elif effect.condition.operator == ComparisonOperator.NEQ and attr_val == cond_val:
-            return
-        elif effect.condition.operator == ComparisonOperator.GT and attr_val <= cond_val:
-            return
-        elif effect.condition.operator == ComparisonOperator.LT and attr_val >= cond_val:
-            return
-        elif effect.condition.operator == ComparisonOperator.GTE and attr_val < cond_val:
-            return
-        elif effect.condition.operator == ComparisonOperator.LTE and attr_val > cond_val:
-            return
+def _simulate_trait(trait: Trait) -> float:
+    """Simulate a trait value based on its base value and variance."""
+    # Generate a value from a normal distribution centered at the trait value
+    # with standard deviation equal to the trait variance
+    value = np.random.normal(trait.value, trait.variance)
     
-    # Apply the effect
-    target = effect.target
-    value = effect.value
-    
-    # Check if target is an archetype
-    if target in archetypes_by_name:
-        current = state.archetype_values.get(target, 0.0)
-        if effect.operation == OperationType.ADD:
-            new_val = current + value
-        elif effect.operation == OperationType.MULTIPLY:
-            new_val = current * value
-        elif effect.operation == OperationType.SET:
-            new_val = value
-        elif effect.operation == OperationType.MIN:
-            new_val = min(current, value)
-        elif effect.operation == OperationType.MAX:
-            new_val = max(current, value)
-        else:
-            raise ValueError(f"Unknown operation type: {effect.operation}")
-        
-        # Clamp value to [0, 1]
-        state.archetype_values[target] = max(0.0, min(1.0, new_val))
-    
-    # Otherwise assume it's an attribute
-    elif target in state.attribute_values:
-        current = state.attribute_values[target]
-        if effect.operation == OperationType.ADD:
-            new_val = current + value
-        elif effect.operation == OperationType.MULTIPLY:
-            new_val = current * value
-        elif effect.operation == OperationType.SET:
-            new_val = value
-        elif effect.operation == OperationType.MIN:
-            new_val = min(current, value)
-        elif effect.operation == OperationType.MAX:
-            new_val = max(current, value)
-        else:
-            raise ValueError(f"Unknown operation type: {effect.operation}")
-        
-        # Clamp value to [0, 1]
-        state.attribute_values[target] = max(0.0, min(1.0, new_val))
+    # Clamp the value to the range [0, 1]
+    return max(0.0, min(1.0, value))
 
 
-def simulate_profile(
-    profile: TanzoProfile, 
-    randomize: bool = False, 
-    seed: Optional[int] = None
-) -> Dict[str, float]:
-    """
-    Simulate a single run of a Tanzo profile.
+def _simulate_archetype(archetype: Archetype) -> Archetype:
+    """Simulate an archetype by varying its traits."""
+    result = copy.deepcopy(archetype)
     
-    Args:
-        profile: TanzoProfile to simulate
-        randomize: If True, apply random variance to attributes
-        seed: Random seed for reproducibility
-        
-    Returns:
-        Dictionary of attribute and archetype values
-    """
-    if seed is not None:
-        random.seed(seed)
-        np.random.seed(seed)
+    if result.traits:
+        for i, trait in enumerate(result.traits):
+            result.traits[i].value = _simulate_trait(trait)
     
-    # Initialize state
-    state = SimulationState(
-        archetype_values={},
-        attribute_values={},
-        active_modifiers=[]
-    )
-    
-    # Get all archetypes by name for easy lookup
-    archetypes_by_name = profile.archetypes_by_name
-    
-    # Initialize attribute values
-    for archetype in profile.profile.archetypes:
-        # Store base archetype value from weight
-        state.archetype_values[archetype.name] = archetype.weight
-        
-        if archetype.attributes:
-            for attr in archetype.attributes:
-                # Apply variance if randomize is enabled
-                value = attr.value
-                if randomize and attr.variance:
-                    # Use normal distribution centered on value with variance as std dev
-                    variance = attr.variance
-                    value = np.random.normal(value, variance)
-                    # Clamp to [0, 1]
-                    value = max(0.0, min(1.0, value))
-                
-                state.attribute_values[attr.name] = value
-    
-    # Apply global modifiers
-    if profile.profile.modifiers:
-        for modifier in profile.profile.modifiers:
-            _apply_effect(modifier.effect, state, archetypes_by_name)
-            state.active_modifiers.append(modifier)
-    
-    # Apply archetype-specific modifiers
-    for archetype in profile.profile.archetypes:
-        if archetype.modifiers:
-            for modifier in archetype.modifiers:
-                _apply_effect(modifier.effect, state, archetypes_by_name)
-                state.active_modifiers.append(modifier)
-    
-    # Merge results
-    result = {**state.attribute_values, **state.archetype_values}
     return result
 
 
-def run_monte_carlo(
-    profile: TanzoProfile,
+def run_simulation(
+    document: Union[str, Path, Dict[str, Any], TanzoDocument],
     iterations: int = 100
-) -> Tuple[Dict[str, float], Dict[str, float]]:
+) -> SimulationResult:
     """
-    Run a Monte Carlo simulation with many iterations.
+    Run a Monte Carlo simulation on a TanzoLang profile.
     
     Args:
-        profile: TanzoProfile to simulate
-        iterations: Number of simulation iterations
-        
-    Returns:
-        Tuple of (means, standard deviations) for attributes and archetypes
-    """
-    # Track results across iterations
-    results = []
+        document: The document to simulate. Can be a file path, a dictionary,
+                 or a TanzoDocument instance.
+        iterations: The number of simulation iterations to run.
     
-    for i in range(iterations):
-        # Use a different seed for each iteration for reproducibility
-        sim_result = simulate_profile(profile, randomize=True, seed=i)
-        results.append(sim_result)
+    Returns:
+        A SimulationResult containing statistics from the simulation.
+    """
+    # Parse the document if needed
+    if not isinstance(document, TanzoDocument):
+        document = validate_and_parse(document)
+    
+    # Initialize result structures
+    trait_values: Dict[str, Dict[str, List[float]]] = {}
+    archetype_types: Set[str] = set()
+    
+    # Run the simulation
+    for _ in range(iterations):
+        # Create a new profile for this iteration
+        profile = copy.deepcopy(document.profile)
+        
+        for archetype in profile.archetypes:
+            archetype_type = archetype.type
+            archetype_types.add(archetype_type)
+            
+            # Simulate the archetype
+            simulated = _simulate_archetype(archetype)
+            
+            # Record trait values
+            if simulated.traits:
+                if archetype_type not in trait_values:
+                    trait_values[archetype_type] = {}
+                
+                for trait in simulated.traits:
+                    if trait.name not in trait_values[archetype_type]:
+                        trait_values[archetype_type][trait.name] = []
+                    
+                    trait_values[archetype_type][trait.name].append(trait.value)
     
     # Calculate statistics
-    all_keys = set()
-    for result in results:
-        all_keys.update(result.keys())
+    trait_means: Dict[str, Dict[str, float]] = {}
+    trait_std_devs: Dict[str, Dict[str, float]] = {}
+    archetype_weights: Dict[str, float] = {}
     
-    means = {}
-    stdevs = {}
+    # Get original archetype weights
+    for archetype in document.profile.archetypes:
+        archetype_weights[archetype.type] = archetype.weight
     
-    for key in all_keys:
-        values = [r.get(key, 0.0) for r in results]
-        means[key] = sum(values) / len(values)
+    # Calculate means and standard deviations
+    for archetype_type, traits in trait_values.items():
+        trait_means[archetype_type] = {}
+        trait_std_devs[archetype_type] = {}
         
-        # Calculate standard deviation
-        variance = sum((x - means[key])**2 for x in values) / len(values)
-        stdevs[key] = math.sqrt(variance)
+        for trait_name, values in traits.items():
+            trait_means[archetype_type][trait_name] = np.mean(values)
+            trait_std_devs[archetype_type][trait_name] = np.std(values)
     
-    return means, stdevs
+    return SimulationResult(
+        trait_means=trait_means,
+        trait_std_devs=trait_std_devs,
+        archetype_weights=archetype_weights,
+        num_iterations=iterations
+    )

@@ -1,66 +1,113 @@
 """
-Export functionality for Tanzo profiles.
+Exporter module for TanzoLang documents.
+
+This module provides functions to export TanzoLang documents to various formats,
+including a shorthand string representation.
 """
 
-from typing import Dict, List
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
-from .models import TanzoProfile
+import yaml
 
-
-def _attribute_to_shorthand(name: str, value: float) -> str:
-    """Convert an attribute to shorthand notation."""
-    # Format value as percentage with no decimal places
-    value_str = f"{int(value * 100)}%"
-    return f"{name}:{value_str}"
+from tanzo_schema.models import TanzoDocument
+from tanzo_schema.validator import validate_and_parse
 
 
-def _archetype_to_shorthand(name: str, weight: float, attr_values: Dict[str, float]) -> str:
-    """Convert an archetype to shorthand notation."""
-    # Format weight as percentage with no decimal places
-    weight_str = f"{int(weight * 100)}%"
-    
-    # Get top 3 attributes by value
-    attrs = sorted(
-        [(name, value) for name, value in attr_values.items()],
-        key=lambda x: x[1],
-        reverse=True
-    )[:3]
-    
-    # Format attributes
-    attr_str = ",".join(_attribute_to_shorthand(name, value) for name, value in attrs)
-    
-    return f"{name}@{weight_str}[{attr_str}]"
-
-
-def export_profile(profile: TanzoProfile) -> str:
+def export_to_json(
+    document: Union[str, Path, Dict[str, Any], TanzoDocument],
+    pretty: bool = True
+) -> str:
     """
-    Export a Tanzo profile to a shorthand string representation.
+    Export a TanzoLang document to JSON.
     
     Args:
-        profile: TanzoProfile to export
-        
+        document: The document to export. Can be a file path, a dictionary,
+                 or a TanzoDocument instance.
+        pretty: Whether to pretty-print the JSON.
+    
     Returns:
-        String representation of the profile
+        A JSON string representation of the document.
     """
-    profile_name = profile.profile.name
+    # Parse the document if needed
+    if not isinstance(document, TanzoDocument):
+        document = validate_and_parse(document)
     
-    # Process archetypes
-    archetype_strings = []
+    # Convert to dictionary
+    doc_dict = document.model_dump(exclude_none=True)
     
-    for archetype in profile.profile.archetypes:
-        # Get attribute values for this archetype
-        attr_values = {}
-        if archetype.attributes:
-            attr_values = {attr.name: attr.value for attr in archetype.attributes}
+    # Convert to JSON
+    indent = 2 if pretty else None
+    return json.dumps(doc_dict, indent=indent)
+
+
+def export_to_yaml(
+    document: Union[str, Path, Dict[str, Any], TanzoDocument]
+) -> str:
+    """
+    Export a TanzoLang document to YAML.
+    
+    Args:
+        document: The document to export. Can be a file path, a dictionary,
+                 or a TanzoDocument instance.
+    
+    Returns:
+        A YAML string representation of the document.
+    """
+    # Parse the document if needed
+    if not isinstance(document, TanzoDocument):
+        document = validate_and_parse(document)
+    
+    # Convert to dictionary
+    doc_dict = document.model_dump(exclude_none=True)
+    
+    # Convert to YAML
+    return yaml.dump(doc_dict, sort_keys=False)
+
+
+def export_shorthand(
+    document: Union[str, Path, Dict[str, Any], TanzoDocument]
+) -> str:
+    """
+    Export a TanzoLang document to a shorthand string representation.
+    
+    The shorthand format is a concise representation of the profile, including
+    the profile name and key archetype and trait information.
+    
+    Args:
+        document: The document to export. Can be a file path, a dictionary,
+                 or a TanzoDocument instance.
+    
+    Returns:
+        A shorthand string representation of the document.
+    """
+    # Parse the document if needed
+    if not isinstance(document, TanzoDocument):
+        document = validate_and_parse(document)
+    
+    profile = document.profile
+    
+    # Start with the profile name
+    parts = [f"{profile.name}"]
+    
+    # Add archetypes
+    archetype_parts = []
+    for archetype in profile.archetypes:
+        a_part = f"{archetype.type[:3]}:{archetype.weight:.1f}"
         
-        # Convert to shorthand
-        arch_str = _archetype_to_shorthand(
-            archetype.name,
-            archetype.weight,
-            attr_values
-        )
-        archetype_strings.append(arch_str)
+        # Add traits if available
+        if archetype.traits:
+            trait_parts = []
+            for trait in archetype.traits:
+                t_part = f"{trait.name}:{trait.value:.1f}"
+                trait_parts.append(t_part)
+            
+            if trait_parts:
+                a_part += f"({','.join(trait_parts)})"
+        
+        archetype_parts.append(a_part)
     
-    # Combine into final string
-    result = f"{profile_name}:{{{';'.join(archetype_strings)}}}"
-    return result
+    parts.append("|".join(archetype_parts))
+    
+    return " - ".join(parts)

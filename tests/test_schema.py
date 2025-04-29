@@ -1,168 +1,140 @@
 """
-Tests for the schema validation functionality.
+Tests for the TanzoLang schema validation.
 """
 
 import json
-import yaml
-import pytest
+import os
 from pathlib import Path
 
+import pytest
+import yaml
+from jsonschema import validate
+
 from clients.python.tanzo_schema import (
-    validate_tanzo_profile, load_profile_from_yaml,
-    TanzoProfile, Archetype
+    load_tanzo_file, validate_tanzo_file, load_tanzo_pydantic
 )
-from clients.python.tanzo_schema.validators import _load_schema
+from clients.python.tanzo_schema.models import TanzoSchema
 
 
-def test_load_schema():
-    """Test that the schema can be loaded."""
-    schema = _load_schema()
-    assert schema is not None
-    assert schema.get("$schema") == "https://json-schema.org/draft-07/schema#"
-    assert schema.get("title") == "TanzoLang Schema"
+# Find the root directory
+ROOT_DIR = Path(__file__).parent.parent
 
 
-def test_validate_minimal_profile():
-    """Test validation of a minimal profile."""
-    minimal_profile = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Test Profile",
-            "archetype": {
-                "primary": "guide"
-            }
-        }
-    }
+def test_schema_validation_json():
+    """Test loading and validating the JSON schema."""
+    schema_path = ROOT_DIR / "spec" / "tanzo-schema.json"
+    assert schema_path.exists(), "Schema file does not exist"
     
-    profile = validate_tanzo_profile(minimal_profile)
-    assert profile is not None
-    assert profile.version == "0.1.0"
-    assert profile.profile.name == "Test Profile"
-    assert profile.profile.archetype.primary == "guide"
-
-
-def test_validate_profile_with_json_string():
-    """Test validation with a JSON string."""
-    json_string = """
-    {
-        "version": "0.1.0",
-        "profile": {
-            "name": "JSON Test",
-            "archetype": {
-                "primary": "advisor"
-            }
-        }
-    }
-    """
+    with open(schema_path, "r") as f:
+        schema = json.load(f)
     
-    profile = validate_tanzo_profile(json_string)
-    assert profile is not None
-    assert profile.profile.name == "JSON Test"
+    # Basic schema structure validation
+    assert "$schema" in schema, "Missing $schema key"
+    assert "$id" in schema, "Missing $id key"
+    assert "title" in schema, "Missing title"
+    assert "properties" in schema, "Missing properties"
+    assert "definitions" in schema, "Missing definitions"
 
 
-def test_validate_profile_with_yaml_string():
-    """Test validation with a YAML string."""
-    yaml_string = """
-    version: "0.1.0"
-    profile:
-      name: "YAML Test"
-      archetype:
-        primary: "expert"
-    """
+def test_schema_validation_yaml():
+    """Test loading and validating the YAML schema."""
+    schema_path = ROOT_DIR / "spec" / "tanzo-schema.yaml"
+    assert schema_path.exists(), "Schema file does not exist"
     
-    profile = validate_tanzo_profile(yaml_string)
-    assert profile is not None
-    assert profile.profile.name == "YAML Test"
+    with open(schema_path, "r") as f:
+        schema = yaml.safe_load(f)
+    
+    # Basic schema structure validation
+    assert "$schema" in schema, "Missing $schema key"
+    assert "$id" in schema, "Missing $id key"
+    assert "title" in schema, "Missing title"
+    assert "properties" in schema, "Missing properties"
+    assert "definitions" in schema, "Missing definitions"
 
 
-def test_load_example_profiles():
-    """Test loading the example profiles."""
-    examples_dir = Path(__file__).parent.parent / "examples"
+def test_example_validation():
+    """Test validating example files against the schema."""
+    schema_path = ROOT_DIR / "spec" / "tanzo-schema.json"
+    example_files = [
+        ROOT_DIR / "examples" / "Kai_profile.yaml",
+        ROOT_DIR / "examples" / "digital_archetype_only.yaml",
+    ]
     
-    # Load Kai profile
-    kai_path = examples_dir / "Kai_profile.yaml"
-    profile = load_profile_from_yaml(kai_path)
-    assert profile is not None
-    assert profile.profile.name == "Kai - Technical Advisor"
+    with open(schema_path, "r") as f:
+        schema = json.load(f)
     
-    # Load minimal profile
-    minimal_path = examples_dir / "digital_archetype_only.yaml"
-    profile = load_profile_from_yaml(minimal_path)
-    assert profile is not None
-    assert profile.profile.name == "Digital Guide"
+    for example_file in example_files:
+        assert example_file.exists(), f"Example file {example_file} does not exist"
+        
+        with open(example_file, "r") as f:
+            if example_file.suffix.lower() in [".yaml", ".yml"]:
+                data = yaml.safe_load(f)
+            else:
+                data = json.load(f)
+        
+        # Validate using jsonschema
+        validate(instance=data, schema=schema)
+        
+        # Validate using our validator
+        assert validate_tanzo_file(example_file) is True
 
 
-def test_invalid_profile_validation():
-    """Test validation of invalid profiles."""
-    # Missing required field
-    invalid_profile = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Invalid Profile"
-            # Missing archetype
-        }
-    }
+def test_pydantic_validation():
+    """Test validating examples using Pydantic models."""
+    example_files = [
+        ROOT_DIR / "examples" / "Kai_profile.yaml",
+        ROOT_DIR / "examples" / "digital_archetype_only.yaml",
+    ]
     
-    with pytest.raises(ValueError):
-        validate_tanzo_profile(invalid_profile)
-    
-    # Invalid enum value
-    invalid_profile = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Invalid Profile",
-            "archetype": {
-                "primary": "invalid_archetype"  # Invalid value
-            }
-        }
-    }
-    
-    with pytest.raises(ValueError):
-        validate_tanzo_profile(invalid_profile)
+    for example_file in example_files:
+        data = load_tanzo_file(example_file)
+        
+        # Validate using Pydantic
+        tanzo_schema = TanzoSchema(**data)
+        
+        # Check basic properties
+        assert tanzo_schema.version == "0.1.0"
+        assert tanzo_schema.profile.name is not None
+        assert tanzo_schema.profile.archetype.type in ["digital", "physical", "hybrid"]
+        assert len(tanzo_schema.profile.archetype.attributes.personality.traits) > 0
 
 
-def test_secondary_archetype_constraint():
-    """Test that secondary archetype must differ from primary."""
-    invalid_profile = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Invalid Profile",
-            "archetype": {
-                "primary": "guide",
-                "secondary": "guide"  # Same as primary
-            }
-        }
-    }
+def test_load_tanzo_pydantic():
+    """Test loading files into Pydantic models."""
+    example_file = ROOT_DIR / "examples" / "Kai_profile.yaml"
     
-    with pytest.raises(ValueError):
-        validate_tanzo_profile(invalid_profile)
+    # Load the file as a Pydantic model
+    tanzo_schema = load_tanzo_pydantic(example_file)
+    
+    # Check that it loaded correctly
+    assert tanzo_schema.version == "0.1.0"
+    assert tanzo_schema.profile.name == "Kai"
+    assert tanzo_schema.profile.archetype.type == "digital"
+    
+    # Check traits
+    traits = tanzo_schema.profile.archetype.attributes.personality.traits
+    trait_names = [t.name for t in traits]
+    assert "empathy" in trait_names
+    assert "curiosity" in trait_names
+    
+    # Check behavior patterns if they exist
+    if (tanzo_schema.profile.archetype.attributes.behavior and 
+        tanzo_schema.profile.archetype.attributes.behavior.patterns):
+        patterns = tanzo_schema.profile.archetype.attributes.behavior.patterns
+        pattern_names = [p.name for p in patterns]
+        assert len(pattern_names) > 0
 
 
-def test_ratio_constraints():
-    """Test that ratio fields are constrained to 0.0-1.0."""
-    # Test with value too high
-    invalid_profile = {
-        "version": "0.1.0",
-        "profile": {
-            "name": "Invalid Profile",
-            "archetype": {
-                "primary": "guide"
-            },
-            "behaviors": [
-                {
-                    "name": "Test Behavior",
-                    "description": "A test behavior",
-                    "strength": 1.5  # Invalid: > 1.0
-                }
-            ]
-        }
-    }
+def test_invalid_schema_version():
+    """Test that invalid schema versions are rejected."""
+    # Create a copy of a valid schema with an invalid version
+    example_file = ROOT_DIR / "examples" / "Kai_profile.yaml"
+    with open(example_file, "r") as f:
+        data = yaml.safe_load(f)
     
-    with pytest.raises(ValueError):
-        validate_tanzo_profile(invalid_profile)
+    # Change the version
+    data["version"] = "0.2.0"
     
-    # Test with negative value
-    invalid_profile["profile"]["behaviors"][0]["strength"] = -0.5
-    
-    with pytest.raises(ValueError):
-        validate_tanzo_profile(invalid_profile)
+    # This should raise a validation error
+    with pytest.raises(Exception):
+        TanzoSchema(**data)

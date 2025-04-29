@@ -1,7 +1,7 @@
-$schema: https://json-schema.org/draft-07/schema#
+$schema: http://json-schema.org/draft-07/schema#
 $id: https://github.com/onalius/tanzo-lang-core/spec/tanzo-schema.yaml
 title: TanzoLang Schema
-description: YAML Schema for Tomodaichi Tanzo ecosystem profiles
+description: Schema specification for Tomodaichi Tanzo ecosystem profiles
 type: object
 required:
   - profile
@@ -9,269 +9,86 @@ required:
 properties:
   version:
     type: string
-    description: TanzoLang schema version
+    description: The version of the TanzoLang schema
     pattern: ^\\d+\\.\\d+\\.\\d+$
-    default: 0.1.0
+    default: "0.1.0"
   profile:
     type: object
     required:
       - name
-      - archetype
+      - archetypes
     properties:
       name:
         type: string
-        description: Profile name
-        minLength: 1
+        description: The name of the profile
       description:
         type: string
-        description: Profile description
-      archetype:
-        $ref: '#/definitions/Archetype'
-      behaviors:
+        description: A description of the profile
+      archetypes:
         type: array
-        description: List of behavioral traits
+        description: The archetypes defining this profile
+        minItems: 1
         items:
-          $ref: '#/definitions/Behavior'
-      personality:
-        $ref: '#/definitions/Personality'
-      communication:
-        $ref: '#/definitions/Communication'
-      knowledge:
-        $ref: '#/definitions/Knowledge'
-      preferences:
-        $ref: '#/definitions/Preferences'
-      simulation:
-        $ref: '#/definitions/Simulation'
+          $ref: "#/definitions/archetype"
       metadata:
         type: object
-        description: Additional custom metadata
+        description: Additional metadata for the profile
         additionalProperties: true
-
 definitions:
-  Archetype:
+  archetype:
     type: object
     required:
-      - primary
+      - type
+      - weight
     properties:
-      primary:
+      type:
         type: string
-        description: Primary archetype identifier
+        description: The type of the archetype
         enum:
-          - advisor
-          - companion
-          - creator
-          - educator
-          - entertainer
-          - expert
-          - guide
-      secondary:
-        type: string
-        description: Secondary archetype for hybrid profiles
-        enum:
-          - advisor
-          - companion
-          - creator
-          - educator
-          - entertainer
-          - expert
-          - guide
-      description:
-        type: string
-        description: Custom archetype description
-
-  Behavior:
+          - digital
+          - physical
+          - social
+          - emotional
+          - cognitive
+      weight:
+        type: number
+        description: The weight of this archetype in the profile (0.0-1.0)
+        minimum: 0
+        maximum: 1
+      traits:
+        type: array
+        description: Traits associated with this archetype
+        items:
+          $ref: "#/definitions/trait"
+      attributes:
+        type: object
+        description: Specific attributes for this archetype
+        additionalProperties:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: object
+  trait:
     type: object
     required:
       - name
-      - description
-      - strength
+      - value
     properties:
       name:
         type: string
-        description: Behavior name
+        description: The name of the trait
+      value:
+        type: number
+        description: The value of the trait (0.0-1.0)
+        minimum: 0
+        maximum: 1
+      variance:
+        type: number
+        description: The variance of the trait for simulation (0.0-1.0)
+        minimum: 0
+        maximum: 1
+        default: 0.1
       description:
         type: string
-        description: Behavior description
-      strength:
-        type: number
-        description: Behavior strength (0.0-1.0)
-        minimum: 0.0
-        maximum: 1.0
-      context:
-        type: string
-        description: When to apply this behavior
-        enum:
-          - always
-          - situational
-          - triggered
-      trigger:
-        type: string
-        description: Trigger pattern for situational behaviors
-
-  Personality:
-    type: object
-    properties:
-      traits:
-        type: object
-        description: OCEAN personality model traits
-        properties:
-          openness:
-            type: number
-            description: Openness to experience (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          conscientiousness:
-            type: number
-            description: Conscientiousness (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          extraversion:
-            type: number
-            description: Extraversion (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          agreeableness:
-            type: number
-            description: Agreeableness (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          neuroticism:
-            type: number
-            description: Neuroticism (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-      values:
-        type: array
-        description: Core values list
-        items:
-          type: string
-      character:
-        type: string
-        description: Character description
-
-  Communication:
-    type: object
-    properties:
-      style:
-        type: string
-        description: Communication style
-        enum:
-          - formal
-          - casual
-          - technical
-          - friendly
-          - direct
-          - nurturing
-          - playful
-      tone:
-        type: string
-        description: Communication tone
-        enum:
-          - professional
-          - warm
-          - enthusiastic
-          - neutral
-          - academic
-          - humorous
-      complexity:
-        type: number
-        description: Language complexity (0.0-1.0)
-        minimum: 0.0
-        maximum: 1.0
-      verbosity:
-        type: number
-        description: Response verbosity (0.0-1.0)
-        minimum: 0.0
-        maximum: 1.0
-
-  Knowledge:
-    type: object
-    properties:
-      domains:
-        type: array
-        description: Knowledge domains
-        items:
-          type: object
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: Domain name
-            proficiency:
-              type: number
-              description: Domain proficiency (0.0-1.0)
-              minimum: 0.0
-              maximum: 1.0
-            description:
-              type: string
-              description: Domain description
-      limitations:
-        type: array
-        description: Knowledge limitations
-        items:
-          type: string
-
-  Preferences:
-    type: object
-    properties:
-      interaction:
-        type: object
-        properties:
-          proactivity:
-            type: number
-            description: Proactivity level (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          detail:
-            type: number
-            description: Detail level preference (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-      response:
-        type: object
-        properties:
-          structure:
-            type: string
-            description: Response structure preference
-            enum:
-              - bullet-points
-              - paragraphs
-              - step-by-step
-              - narrative
-              - flexible
-          formatPreference:
-            type: string
-            description: Format preference
-            enum:
-              - text
-              - markdown
-              - code
-              - mixed
-
-  Simulation:
-    type: object
-    properties:
-      parameters:
-        type: object
-        properties:
-          temperature:
-            type: number
-            description: Simulation temperature (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          randomness:
-            type: number
-            description: Randomness level (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-          creativity:
-            type: number
-            description: Creativity level (0.0-1.0)
-            minimum: 0.0
-            maximum: 1.0
-      constraints:
-        type: array
-        description: Simulation constraints
-        items:
-          type: string
+        description: A description of the trait

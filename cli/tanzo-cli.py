@@ -1,106 +1,104 @@
 #!/usr/bin/env python3
+
 """
-Tanzo CLI - Command-line interface for TanzoLang
+TanzoLang CLI tool
 
-This CLI provides utilities for validating, simulating, and exporting TanzoLang profiles.
-
-Usage:
-    tanzo-cli.py validate <file>
-    tanzo-cli.py simulate <file> [--iterations=<n>]
-    tanzo-cli.py export <file> [--format=<fmt>]
-    tanzo-cli.py --help
+A command-line interface for working with TanzoLang profiles.
 """
 
 import os
 import sys
-import json
-import click
 from pathlib import Path
+from typing import Optional
 
-# Add parent directory to sys.path to import tanzo_schema
-sys.path.insert(0, str(Path(__file__).parent.parent))
-try:
-    from clients.python.tanzo_schema import (
-        validate_tanzo_profile, load_profile_from_yaml,
-        export_profile_shorthand, simulate_profile
-    )
-except ImportError:
-    sys.path.insert(0, str(Path(__file__).parent.parent / "clients" / "python"))
-    from tanzo_schema import (
-        validate_tanzo_profile, load_profile_from_yaml,
-        export_profile_shorthand, simulate_profile
-    )
+import click
+
+# Add the parent directory to the Python path to import the tanzo_schema package
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+from clients.python.tanzo_schema import validate_document, run_simulation, export_shorthand
 
 
 @click.group()
-@click.version_option(version="0.1.0")
 def cli():
-    """Tanzo CLI - Command-line interface for TanzoLang profiles."""
+    """TanzoLang CLI - Tools for working with TanzoLang profiles."""
     pass
 
 
-@cli.command("validate")
-@click.argument("file", type=click.Path(exists=True, readable=True, path_type=Path))
-def validate_cmd(file: Path):
+@cli.command()
+@click.argument('file', type=click.Path(exists=True, readable=True))
+def validate(file: str):
     """Validate a TanzoLang profile against the schema."""
     try:
-        profile = load_profile_from_yaml(file)
-        click.echo(f"✅ Profile '{profile.profile.name}' is valid!")
-        return 0
-    except ValueError as e:
-        click.echo(f"❌ Validation error: {str(e)}", err=True)
-        return 1
+        errors = validate_document(file)
+        
+        if not errors:
+            click.echo(click.style("Validation passed!", fg="green", bold=True))
+            return 0
+        else:
+            click.echo(click.style("Validation failed!", fg="red", bold=True))
+            for error in errors:
+                click.echo(click.style(f"  - {error}", fg="red"))
+            return 1
     except Exception as e:
-        click.echo(f"❌ Error: {str(e)}", err=True)
+        click.echo(click.style(f"Error: {e}", fg="red", bold=True))
         return 1
 
 
-@cli.command("simulate")
-@click.argument("file", type=click.Path(exists=True, readable=True, path_type=Path))
-@click.option(
-    "--iterations", "-i", type=int, default=100,
-    help="Number of Monte Carlo iterations to run (default: 100)"
-)
-def simulate_cmd(file: Path, iterations: int):
+@cli.command()
+@click.argument('file', type=click.Path(exists=True, readable=True))
+@click.option('--iterations', '-i', type=int, default=100, help='Number of simulation iterations to run')
+def simulate(file: str, iterations: int):
     """Run a Monte Carlo simulation on a TanzoLang profile."""
     try:
-        profile = load_profile_from_yaml(file)
-        result = simulate_profile(profile, iterations=iterations)
-        click.echo(result.summary)
+        # Validate the document first
+        errors = validate_document(file)
+        if errors:
+            click.echo(click.style("Validation failed!", fg="red", bold=True))
+            for error in errors:
+                click.echo(click.style(f"  - {error}", fg="red"))
+            return 1
+        
+        # Run the simulation
+        click.echo(f"Running simulation with {iterations} iterations...")
+        results = run_simulation(file, iterations=iterations)
+        
+        # Display the results
+        click.echo(results)
         return 0
     except Exception as e:
-        click.echo(f"❌ Error: {str(e)}", err=True)
+        click.echo(click.style(f"Error: {e}", fg="red", bold=True))
         return 1
 
 
-@cli.command("export")
-@click.argument("file", type=click.Path(exists=True, readable=True, path_type=Path))
-@click.option(
-    "--format", "-f", type=click.Choice(["short", "json", "yaml"]), default="short",
-    help="Export format (default: short)"
-)
-def export_cmd(file: Path, format: str):
-    """Export a TanzoLang profile in various formats."""
+@cli.command()
+@click.argument('file', type=click.Path(exists=True, readable=True))
+def export(file: str):
+    """Export a TanzoLang profile to a shorthand string."""
     try:
-        profile = load_profile_from_yaml(file)
+        # Validate the document first
+        errors = validate_document(file)
+        if errors:
+            click.echo(click.style("Validation failed!", fg="red", bold=True))
+            for error in errors:
+                click.echo(click.style(f"  - {error}", fg="red"))
+            return 1
         
-        if format == "short":
-            result = export_profile_shorthand(profile)
-            click.echo(result)
-        elif format == "json":
-            from tanzo_schema.exporters import export_profile_json
-            result = export_profile_json(profile)
-            click.echo(result)
-        elif format == "yaml":
-            from tanzo_schema.exporters import export_profile_yaml
-            result = export_profile_yaml(profile)
-            click.echo(result)
+        # Generate the shorthand
+        shorthand = export_shorthand(file)
         
+        # Display the result
+        click.echo(shorthand)
         return 0
     except Exception as e:
-        click.echo(f"❌ Error: {str(e)}", err=True)
+        click.echo(click.style(f"Error: {e}", fg="red", bold=True))
         return 1
+
+
+def main():
+    """Entry point for the CLI."""
+    return cli()
 
 
 if __name__ == "__main__":
-    sys.exit(cli())
+    sys.exit(main())

@@ -1,23 +1,33 @@
-# Tomodaichi Tanzo Language
+# TanzoLang Core
 
-Welcome to the TanzoLang documentation, the official specification and tooling for the Tomodaichi Tanzo ecosystem.
+Welcome to the documentation for the TanzoLang Core project, which houses the open JSON-Schema specification, helper SDK stubs, and CLI tooling for the Tomodaichi Tanzo ecosystem.
 
-## What is TanzoLang?
+## Overview
 
-TanzoLang is a JSON-Schema based language for defining and working with digital character profiles in the Tomodaichi Tanzo ecosystem. It provides a structured format for describing character archetypes, behaviors, personalities, communication styles, and more.
+TanzoLang is a schema for defining and working with profile archetypes in the Tomodaichi Tanzo ecosystem. This repository provides the canonical schema definition, client libraries for working with TanzoLang documents, and CLI tools for validating and manipulating profiles.
 
-## Key Features
+## Key Components
 
-- Standardized JSON Schema for digital character profiles
-- Client libraries for Python and TypeScript
-- CLI for validation, simulation, and export
-- Comprehensive test suite and documentation
+- **Schema Specification**: The canonical JSON Schema definition for TanzoLang documents.
+- **Python SDK**: A Pydantic-based library for working with TanzoLang profiles in Python.
+- **TypeScript SDK**: A Zod-based library for working with TanzoLang profiles in TypeScript.
+- **CLI Tool**: A command-line interface for validating, simulating, and exporting TanzoLang profiles.
 
 ## Getting Started
 
-### Installation
+See the [Getting Started](getting-started.md) guide for instructions on installing and using the TanzoLang tools.
 
-#### Python
+## Examples
 
-```bash
-pip install tanzo-schema
+The repository includes example TanzoLang profiles in the `examples/` directory:
+
+- `Kai_profile.yaml`: A sample profile with multiple archetypes.
+- `digital_archetype_only.yaml`: A simple profile with only a digital archetype.
+
+## Contributing
+
+We welcome contributions to the TanzoLang Core project! Please see the [CONTRIBUTING.md](https://github.com/onalius/tanzo-lang-core/blob/main/CONTRIBUTING.md) file for guidelines on how to contribute.
+
+## License
+
+TanzoLang Core is licensed under the Apache License, Version 2.0. See the [LICENSE](https://github.com/onalius/tanzo-lang-core/blob/main/LICENSE) file for more information.

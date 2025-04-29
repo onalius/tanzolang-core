@@ -1,133 +1,91 @@
 """
-Tests for the TanzoValidator class.
+Tests for the validator module of the tanzo_schema package.
 """
 
-import json
 import os
+import pytest
 from pathlib import Path
 
-import pytest
-import yaml
-
-from clients.python.tanzo_schema import TanzoProfile, TanzoValidator
+from clients.python.tanzo_schema import validate_document
+from clients.python.tanzo_schema.validator import load_schema, load_document
 
 
-@pytest.fixture
-def validator():
-    """Return a TanzoValidator instance."""
-    return TanzoValidator()
+def test_load_schema():
+    """Test loading the schema."""
+    schema = load_schema()
+    assert isinstance(schema, dict)
+    assert "$schema" in schema
+    assert "properties" in schema
+    assert "profile" in schema["properties"]
 
 
-@pytest.fixture
-def example_profile_path():
-    """Return the path to an example profile."""
-    return Path(__file__).parent.parent / "examples" / "Kai_profile.yaml"
+def test_load_document_yaml(example_file_path):
+    """Test loading a YAML document."""
+    document = load_document(example_file_path)
+    assert isinstance(document, dict)
+    assert "profile" in document
+    assert "version" in document
 
 
-@pytest.fixture
-def digital_profile_path():
-    """Return the path to the digital archetype example profile."""
-    return Path(__file__).parent.parent / "examples" / "digital_archetype_only.yaml"
+def test_load_document_json(example_json_path):
+    """Test loading a JSON document."""
+    document = load_document(example_json_path)
+    assert isinstance(document, dict)
+    assert "profile" in document
+    assert "version" in document
 
 
-@pytest.fixture
-def example_profile_data(example_profile_path):
-    """Load example profile data."""
-    with open(example_profile_path, "r") as f:
-        return yaml.safe_load(f)
+def test_load_document_nonexistent_file():
+    """Test loading a nonexistent file."""
+    with pytest.raises(FileNotFoundError):
+        load_document("nonexistent.yaml")
 
 
-@pytest.fixture
-def digital_profile_data(digital_profile_path):
-    """Load digital profile data."""
-    with open(digital_profile_path, "r") as f:
-        return yaml.safe_load(f)
+def test_load_document_invalid_yaml(invalid_yaml_path):
+    """Test loading an invalid YAML document."""
+    with pytest.raises(ValueError):
+        load_document(invalid_yaml_path)
 
 
-def test_validate_dict_valid(validator, example_profile_data):
-    """Test validating a valid dictionary."""
-    is_valid, errors = validator.validate_dict(example_profile_data)
-    assert is_valid
-    assert len(errors) == 0
+def test_validate_document_valid(example_file_path):
+    """Test validating a valid document."""
+    errors = validate_document(example_file_path)
+    assert errors == []
 
 
-def test_validate_dict_invalid(validator):
-    """Test validating an invalid dictionary."""
-    invalid_data = {
-        "identity": {
-            "name": "Test Entity"
-        },
-        # Missing required 'archetype' property
-        "traits": {}
+def test_validate_document_invalid(invalid_schema_path):
+    """Test validating an invalid document."""
+    errors = validate_document(invalid_schema_path)
+    assert len(errors) > 0
+
+
+def test_validate_document_dict():
+    """Test validating a document provided as a dictionary."""
+    document = {
+        "version": "0.1.0",
+        "profile": {
+            "name": "Test Profile",
+            "archetypes": [
+                {
+                    "type": "digital",
+                    "weight": 0.8
+                }
+            ]
+        }
     }
-    
-    is_valid, errors = validator.validate_dict(invalid_data)
-    assert not is_valid
-    assert len(errors) > 0
-    assert any("archetype" in error.lower() for error in errors)
+    errors = validate_document(document)
+    assert errors == []
 
 
-def test_validate_file_valid(validator, example_profile_path):
-    """Test validating a valid file."""
-    is_valid, errors = validator.validate_file(str(example_profile_path))
-    assert is_valid
-    assert len(errors) == 0
-
-
-def test_validate_file_nonexistent(validator):
-    """Test validating a nonexistent file."""
-    is_valid, errors = validator.validate_file("nonexistent.yaml")
-    assert not is_valid
-    assert len(errors) > 0
-    assert any("error loading file" in error.lower() for error in errors)
-
-
-def test_validate_file_invalid_extension(validator, tmp_path):
-    """Test validating a file with an invalid extension."""
-    file_path = tmp_path / "profile.txt"
-    with open(file_path, "w") as f:
-        f.write("This is not a YAML or JSON file")
-    
-    is_valid, errors = validator.validate_file(str(file_path))
-    assert not is_valid
-    assert len(errors) > 0
-    assert any("unsupported file extension" in error.lower() for error in errors)
-
-
-def test_validate_pydantic_valid(validator, example_profile_data):
-    """Test validating a valid Pydantic model."""
-    profile = TanzoProfile(**example_profile_data)
-    is_valid, errors = validator.validate_pydantic(profile)
-    assert is_valid
-    assert len(errors) == 0
-
-
-def test_validate_pydantic_missing_optional(validator):
-    """Test validating a Pydantic model with missing optional fields."""
-    minimal_data = {
-        "identity": {
-            "name": "Test Entity"
-        },
-        "archetype": {
-            "primary": "Sage"
-        },
-        "traits": {}
+def test_validate_document_missing_required():
+    """Test validating a document with missing required fields."""
+    document = {
+        "version": "0.1.0",
+        "profile": {
+            "name": "Test Profile",
+            "archetypes": []
+        }
     }
-    
-    profile = TanzoProfile(**minimal_data)
-    is_valid, errors = validator.validate_pydantic(profile)
-    assert is_valid
-    assert len(errors) == 0
-
-
-def test_validate_both_example_files(validator, example_profile_path, digital_profile_path):
-    """Test validating both example files."""
-    # Validate Kai profile
-    is_valid, errors = validator.validate_file(str(example_profile_path))
-    assert is_valid
-    assert len(errors) == 0
-    
-    # Validate digital archetype profile
-    is_valid, errors = validator.validate_file(str(digital_profile_path))
-    assert is_valid
-    assert len(errors) == 0
+    errors = validate_document(document)
+    assert len(errors) > 0
+    assert any("archetypes" in error for error in errors)

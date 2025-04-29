@@ -1,188 +1,136 @@
 /**
- * Zod schema definition for TanzoLang
+ * Zod schema definitions for TanzoLang
  */
 import { z } from 'zod';
 
-// Enums
-export const ArchetypeTypeEnum = z.enum([
-  'advisor',
-  'companion',
-  'creator',
-  'educator',
-  'entertainer',
-  'expert',
-  'guide'
-]);
-
-export const BehaviorContextEnum = z.enum([
-  'always',
-  'situational',
-  'triggered'
-]);
-
-export const CommunicationStyleEnum = z.enum([
-  'formal',
-  'casual',
-  'technical',
-  'friendly',
-  'direct',
-  'nurturing',
-  'playful'
-]);
-
-export const CommunicationToneEnum = z.enum([
-  'professional',
-  'warm',
-  'enthusiastic',
-  'neutral',
-  'academic',
-  'humorous'
-]);
-
-export const ResponseStructureEnum = z.enum([
-  'bullet-points',
-  'paragraphs',
-  'step-by-step',
-  'narrative',
-  'flexible'
-]);
-
-export const FormatPreferenceEnum = z.enum([
-  'text',
-  'markdown',
-  'code',
-  'mixed'
-]);
-
-// Type alias for values between 0.0 and 1.0
-const Ratio = z.number().min(0).max(1);
-
-// Schema definitions
-export const ArchetypeSchema = z.object({
-  primary: ArchetypeTypeEnum,
-  secondary: ArchetypeTypeEnum.optional(),
-  description: z.string().optional()
-}).refine(data => {
-  // If secondary is provided, it must differ from primary
-  if (data.secondary && data.secondary === data.primary) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Secondary archetype must differ from primary"
+// Define the personality trait schema
+export const personalityTrait = z.object({
+  name: z.string().describe('Name of the personality trait'),
+  value: z.number()
+    .min(0)
+    .max(1)
+    .describe('Strength of the trait between 0 and 1'),
+  variance: z.number()
+    .min(0)
+    .max(1)
+    .describe('Variance of the trait value (for simulation)')
+    .optional(),
 });
 
-export const BehaviorSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  strength: Ratio,
-  context: BehaviorContextEnum.optional().default('always'),
-  trigger: z.string().optional()
-}).refine(data => {
-  // If context is 'triggered', trigger must be provided
-  if (data.context === 'triggered' && !data.trigger) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Trigger must be provided for triggered behaviors"
+export type PersonalityTraitType = z.infer<typeof personalityTrait>;
+
+// Define the personality schema
+export const personality = z.object({
+  traits: z.array(personalityTrait).describe('Personality traits'),
+  values: z.array(z.string())
+    .describe('Core values that guide the archetype\'s behavior')
+    .optional(),
+  background: z.string()
+    .describe('Backstory or origin of the archetype')
+    .optional(),
 });
 
-export const PersonalityTraitsSchema = z.object({
-  openness: Ratio.optional().default(0.5),
-  conscientiousness: Ratio.optional().default(0.5),
-  extraversion: Ratio.optional().default(0.5),
-  agreeableness: Ratio.optional().default(0.5),
-  neuroticism: Ratio.optional().default(0.5)
+export type PersonalityType = z.infer<typeof personality>;
+
+// Define appearance schemas
+export const physicalAppearance = z.object({
+  height: z.string().optional(),
+  build: z.string().optional(),
+  age: z.number().optional(),
+  features: z.array(z.string()).optional(),
 });
 
-export const PersonalitySchema = z.object({
-  traits: PersonalityTraitsSchema.optional(),
-  values: z.array(z.string()).optional(),
-  character: z.string().optional()
+export type PhysicalAppearanceType = z.infer<typeof physicalAppearance>;
+
+export const digitalAppearance = z.object({
+  avatar: z.string()
+    .describe('Description of digital avatar')
+    .optional(),
+  style: z.string()
+    .describe('Visual style of digital representation')
+    .optional(),
 });
 
-export const CommunicationSchema = z.object({
-  style: CommunicationStyleEnum.optional(),
-  tone: CommunicationToneEnum.optional(),
-  complexity: Ratio.optional().default(0.5),
-  verbosity: Ratio.optional().default(0.5)
+export type DigitalAppearanceType = z.infer<typeof digitalAppearance>;
+
+export const appearance = z.object({
+  physical: physicalAppearance.optional(),
+  digital: digitalAppearance.optional(),
 });
 
-export const KnowledgeDomainSchema = z.object({
-  name: z.string(),
-  proficiency: Ratio.optional().default(0.5),
-  description: z.string().optional()
+export type AppearanceType = z.infer<typeof appearance>;
+
+// Define behavior schemas
+export const behaviorPattern = z.object({
+  name: z.string().describe('Name of the behavior pattern'),
+  description: z.string().describe('Description of the behavior pattern'),
+  triggers: z.array(z.string())
+    .describe('Events that trigger this behavior')
+    .optional(),
+  probability: z.number()
+    .min(0)
+    .max(1)
+    .describe('Probability of exhibiting this behavior when triggered')
+    .optional(),
 });
 
-export const KnowledgeSchema = z.object({
-  domains: z.array(KnowledgeDomainSchema).optional(),
-  limitations: z.array(z.string()).optional()
+export type BehaviorPatternType = z.infer<typeof behaviorPattern>;
+
+export const behavior = z.object({
+  patterns: z.array(behaviorPattern).optional(),
+  reactions: z.record(z.string(), z.string())
+    .describe('How the archetype reacts to different stimuli')
+    .optional(),
 });
 
-export const InteractionPreferencesSchema = z.object({
-  proactivity: Ratio.optional().default(0.5),
-  detail: Ratio.optional().default(0.5)
+export type BehaviorType = z.infer<typeof behavior>;
+
+// Define archetype schemas
+export const archetypeType = z.enum(['digital', 'physical', 'hybrid']);
+
+export type ArchetypeType = z.infer<typeof archetypeType>;
+
+export const archetypeAttributes = z.object({
+  personality: personality.describe('Personality attributes'),
+  appearance: appearance.optional().describe('Appearance attributes'),
+  capabilities: z.array(z.string())
+    .describe('Capabilities of the archetype')
+    .optional(),
+  behavior: behavior.optional().describe('Behavior attributes'),
 });
 
-export const ResponsePreferencesSchema = z.object({
-  structure: ResponseStructureEnum.optional(),
-  formatPreference: FormatPreferenceEnum.optional()
+export type ArchetypeAttributesType = z.infer<typeof archetypeAttributes>;
+
+export const archetype = z.object({
+  type: archetypeType.describe('The type of archetype'),
+  attributes: archetypeAttributes.describe('Attributes of the archetype'),
 });
 
-export const PreferencesSchema = z.object({
-  interaction: InteractionPreferencesSchema.optional(),
-  response: ResponsePreferencesSchema.optional()
+// Define profile schema
+export const profile = z.object({
+  name: z.string().describe('The name of the profile'),
+  description: z.string()
+    .describe('A description of the profile')
+    .optional(),
+  archetype: archetype.describe('The archetype definition'),
+  parameters: z.record(z.string(), z.any())
+    .describe('Custom parameters that affect the behavior of the profile')
+    .optional(),
+  metadata: z.record(z.string(), z.any())
+    .describe('Additional metadata about the profile')
+    .optional(),
 });
 
-export const SimulationParametersSchema = z.object({
-  temperature: Ratio.optional().default(0.7),
-  randomness: Ratio.optional().default(0.3),
-  creativity: Ratio.optional().default(0.5)
+export type ProfileType = z.infer<typeof profile>;
+
+// Define the top-level schema
+export const tanzoSchema = z.object({
+  version: z.string()
+    .describe('The version of the TanzoLang schema being used')
+    .refine(v => v === '0.1.0', {
+      message: "Only version '0.1.0' is currently supported",
+    }),
+  profile: profile.describe('The profile definition'),
 });
 
-export const SimulationSchema = z.object({
-  parameters: SimulationParametersSchema.optional(),
-  constraints: z.array(z.string()).optional()
-});
-
-export const ProfileDataSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  archetype: ArchetypeSchema,
-  behaviors: z.array(BehaviorSchema).optional(),
-  personality: PersonalitySchema.optional(),
-  communication: CommunicationSchema.optional(),
-  knowledge: KnowledgeSchema.optional(),
-  preferences: PreferencesSchema.optional(),
-  simulation: SimulationSchema.optional(),
-  metadata: z.record(z.any()).optional()
-});
-
-export const TanzoProfileSchema = z.object({
-  version: z.string().regex(/^\d+\.\d+\.\d+$/),
-  profile: ProfileDataSchema
-});
-
-// TypeScript type definitions derived from Zod schemas
-export type ArchetypeType = z.infer<typeof ArchetypeTypeEnum>;
-export type BehaviorContext = z.infer<typeof BehaviorContextEnum>;
-export type CommunicationStyle = z.infer<typeof CommunicationStyleEnum>;
-export type CommunicationTone = z.infer<typeof CommunicationToneEnum>;
-export type ResponseStructure = z.infer<typeof ResponseStructureEnum>;
-export type FormatPreference = z.infer<typeof FormatPreferenceEnum>;
-
-export type Archetype = z.infer<typeof ArchetypeSchema>;
-export type Behavior = z.infer<typeof BehaviorSchema>;
-export type PersonalityTraits = z.infer<typeof PersonalityTraitsSchema>;
-export type Personality = z.infer<typeof PersonalitySchema>;
-export type Communication = z.infer<typeof CommunicationSchema>;
-export type KnowledgeDomain = z.infer<typeof KnowledgeDomainSchema>;
-export type Knowledge = z.infer<typeof KnowledgeSchema>;
-export type InteractionPreferences = z.infer<typeof InteractionPreferencesSchema>;
-export type ResponsePreferences = z.infer<typeof ResponsePreferencesSchema>;
-export type Preferences = z.infer<typeof PreferencesSchema>;
-export type SimulationParameters = z.infer<typeof SimulationParametersSchema>;
-export type Simulation = z.infer<typeof SimulationSchema>;
-export type ProfileData = z.infer<typeof ProfileDataSchema>;
-export type TanzoProfile = z.infer<typeof TanzoProfileSchema>;
+export type TanzoSchemaType = z.infer<typeof tanzoSchema>;

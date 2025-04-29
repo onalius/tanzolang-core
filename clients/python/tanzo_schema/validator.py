@@ -1,120 +1,120 @@
 """
-Validation functions for TanzoLang profiles.
+Validator module for TanzoLang documents.
+
+This module provides functions to validate TanzoLang documents against
+the official JSON Schema.
 """
 
 import json
 import os
 from pathlib import Path
-from typing import Dict, Any, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
-import yaml
 import jsonschema
-from jsonschema import validate
-from pydantic import ValidationError
+import yaml
+from jsonschema import Draft7Validator
 
-from tanzo_schema.models import Profile
+from tanzo_schema.models import TanzoDocument
+
+# Get the absolute path to the schema file
+SCHEMA_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+    "spec", 
+    "tanzo-schema.json"
+)
 
 
-def _load_schema() -> Dict[str, Any]:
+def load_schema() -> Dict[str, Any]:
+    """Load the TanzoLang JSON Schema."""
+    try:
+        with open(SCHEMA_PATH, "r") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise ValueError(f"Failed to load schema: {e}")
+
+
+def load_document(file_path: Union[str, Path]) -> Dict[str, Any]:
     """
-    Load the TanzoLang JSON Schema.
+    Load a TanzoLang document from a file path.
     
-    Returns:
-        Dict[str, Any]: The schema as a dictionary
-    """
-    # Try to find the schema file in a few common locations
-    possible_paths = [
-        Path("spec/tanzo-schema.json"),  # Current working directory
-        Path(__file__).parent.parent.parent.parent / "spec" / "tanzo-schema.json",  # From package to repo root
-        Path("/spec/tanzo-schema.json"),  # Absolute path
-    ]
-    
-    for path in possible_paths:
-        if path.exists():
-            with open(path, "r") as f:
-                return json.load(f)
-    
-    # If schema not found, raise an error
-    raise FileNotFoundError(
-        "Could not find tanzo-schema.json. Make sure it exists in the spec directory."
-    )
-
-
-def validate_profile(profile_data: Dict[str, Any]) -> bool:
-    """
-    Validate a profile against the TanzoLang schema.
-    
-    Args:
-        profile_data (Dict[str, Any]): The profile data to validate
-        
-    Returns:
-        bool: True if valid, raises exception if invalid
-        
-    Raises:
-        jsonschema.exceptions.ValidationError: If profile does not conform to schema
-    """
-    schema = _load_schema()
-    validate(instance=profile_data, schema=schema)
-    return True
-
-
-def load_profile(file_path: Union[str, Path]) -> Profile:
-    """
-    Load and validate a profile from a file.
-    
-    Args:
-        file_path (Union[str, Path]): Path to the profile file (YAML or JSON)
-        
-    Returns:
-        Profile: A validated Pydantic model of the profile
-        
-    Raises:
-        FileNotFoundError: If file does not exist
-        ValidationError: If profile does not conform to the Pydantic model
-        jsonschema.exceptions.ValidationError: If profile does not conform to schema
+    Supports both JSON and YAML formats.
     """
     file_path = Path(file_path)
+    
     if not file_path.exists():
-        raise FileNotFoundError(f"Profile file not found: {file_path}")
+        raise FileNotFoundError(f"File not found: {file_path}")
     
-    # Load file based on extension
-    with open(file_path, "r") as f:
-        if file_path.suffix.lower() in [".yaml", ".yml"]:
-            profile_data = yaml.safe_load(f)
-        elif file_path.suffix.lower() == ".json":
-            profile_data = json.load(f)
-        else:
-            raise ValueError(f"Unsupported file format: {file_path.suffix}")
-    
-    # Validate against JSON Schema
-    validate_profile(profile_data)
-    
-    # Parse with Pydantic
-    return Profile.model_validate(profile_data)
+    try:
+        with open(file_path, "r") as f:
+            if file_path.suffix.lower() in (".yaml", ".yml"):
+                return yaml.safe_load(f)
+            else:
+                return json.load(f)
+    except (yaml.YAMLError, json.JSONDecodeError) as e:
+        raise ValueError(f"Failed to parse document: {e}")
 
 
-def save_profile(profile: Profile, file_path: Union[str, Path], format: str = "yaml") -> None:
+def validate_document(
+    document: Union[str, Path, Dict[str, Any], TanzoDocument],
+    schema: Optional[Dict[str, Any]] = None
+) -> List[str]:
     """
-    Save a profile to a file.
+    Validate a TanzoLang document against the schema.
     
     Args:
-        profile (Profile): The profile to save
-        file_path (Union[str, Path]): Path where to save the file
-        format (str, optional): Format to save as ("yaml" or "json"). Defaults to "yaml".
-        
-    Raises:
-        ValueError: If format is not supported
+        document: The document to validate. Can be a file path, a dictionary,
+                 or a TanzoDocument instance.
+        schema: Optional schema to validate against. If not provided,
+                the default schema will be used.
+    
+    Returns:
+        A list of validation errors. Empty list if validation passed.
     """
-    file_path = Path(file_path)
+    # Load the schema if not provided
+    if schema is None:
+        schema = load_schema()
     
-    # Convert to dictionary
-    profile_data = profile.model_dump(exclude_none=True)
+    # Load the document if it's a file path
+    if isinstance(document, (str, Path)):
+        document = load_document(document)
+    elif isinstance(document, TanzoDocument):
+        document = document.model_dump(exclude_none=True)
     
-    # Save in requested format
-    with open(file_path, "w") as f:
-        if format.lower() == "yaml":
-            yaml.dump(profile_data, f, sort_keys=False, default_flow_style=False)
-        elif format.lower() == "json":
-            json.dump(profile_data, f, indent=2)
-        else:
-            raise ValueError(f"Unsupported format: {format}. Use 'yaml' or 'json'.")
+    # Validate the document
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(document))
+    
+    # Convert errors to strings
+    return [
+        f"{'.'.join(str(p) for p in error.path)}: {error.message}"
+        for error in errors
+    ]
+
+
+def validate_and_parse(
+    document: Union[str, Path, Dict[str, Any]]
+) -> TanzoDocument:
+    """
+    Validate a document and parse it into a TanzoDocument if valid.
+    
+    Args:
+        document: The document to validate and parse.
+    
+    Returns:
+        A TanzoDocument instance.
+    
+    Raises:
+        ValueError: If the document is invalid.
+    """
+    # Load the document if it's a file path
+    if isinstance(document, (str, Path)):
+        document = load_document(document)
+    
+    # Validate the document
+    errors = validate_document(document)
+    
+    if errors:
+        raise ValueError(f"Invalid TanzoLang document: {'; '.join(errors)}")
+    
+    # Parse the document
+    return TanzoDocument.model_validate(document)

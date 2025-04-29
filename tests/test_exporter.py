@@ -1,130 +1,146 @@
 """
-Tests for the TanzoExporter class.
+Tests for the exporter module of the tanzo_schema package.
 """
 
 import json
-import os
-from pathlib import Path
-
-import pytest
 import yaml
+import pytest
 
-from clients.python.tanzo_schema import TanzoExporter, TanzoProfile
-
-
-@pytest.fixture
-def example_profile_path():
-    """Return the path to an example profile."""
-    return Path(__file__).parent.parent / "examples" / "Kai_profile.yaml"
+from clients.python.tanzo_schema import export_shorthand
+from clients.python.tanzo_schema.exporter import export_to_json, export_to_yaml
+from clients.python.tanzo_schema.models import Archetype, Profile, Trait, TanzoDocument
 
 
-@pytest.fixture
-def example_profile(example_profile_path):
-    """Load and parse the example profile."""
-    with open(example_profile_path, "r") as f:
-        data = yaml.safe_load(f)
-    return TanzoProfile(**data)
-
-
-@pytest.fixture
-def example_exporter(example_profile):
-    """Return a TanzoExporter for the example profile."""
-    return TanzoExporter(example_profile)
-
-
-def test_exporter_initialization(example_profile):
-    """Test that the exporter initializes correctly."""
-    exporter = TanzoExporter(example_profile)
-    assert exporter.profile == example_profile
-
-
-def test_to_json(example_exporter, example_profile):
-    """Test exporting to JSON format."""
-    json_output = example_exporter.to_json()
+def test_export_to_json():
+    """Test exporting a document to JSON."""
+    document = TanzoDocument(
+        version="0.1.0",
+        profile=Profile(
+            name="Test Profile",
+            archetypes=[
+                Archetype(
+                    type="digital",
+                    weight=0.8,
+                    traits=[
+                        Trait(
+                            name="trait1",
+                            value=0.5
+                        )
+                    ]
+                )
+            ]
+        )
+    )
     
-    # Check that the output is valid JSON
-    data = json.loads(json_output)
+    json_str = export_to_json(document)
+    parsed = json.loads(json_str)
     
-    # Check key attributes
-    assert data["identity"]["name"] == example_profile.identity.name
-    assert data["archetype"]["primary"] == example_profile.archetype.primary
+    assert parsed["version"] == "0.1.0"
+    assert parsed["profile"]["name"] == "Test Profile"
+    assert parsed["profile"]["archetypes"][0]["type"] == "digital"
+    assert parsed["profile"]["archetypes"][0]["traits"][0]["name"] == "trait1"
 
 
-def test_to_yaml(example_exporter, example_profile):
-    """Test exporting to YAML format."""
-    yaml_output = example_exporter.to_yaml()
+def test_export_to_yaml():
+    """Test exporting a document to YAML."""
+    document = TanzoDocument(
+        version="0.1.0",
+        profile=Profile(
+            name="Test Profile",
+            archetypes=[
+                Archetype(
+                    type="digital",
+                    weight=0.8,
+                    traits=[
+                        Trait(
+                            name="trait1",
+                            value=0.5
+                        )
+                    ]
+                )
+            ]
+        )
+    )
     
-    # Check that the output is valid YAML
-    data = yaml.safe_load(yaml_output)
+    yaml_str = export_to_yaml(document)
+    parsed = yaml.safe_load(yaml_str)
     
-    # Check key attributes
-    assert data["identity"]["name"] == example_profile.identity.name
-    assert data["archetype"]["primary"] == example_profile.archetype.primary
+    assert parsed["version"] == "0.1.0"
+    assert parsed["profile"]["name"] == "Test Profile"
+    assert parsed["profile"]["archetypes"][0]["type"] == "digital"
+    assert parsed["profile"]["archetypes"][0]["traits"][0]["name"] == "trait1"
 
 
-def test_to_shorthand(example_exporter):
-    """Test exporting to shorthand format."""
-    shorthand = example_exporter.to_shorthand()
+def test_export_shorthand_document():
+    """Test exporting a document to shorthand format."""
+    document = TanzoDocument(
+        version="0.1.0",
+        profile=Profile(
+            name="Test Profile",
+            archetypes=[
+                Archetype(
+                    type="digital",
+                    weight=0.8,
+                    traits=[
+                        Trait(
+                            name="trait1",
+                            value=0.5
+                        ),
+                        Trait(
+                            name="trait2",
+                            value=0.7
+                        )
+                    ]
+                ),
+                Archetype(
+                    type="social",
+                    weight=0.6
+                )
+            ]
+        )
+    )
     
-    # Check that the shorthand contains key information
-    assert "Kai Yamamoto" in shorthand
-    assert "Mentor" in shorthand
+    shorthand = export_shorthand(document)
     
-    # The shorthand should be a single line summary
+    assert "Test Profile" in shorthand
+    assert "dig:0.8" in shorthand
+    assert "trait1:0.5" in shorthand
+    assert "trait2:0.7" in shorthand
+    assert "soc:0.6" in shorthand
+
+
+def test_export_shorthand_file(example_file_path):
+    """Test exporting a file to shorthand format."""
+    shorthand = export_shorthand(example_file_path)
+    
     assert isinstance(shorthand, str)
-    assert len(shorthand.strip().split("\n")) == 1
+    assert len(shorthand) > 0
 
 
-def test_to_file(example_exporter, tmp_path):
-    """Test exporting to a file."""
-    # Test JSON export
-    json_path = tmp_path / "profile.json"
-    example_exporter.to_file(str(json_path))
+def test_export_to_json_pretty():
+    """Test exporting a document to pretty-printed JSON."""
+    document = TanzoDocument(
+        version="0.1.0",
+        profile=Profile(
+            name="Test Profile",
+            archetypes=[
+                Archetype(
+                    type="digital",
+                    weight=0.8
+                )
+            ]
+        )
+    )
     
-    assert json_path.exists()
-    with open(json_path, "r") as f:
-        json_data = json.load(f)
-    assert json_data["identity"]["name"] == "Kai Yamamoto"
+    json_str = export_to_json(document, pretty=True)
     
-    # Test YAML export
-    yaml_path = tmp_path / "profile.yaml"
-    example_exporter.to_file(str(yaml_path))
+    # Pretty-printed JSON should include line breaks
+    assert "\n" in json_str
     
-    assert yaml_path.exists()
-    with open(yaml_path, "r") as f:
-        yaml_data = yaml.safe_load(f)
-    assert yaml_data["identity"]["name"] == "Kai Yamamoto"
+    json_str_compact = export_to_json(document, pretty=False)
     
-    # Test shorthand export
-    txt_path = tmp_path / "profile.txt"
-    example_exporter.to_file(str(txt_path))
+    # Compact JSON should not include line breaks
+    assert "\n" not in json_str_compact
     
-    assert txt_path.exists()
-    with open(txt_path, "r") as f:
-        content = f.read()
-    assert "Kai Yamamoto" in content
-
-
-def test_to_file_with_format_override(example_exporter, tmp_path):
-    """Test exporting to a file with format override."""
-    # Export JSON to a file with a different extension
-    weird_path = tmp_path / "profile.weird"
-    example_exporter.to_file(str(weird_path), format_type="json")
-    
-    assert weird_path.exists()
-    with open(weird_path, "r") as f:
-        json_data = json.load(f)
-    assert json_data["identity"]["name"] == "Kai Yamamoto"
-
-
-def test_to_file_invalid_format(example_exporter, tmp_path):
-    """Test error handling for invalid format types."""
-    invalid_path = tmp_path / "profile.inv"
-    
-    # Should raise ValueError with invalid format
-    with pytest.raises(ValueError):
-        example_exporter.to_file(str(invalid_path), format_type="invalid")
-    
-    # Should also raise ValueError with unrecognized extension and no format specified
-    with pytest.raises(ValueError):
-        example_exporter.to_file(str(invalid_path))
+    # But both should parse to the same object
+    assert json.loads(json_str) == json.loads(json_str_compact)

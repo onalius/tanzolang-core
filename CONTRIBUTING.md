@@ -1,63 +1,55 @@
 # Contributing to TanzoLang Core
 
-Thank you for your interest in contributing to TanzoLang Core! This document provides guidelines and instructions for contributing to this project.
+Thank you for considering contributing to TanzoLang Core! This document outlines the process and guidelines for contributing to this project.
 
 ## Code of Conduct
 
-Please review our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## Getting Started
+## How Can I Contribute?
 
-1. Fork the repository
-2. Clone your forked repository
-3. Install development dependencies with Poetry: `poetry install`
-4. Install pre-commit hooks: `poetry run pre-commit install`
+### Reporting Bugs
+
+- Before creating a bug report, check the existing issues to see if the problem has already been reported.
+- If you're unable to find an open issue addressing the problem, open a new one.
+- Include a clear title and description, as much relevant information as possible, and a code sample or an executable test case demonstrating the expected behavior that is not occurring.
+
+### Suggesting Enhancements
+
+- Before creating an enhancement suggestion, check the existing issues to see if the enhancement has already been suggested.
+- If not, open a new issue with a clear title and description of the suggested enhancement.
+
+### Pull Requests
+
+- Fill in the required template.
+- Follow the code style of the project.
+- Run the tests to ensure they all pass.
+- Include appropriate tests for your changes.
+- Update the documentation as needed.
 
 ## Development Workflow
 
+### Git Workflow
+
+We follow a standard GitHub flow:
+
+1. Fork the repository.
+2. Create a new branch from `main` for your changes.
+3. Make your changes and commit them to your branch.
+4. Push your branch to your fork.
+5. Create a pull request to the `main` branch of the main repository.
+
 ### Branch Naming Convention
 
-Use the following format for branch names:
+We use the following branch naming convention:
 
-- `feature/short-description` - For new features
-- `fix/issue-short-description` - For bug fixes
-- `docs/short-description` - For documentation updates
-- `refactor/short-description` - For code refactoring
-- `test/short-description` - For adding or updating tests
+- `feature/short-description` for new features
+- `fix/short-description` for bug fixes
+- `docs/short-description` for documentation changes
+- `refactor/short-description` for code refactoring
+- `test/short-description` for adding or modifying tests
 
-Example: `feature/add-new-archetype-validator`
+### Commit Messages
 
-### Commit Message Convention
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages:
 
-We use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. This enables automatic versioning and changelog generation.
-
-Format: `<type>(<scope>): <description>`
-
-Types:
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, missing semicolons, etc.)
-- `refactor`: Code refactoring (no functional changes)
-- `test`: Adding or updating tests
-- `chore`: Build process or auxiliary tool changes
-
-Examples:
-- `feat(schema): add new communication style options`
-- `fix(cli): resolve validation error handling issue`
-- `docs(readme): update installation instructions`
-
-### Pre-commit Hooks
-
-We use pre-commit hooks to enforce code quality. The hooks run:
-
-- Black for code formatting
-- isort for import sorting
-- mypy for type checking
-- ruff for linting
-- Commitizen for commit message validation
-
-If a pre-commit hook fails, the commit will be aborted. You can run the checks manually:
-
-```bash
-poetry run pre-commit run --all-files

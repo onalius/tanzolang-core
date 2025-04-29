@@ -1,103 +1,110 @@
 /**
- * Validation functions for TanzoLang profiles.
+ * Validator for TanzoLang profiles.
+ * 
+ * This module provides functionality to validate TanzoLang profiles against the schema.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { YAML } from 'yaml';
 import { z } from 'zod';
-import { parse, stringify } from 'yaml';
-import { ProfileSchema, Profile } from './types';
+import { tanzoProfileSchema, TanzoProfile } from './schema';
 
-/**
- * Load the TanzoLang JSON Schema
- * @returns The schema as an object
- */
-export function loadSchema(): any {
-  // Try to find the schema file in a few common locations
-  const possiblePaths = [
-    path.resolve(process.cwd(), 'spec/tanzo-schema.json'),
-    path.resolve(__dirname, '../../../spec/tanzo-schema.json'),
-    '/spec/tanzo-schema.json'
-  ];
+export class TanzoValidator {
+  private schema: any;
 
-  for (const schemaPath of possiblePaths) {
-    if (fs.existsSync(schemaPath)) {
-      const schemaContent = fs.readFileSync(schemaPath, 'utf8');
-      return JSON.parse(schemaContent);
+  /**
+   * Initialize the validator with the schema.
+   * 
+   * @param schemaPath - Path to the schema file. If undefined, the default schema is used.
+   */
+  constructor(schemaPath?: string) {
+    if (schemaPath) {
+      this.schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    } else {
+      // Try to find the schema in the package
+      try {
+        // First, check if we're running from within the repository
+        const repoSchemaPath = path.resolve(__dirname, '../../../spec/tanzo-schema.json');
+        if (fs.existsSync(repoSchemaPath)) {
+          this.schema = JSON.parse(fs.readFileSync(repoSchemaPath, 'utf8'));
+        } else {
+          // Then check for a bundled schema
+          const bundledSchemaPath = path.resolve(__dirname, '../tanzo-schema.json');
+          if (fs.existsSync(bundledSchemaPath)) {
+            this.schema = JSON.parse(fs.readFileSync(bundledSchemaPath, 'utf8'));
+          } else {
+            throw new Error('Could not find the TanzoLang schema file.');
+          }
+        }
+      } catch (error) {
+        throw new Error(`Failed to load the TanzoLang schema: ${error}`);
+      }
     }
   }
 
-  // If schema not found, throw an error
-  throw new Error(
-    'Could not find tanzo-schema.json. Make sure it exists in the spec directory.'
-  );
-}
-
-/**
- * Validate a profile against the TanzoLang schema
- * @param profileData The profile data to validate
- * @returns True if valid, throws error if invalid
- */
-export function validateProfile(profileData: any): boolean {
-  try {
-    // Validate with Zod schema
-    ProfileSchema.parse(profileData);
-    return true;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw new Error(`Profile validation failed: ${error.message}`);
+  /**
+   * Validate a TanzoLang profile file against the schema.
+   * 
+   * @param filePath - Path to the profile file (JSON or YAML).
+   * @returns True if the profile is valid.
+   * @throws {Error} If the file cannot be found or if the profile is invalid.
+   */
+  public validateFile(filePath: string): boolean {
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Profile file not found: ${filePath}`);
     }
-    throw error;
-  }
-}
 
-/**
- * Load and validate a profile from a file
- * @param filePath Path to the profile file (YAML or JSON)
- * @returns A validated profile object
- */
-export function loadProfile(filePath: string): Profile {
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Profile file not found: ${filePath}`);
-  }
+    // Load the profile from the file
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    let profileData: any;
 
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  let profileData: any;
+    if (filePath.endsWith('.yaml') || filePath.endsWith('.yml')) {
+      profileData = YAML.parse(fileContent);
+    } else if (filePath.endsWith('.json')) {
+      profileData = JSON.parse(fileContent);
+    } else {
+      throw new Error(`Unsupported file format: ${filePath}`);
+    }
 
-  // Load file based on extension
-  const ext = path.extname(filePath).toLowerCase();
-  if (ext === '.yaml' || ext === '.yml') {
-    profileData = parse(fileContent);
-  } else if (ext === '.json') {
-    profileData = JSON.parse(fileContent);
-  } else {
-    throw new Error(`Unsupported file format: ${ext}`);
+    return this.validate(profileData);
   }
 
-  // Validate with Zod schema
-  return ProfileSchema.parse(profileData);
-}
+  /**
+   * Validate a TanzoLang profile against the schema.
+   * 
+   * @param profileData - The profile data to validate.
+   * @returns True if the profile is valid.
+   * @throws {Error} If the profile is invalid.
+   */
+  public validate(profileData: any): boolean {
+    try {
+      // Validate using Zod schema
+      tanzoProfileSchema.parse(profileData);
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(`Profile validation failed: ${JSON.stringify(error.errors)}`);
+      }
+      throw new Error(`Profile validation failed: ${error}`);
+    }
+  }
 
-/**
- * Save a profile to a file
- * @param profile The profile to save
- * @param filePath Path where to save the file
- * @param format Format to save as ('yaml' or 'json')
- */
-export function saveProfile(
-  profile: Profile,
-  filePath: string,
-  format: 'yaml' | 'json' = 'yaml'
-): void {
-  // Remove undefined properties
-  const cleanProfile = JSON.parse(JSON.stringify(profile));
-
-  // Save in requested format
-  if (format === 'yaml') {
-    fs.writeFileSync(filePath, stringify(cleanProfile));
-  } else if (format === 'json') {
-    fs.writeFileSync(filePath, JSON.stringify(cleanProfile, null, 2));
-  } else {
-    throw new Error(`Unsupported format: ${format}. Use 'yaml' or 'json'.`);
+  /**
+   * Parse and validate a TanzoLang profile.
+   * 
+   * @param profileData - The profile data to parse and validate.
+   * @returns The parsed and validated TanzoProfile.
+   * @throws {Error} If the profile is invalid.
+   */
+  public parseProfile(profileData: any): TanzoProfile {
+    try {
+      return tanzoProfileSchema.parse(profileData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(`Profile parsing failed: ${JSON.stringify(error.errors)}`);
+      }
+      throw new Error(`Profile parsing failed: ${error}`);
+    }
   }
 }
