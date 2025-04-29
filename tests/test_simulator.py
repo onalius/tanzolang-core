@@ -1,180 +1,203 @@
 """
-Tests for the TanzoLang simulator.
+Tests for the TanzoLang simulator
 """
 
 import os
+import sys
+import unittest
 from pathlib import Path
-
 import numpy as np
-import pytest
 
-from tanzo_schema.simulator import (
-    _simulate_value,
-    _simulate_trait,
-    _simulate_attribute,
-    simulate_single_profile,
-    simulate_profile,
-    summarize_simulations,
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from clients.python.tanzo_schema.simulator import (
+    sample_distribution,
+    simulate_attribute,
+    simulate_profile_once,
+    simulate_profile
 )
-from tanzo_schema.validator import load_profile
+from clients.python.tanzo_schema.models import (
+    NormalDistribution,
+    UniformDistribution,
+    DiscreteDistribution,
+    Attribute
+)
 
 
-# Find the root directory of the project
-ROOT_DIR = Path(__file__).resolve().parent.parent
-EXAMPLES_DIR = ROOT_DIR / "examples"
+class TestSimulator(unittest.TestCase):
+    """Tests for the tanzo_schema simulator module"""
+    
+    def setUp(self):
+        """Setup test distributions and attributes"""
+        # Create test distributions
+        self.normal_dist = NormalDistribution(distribution="normal", mean=10.0, stdDev=2.0)
+        self.uniform_dist = UniformDistribution(distribution="uniform", min=5.0, max=15.0)
+        self.discrete_dist = DiscreteDistribution(
+            distribution="discrete",
+            values=["low", "medium", "high"],
+            weights=[0.2, 0.5, 0.3]
+        )
+        
+        # Create test attributes
+        self.normal_attr = Attribute(
+            name="normal_attr",
+            value=self.normal_dist,
+            description="A normal distribution attribute",
+            unit="points"
+        )
+        
+        self.uniform_attr = Attribute(
+            name="uniform_attr",
+            value=self.uniform_dist
+        )
+        
+        self.discrete_attr = Attribute(
+            name="discrete_attr",
+            value=self.discrete_dist
+        )
+        
+        self.fixed_attr = Attribute(
+            name="fixed_attr",
+            value="fixed_value"
+        )
+        
+        # Path to example profiles
+        self.examples_dir = Path(__file__).parent.parent / "examples"
+        self.valid_example = self.examples_dir / "Kai_profile.yaml"
+    
+    def test_sample_normal_distribution(self):
+        """Test sampling from a normal distribution"""
+        # Sample multiple times to test distribution properties
+        samples = [sample_distribution(self.normal_dist) for _ in range(1000)]
+        
+        # Check basic statistics
+        mean = np.mean(samples)
+        std_dev = np.std(samples)
+        
+        # Should be approximately close to the specified parameters
+        # (allowing for some random variation)
+        self.assertAlmostEqual(mean, 10.0, delta=0.5)
+        self.assertAlmostEqual(std_dev, 2.0, delta=0.5)
+    
+    def test_sample_uniform_distribution(self):
+        """Test sampling from a uniform distribution"""
+        # Sample multiple times
+        samples = [sample_distribution(self.uniform_dist) for _ in range(1000)]
+        
+        # All samples should be within range
+        for sample in samples:
+            self.assertGreaterEqual(sample, 5.0)
+            self.assertLessEqual(sample, 15.0)
+        
+        # Mean should be approximately the average of min and max
+        mean = np.mean(samples)
+        self.assertAlmostEqual(mean, 10.0, delta=0.5)
+    
+    def test_sample_discrete_distribution(self):
+        """Test sampling from a discrete distribution"""
+        # Sample multiple times
+        samples = [sample_distribution(self.discrete_dist) for _ in range(1000)]
+        
+        # All samples should be one of the possible values
+        for sample in samples:
+            self.assertIn(sample, ["low", "medium", "high"])
+        
+        # Frequency should approximately match weights
+        low_count = samples.count("low")
+        medium_count = samples.count("medium")
+        high_count = samples.count("high")
+        
+        self.assertAlmostEqual(low_count / 1000, 0.2, delta=0.05)
+        self.assertAlmostEqual(medium_count / 1000, 0.5, delta=0.05)
+        self.assertAlmostEqual(high_count / 1000, 0.3, delta=0.05)
+    
+    def test_simulate_attribute(self):
+        """Test simulating an attribute"""
+        # Test with normal distribution
+        name, value = simulate_attribute(self.normal_attr)
+        self.assertEqual(name, "normal_attr")
+        self.assertIsInstance(value, float)
+        
+        # Test with fixed value
+        name, value = simulate_attribute(self.fixed_attr)
+        self.assertEqual(name, "fixed_attr")
+        self.assertEqual(value, "fixed_value")
+    
+    def test_simulate_profile_once(self):
+        """Test simulating a profile once"""
+        # Use a real example profile
+        from clients.python.tanzo_schema.validator import validate_profile
+        profile = validate_profile(self.valid_example)
+        
+        # Run the simulation
+        result = simulate_profile_once(profile)
+        
+        # Check the structure of the result
+        self.assertIn("Online Avatar", result)
+        self.assertIn("Physical Self", result)
+        
+        # Check attributes in the digital archetype
+        digital = result["Online Avatar"]
+        self.assertIn("username", digital)
+        self.assertIn("screen_time", digital)
+        self.assertIn("social_influence", digital)
+        
+        # Check attributes in the physical archetype
+        physical = result["Physical Self"]
+        self.assertIn("height", physical)
+        self.assertIn("weight", physical)
+        self.assertIn("activity_level", physical)
+        
+        # Username should be fixed
+        self.assertEqual(digital["username"], "kai_digital")
+        
+        # Height should be fixed
+        self.assertEqual(physical["height"], 175)
+        
+        # Activity level should be one of the discrete values
+        self.assertIn(physical["activity_level"], ["low", "medium", "high"])
+    
+    def test_simulate_profile(self):
+        """Test running multiple simulations and generating statistics"""
+        # Run simulation with fewer iterations for speed
+        result = simulate_profile(str(self.valid_example), iterations=10)
+        
+        # Check the structure of the result
+        self.assertEqual(result["profile_name"], "Kai's Digital Twin")
+        self.assertEqual(result["iterations"], 10)
+        self.assertIn("archetypes", result)
+        
+        # Check archetypes
+        archetypes = result["archetypes"]
+        self.assertIn("Online Avatar", archetypes)
+        self.assertIn("Physical Self", archetypes)
+        
+        # Check attributes and their statistics
+        digital_attrs = archetypes["Online Avatar"]
+        self.assertIn("username", digital_attrs)
+        self.assertIn("fixed_value", digital_attrs["username"])
+        
+        # Screen time should have numeric statistics
+        self.assertIn("screen_time", digital_attrs)
+        screen_time_stats = digital_attrs["screen_time"]
+        self.assertIn("mean", screen_time_stats)
+        self.assertIn("median", screen_time_stats)
+        self.assertIn("min", screen_time_stats)
+        self.assertIn("max", screen_time_stats)
+        self.assertIn("std_dev", screen_time_stats)
+        
+        # Activity level should have frequency statistics
+        physical_attrs = archetypes["Physical Self"]
+        self.assertIn("activity_level", physical_attrs)
+        activity_stats = physical_attrs["activity_level"]
+        self.assertIn("frequencies", activity_stats)
+        
+        # Check all possible values are represented in frequencies
+        frequencies = activity_stats["frequencies"]
+        for value in ["low", "medium", "high"]:
+            self.assertIn(value, frequencies)
 
 
-def test_simulate_value():
-    """Test the _simulate_value function."""
-    # Set random seed for reproducibility
-    np.random.seed(42)
-    
-    # Test with a specific variance
-    value = _simulate_value(50, 10)
-    assert 0 <= value <= 100, "Simulated value should be within bounds"
-    
-    # Test with global variance factor
-    value = _simulate_value(50, None, 0.2)
-    assert 0 <= value <= 100, "Simulated value should be within bounds"
-    
-    # Test with different bounds
-    value = _simulate_value(5, 1, 0.1, 1, 10)
-    assert 1 <= value <= 10, "Simulated value should be within custom bounds"
-
-
-def test_simulate_trait():
-    """Test the _simulate_trait function."""
-    # Set random seed for reproducibility
-    np.random.seed(42)
-    
-    trait_data = {
-        "value": 75,
-        "variance": 10,
-        "description": "Test trait"
-    }
-    
-    simulated = _simulate_trait(trait_data, 0.2)
-    
-    # Check that all original fields are preserved
-    assert "value" in simulated
-    assert "variance" in simulated
-    assert "description" in simulated
-    assert simulated["description"] == "Test trait"
-    
-    # Check that value is simulated
-    assert simulated["value"] != 75, "Value should be different after simulation"
-    assert 0 <= simulated["value"] <= 100, "Simulated value should be within bounds"
-    
-    # Check that a simulated flag is added
-    assert "simulated" in simulated
-    assert simulated["simulated"] is True
-
-
-def test_simulate_attribute():
-    """Test the _simulate_attribute function."""
-    # Set random seed for reproducibility
-    np.random.seed(42)
-    
-    attr_data = {
-        "value": 60,
-        "variance": 15,
-        "notes": "Test attribute"
-    }
-    
-    simulated = _simulate_attribute(attr_data, 0.2)
-    
-    # Check that all original fields are preserved
-    assert "value" in simulated
-    assert "variance" in simulated
-    assert "notes" in simulated
-    assert simulated["notes"] == "Test attribute"
-    
-    # Check that value is simulated
-    assert simulated["value"] != 60, "Value should be different after simulation"
-    assert 0 <= simulated["value"] <= 100, "Simulated value should be within bounds"
-    
-    # Check that a simulated flag is added
-    assert "simulated" in simulated
-    assert simulated["simulated"] is True
-
-
-def test_simulate_single_profile():
-    """Test the simulate_single_profile function."""
-    # Load a test profile
-    profile_path = EXAMPLES_DIR / "Kai_profile.yaml"
-    profile_data = load_profile(profile_path)
-    
-    # Set random seed for reproducibility
-    np.random.seed(42)
-    
-    # Simulate the profile
-    simulated = simulate_single_profile(profile_data)
-    
-    # Check that the overall structure is preserved
-    assert "metadata" in simulated
-    assert "digital_archetype" in simulated
-    assert "traits" in simulated["digital_archetype"]
-    assert "attributes" in simulated["digital_archetype"]
-    
-    # Check that the simulation metadata is added
-    assert "simulated" in simulated["metadata"]
-    assert simulated["metadata"]["simulated"] is True
-    
-    # Check that the trait values are different
-    orig_openness = profile_data["digital_archetype"]["traits"]["openness"]["value"]
-    sim_openness = simulated["digital_archetype"]["traits"]["openness"]["value"]
-    assert orig_openness != sim_openness, "Trait values should be different after simulation"
-
-
-def test_simulate_profile():
-    """Test the simulate_profile function."""
-    # Load a test profile
-    profile_path = EXAMPLES_DIR / "Kai_profile.yaml"
-    
-    # Simulate the profile with multiple iterations
-    simulations = simulate_profile(profile_path, iterations=5)
-    
-    # Check that we get the expected number of simulations
-    assert len(simulations) == 5, "Should return the requested number of simulations"
-    
-    # Check that all simulations are different
-    openness_values = [
-        sim["digital_archetype"]["traits"]["openness"]["value"]
-        for sim in simulations
-    ]
-    assert len(set(openness_values)) > 1, "Multiple simulations should have different values"
-
-
-def test_summarize_simulations():
-    """Test the summarize_simulations function."""
-    # Load a test profile
-    profile_path = EXAMPLES_DIR / "Kai_profile.yaml"
-    
-    # Simulate the profile with multiple iterations
-    simulations = simulate_profile(profile_path, iterations=10)
-    
-    # Generate summary
-    summary = summarize_simulations(simulations)
-    
-    # Check that the summary contains expected traits
-    assert "openness" in summary
-    assert "conscientiousness" in summary
-    assert "extraversion" in summary
-    assert "agreeableness" in summary
-    assert "neuroticism" in summary
-    
-    # Check that each trait summary has the expected statistics
-    for trait in ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"]:
-        assert "mean" in summary[trait]
-        assert "median" in summary[trait]
-        assert "std_dev" in summary[trait]
-        assert "min" in summary[trait]
-        assert "max" in summary[trait]
-        assert "samples" in summary[trait]
-        assert summary[trait]["samples"] == 10
-
-
-def test_empty_simulations_summary():
-    """Test that summarize_simulations handles empty input."""
-    summary = summarize_simulations([])
-    assert summary == {}, "Summary of empty simulations should be an empty dict"
+if __name__ == "__main__":
+    unittest.main()

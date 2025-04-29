@@ -1,148 +1,109 @@
 /**
- * Exporter for TanzoLang profiles to various formats
+ * Export utilities for TanzoLang profiles
  */
 
-import { TanzoProfileType } from './models';
-import * as fs from 'fs';
+import { 
+  TanzoProfile,
+  Attribute,
+  NormalDistribution,
+  UniformDistribution,
+  DiscreteDistribution
+} from './models';
+import { validateProfile } from './validator';
 
 /**
- * Exporter for TanzoLang profiles
+ * Format a probability distribution as a concise string
+ * 
+ * @param distribution The distribution to format
+ * @returns A formatted string representation
  */
-export class TanzoExporter {
-  private profile: TanzoProfileType;
-
-  /**
-   * Initialize the exporter with a profile
-   * 
-   * @param profile TanzoProfile instance
-   */
-  constructor(profile: TanzoProfileType) {
-    this.profile = profile;
+export function formatDistribution(
+  distribution: NormalDistribution | UniformDistribution | DiscreteDistribution
+): string {
+  if (distribution.distribution === 'normal') {
+    return `N(${distribution.mean.toFixed(2)}, ${distribution.stdDev.toFixed(2)})`;
   }
-
-  /**
-   * Export the profile to a plain object
-   * Removes undefined/null values
-   * 
-   * @returns Object representation of the profile
-   */
-  public toObject(): Record<string, any> {
-    return this.removeEmpty(JSON.parse(JSON.stringify(this.profile)));
+  
+  else if (distribution.distribution === 'uniform') {
+    return `U(${distribution.min.toFixed(2)}, ${distribution.max.toFixed(2)})`;
   }
-
-  /**
-   * Export the profile to a JSON string
-   * 
-   * @param indent Number of spaces for indentation
-   * @returns JSON string representation of the profile
-   */
-  public toJson(indent: number = 2): string {
-    return JSON.stringify(this.toObject(), null, indent);
-  }
-
-  /**
-   * Export the profile to a YAML string
-   * 
-   * @returns YAML string representation of the profile
-   */
-  public toYaml(): string {
-    try {
-      const yaml = require('js-yaml');
-      return yaml.dump(this.toObject(), { sortKeys: false });
-    } catch (error) {
-      console.error('js-yaml is required to generate YAML. Please install it with: npm install js-yaml');
-      throw new Error('js-yaml is required to generate YAML');
-    }
-  }
-
-  /**
-   * Export the profile to a shorthand string format
-   * This is a compact representation for quick reference
-   * 
-   * @returns Shorthand string representation of the profile
-   */
-  public toShorthand(): string {
-    const da = this.profile.digital_archetype;
-    const attributes = this.profile.attributes;
-    
-    // Name, category and top traits
-    const parts: string[] = [
-      `${da.name} (${da.category})`,
-      'Traits:',
-      Object.entries(attributes.personality.traits)
-        .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}`)
-        .join(', '),
-    ];
-    
-    // Top 3 skills
-    const capabilities = attributes.abilities.core_capabilities;
-    if (capabilities && capabilities.length > 0) {
-      const skills = capabilities.slice(0, 3);
-      if (capabilities.length > 3) {
-        skills.push('...');
+  
+  else if (distribution.distribution === 'discrete') {
+    // Format discrete values and weights
+    const pairs = distribution.values.map((val, i) => {
+      // Format the value based on its type
+      let formattedVal: string;
+      if (typeof val === 'string') {
+        formattedVal = `"${val}"`;
+      } else if (typeof val === 'boolean') {
+        formattedVal = String(val).toLowerCase();
+      } else {
+        formattedVal = String(val);
       }
-      parts.push('Skills: ' + skills.join(', '));
-    }
+      
+      return `${formattedVal}:${distribution.weights[i].toFixed(2)}`;
+    });
     
-    // Knowledge domains
-    const domains = attributes.knowledge.domains;
-    if (domains && domains.length > 0) {
-      const domainList = domains.slice(0, 3);
-      if (domains.length > 3) {
-        domainList.push('...');
-      }
-      parts.push(
-        `Knowledge (${attributes.knowledge.expertise_level}): ` + 
-        domainList.join(', ')
-      );
-    }
-    
-    // Basic metadata
-    if (this.profile.metadata && this.profile.metadata.author) {
-      parts.push(`By: ${this.profile.metadata.author}`);
-    }
-    
-    parts.push(`Version: ${this.profile.profile_version}`);
-    
-    return parts.join(' | ');
+    return `D(${pairs.join(', ')})`;
   }
+  
+  throw new Error(`Unknown distribution type: ${(distribution as any).distribution}`);
+}
 
-  /**
-   * Save the profile to a JSON file
-   * 
-   * @param filePath Path to save the file
-   * @param indent Number of spaces for indentation
-   */
-  public saveJson(filePath: string, indent: number = 2): void {
-    fs.writeFileSync(filePath, this.toJson(indent), 'utf8');
+/**
+ * Format an attribute as a concise string
+ * 
+ * @param attribute The attribute to format
+ * @returns A formatted string representation
+ */
+export function formatAttribute(attribute: Attribute): string {
+  const value = attribute.value;
+  
+  // Format based on value type
+  let formattedValue: string;
+  if (typeof value === 'object' && 'distribution' in value) {
+    formattedValue = formatDistribution(value);
+  } else if (typeof value === 'string') {
+    formattedValue = `"${value}"`;
+  } else if (typeof value === 'boolean') {
+    formattedValue = String(value).toLowerCase();
+  } else {
+    formattedValue = String(value);
   }
-
-  /**
-   * Save the profile to a YAML file
-   * 
-   * @param filePath Path to save the file
-   */
-  public saveYaml(filePath: string): void {
-    fs.writeFileSync(filePath, this.toYaml(), 'utf8');
+  
+  // Include unit if available
+  if (attribute.unit) {
+    return `${attribute.name}=${formattedValue} ${attribute.unit}`;
+  } else {
+    return `${attribute.name}=${formattedValue}`;
   }
+}
 
-  /**
-   * Recursively remove empty values (null, undefined) from an object
-   * 
-   * @param obj Object to clean
-   * @returns Cleaned object without empty values
-   */
-  private removeEmpty(obj: any): any {
-    if (Array.isArray(obj)) {
-      return obj
-        .map(v => this.removeEmpty(v))
-        .filter(v => v !== undefined && v !== null);
-    } else if (obj !== null && typeof obj === 'object') {
-      return Object.entries(obj)
-        .map(([k, v]) => [k, this.removeEmpty(v)])
-        .filter(([_, v]) => v !== undefined && v !== null)
-        .reduce((a, [k, v]) => ({ ...a, [k]: v }), {});
+/**
+ * Export a TanzoLang profile as a concise string representation
+ * 
+ * @param profilePath Path to the profile file
+ * @returns A formatted string representation of the profile
+ */
+export function exportProfile(profilePath: string): string {
+  // Validate the profile first
+  const profile = validateProfile(profilePath);
+  
+  // Format the profile
+  const lines: string[] = [`TanzoProfile: ${profile.profile.name} (v${profile.version})`];
+  
+  // Format each archetype
+  for (const archetype of profile.profile.archetypes) {
+    const archetypeName = archetype.name || archetype.type;
+    const archetypeLine = `  ${archetype.type.toUpperCase()}:${archetypeName}`;
+    lines.push(archetypeLine);
+    
+    // Format attributes for this archetype
+    for (const attribute of archetype.attributes) {
+      const attributeLine = `    ${formatAttribute(attribute)}`;
+      lines.push(attributeLine);
     }
-    return obj;
   }
+  
+  return lines.join('\n');
 }

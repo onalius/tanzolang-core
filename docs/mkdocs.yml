@@ -1,55 +1,41 @@
-site_name: TanzoLang Documentation
-site_description: Documentation for the TanzoLang schema specification and tools
+site_name: TanzoLang Core Documentation
 site_url: https://onalius.github.io/tanzo-lang-core/
 repo_url: https://github.com/onalius/tanzo-lang-core
 repo_name: onalius/tanzo-lang-core
+edit_uri: edit/main/docs/
+
+nav:
+  - Home: index.md
+  - Schema Reference: schema.md
+  - Usage Guide: usage.md
 
 theme:
   name: material
   palette:
     primary: indigo
-    accent: indigo
+    accent: amber
   features:
     - navigation.instant
-    - navigation.tracking
-    - navigation.expand
-    - navigation.indexes
-    - content.code.annotate
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
     - content.code.copy
 
-plugins:
-  - search
-  - minify:
-      minify_html: true
-
 markdown_extensions:
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
+  - pymdownx.superfences
   - pymdownx.inlinehilite
-  - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
-  - tables
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - def_list
   - toc:
       permalink: true
 
-nav:
-  - Home: index.md
-  - Schema:
-    - Overview: schema.md
-    - Examples: schema-examples.md
-  - CLI:
-    - Overview: cli.md
-    - Commands: cli-commands.md
-  - SDKs:
-    - Python: python-sdk.md
-    - TypeScript: typescript-sdk.md
-  - Contributing: contributing.md
-
-extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/onalius/tanzo-lang-core
+plugins:
+  - search

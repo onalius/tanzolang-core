@@ -1,149 +1,149 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: https://github.com/onalius/tanzo-lang-core/spec/tanzo-schema.yaml
 title: TanzoLang Schema
-description: Schema definition for Tomodaichi Tanzo digital archetypes and profiles
+description: Schema for Tomodaichi Tanzo profiles describing digital archetypes and attributes
 type: object
 required:
   - version
-  - profile_type
-  - archetype
+  - profile
 properties:
   version:
     type: string
-    description: The TanzoLang schema version
-    pattern: ^\\d+\\.\\d+\\.\\d+$
-  profile_type:
-    type: string
-    description: Type of Tanzo profile
+    description: The version of the TanzoLang schema
     enum:
-      - full
-      - archetype_only
-      - simulation
-  archetype:
+      - 0.1.0
+  profile:
     type: object
-    description: Digital archetype definition
     required:
       - name
-      - core_traits
-      - skills
+      - archetypes
     properties:
       name:
         type: string
-        description: Name of the digital archetype
+        description: The name of the profile
       description:
         type: string
-        description: Description of the digital archetype
-      core_traits:
-        type: object
-        description: Core personality traits of the archetype
-        required:
-          - intelligence
-          - creativity
-          - sociability
-        properties:
-          intelligence:
-            $ref: '#/definitions/trait_score'
-          creativity:
-            $ref: '#/definitions/trait_score'
-          sociability:
-            $ref: '#/definitions/trait_score'
-          adaptability:
-            $ref: '#/definitions/trait_score'
-          resilience:
-            $ref: '#/definitions/trait_score'
-        additionalProperties:
-          $ref: '#/definitions/trait_score'
-      skills:
+        description: A description of the profile
+      archetypes:
         type: array
-        description: Skills possessed by the archetype
+        description: A list of digital archetypes
         minItems: 1
         items:
-          $ref: '#/definitions/skill'
-      interests:
-        type: array
-        description: Interests of the archetype
-        items:
-          type: string
-      values:
-        type: array
-        description: Core values of the archetype
-        items:
-          type: string
-  simulation_parameters:
-    type: object
-    description: Parameters for simulation runs
-    properties:
-      variation_factor:
-        type: number
-        description: Factor for variation in simulations
-        minimum: 0
-        maximum: 1
-      seed:
-        type: integer
-        description: Random seed for reproducible simulations
-      iterations:
-        type: integer
-        description: Number of simulation iterations
-        minimum: 1
-        default: 100
-      environments:
-        type: array
-        description: Simulation environments
-        items:
-          type: string
-  metadata:
-    type: object
-    description: Additional metadata
-    properties:
-      author:
-        type: string
-      created_at:
-        type: string
-        format: date-time
-      tags:
-        type: array
-        items:
-          type: string
+          $ref: '#/definitions/archetype'
 definitions:
-  trait_score:
+  archetype:
     type: object
     required:
-      - base
+      - type
+      - attributes
     properties:
-      base:
-        type: number
-        description: Base score for the trait
-        minimum: 0
-        maximum: 10
-      range:
-        type: array
-        description: Range of possible values [min, max]
-        minItems: 2
-        maxItems: 2
-        items:
-          type: number
-      distribution:
+      type:
         type: string
-        description: Statistical distribution for simulation
+        description: The type of the digital archetype
         enum:
-          - normal
-          - uniform
-          - exponential
-  skill:
+          - digital
+          - physical
+          - hybrid
+      name:
+        type: string
+        description: The name of the archetype
+      description:
+        type: string
+        description: A description of the archetype
+      attributes:
+        type: array
+        description: A list of attributes for this archetype
+        minItems: 1
+        items:
+          $ref: '#/definitions/attribute'
+  attribute:
     type: object
     required:
       - name
-      - proficiency
+      - value
     properties:
       name:
         type: string
-        description: Name of the skill
-      proficiency:
-        $ref: '#/definitions/trait_score'
-      category:
+        description: The name of the attribute
+      value:
+        oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - $ref: '#/definitions/probabilityDistribution'
+        description: The value of the attribute or a probability distribution
+      description:
         type: string
-        description: Skill category
-      experience_years:
+        description: A description of the attribute
+      unit:
+        type: string
+        description: The unit of measurement for the attribute
+  probabilityDistribution:
+    type: object
+    oneOf:
+      - $ref: '#/definitions/normalDistribution'
+      - $ref: '#/definitions/uniformDistribution'
+      - $ref: '#/definitions/discreteDistribution'
+  normalDistribution:
+    type: object
+    required:
+      - distribution
+      - mean
+      - stdDev
+    properties:
+      distribution:
+        type: string
+        enum:
+          - normal
+      mean:
         type: number
-        description: Years of experience with this skill
-        minimum: 0
+        description: The mean (average) of the normal distribution
+      stdDev:
+        type: number
+        description: The standard deviation of the normal distribution
+        exclusiveMinimum: 0
+  uniformDistribution:
+    type: object
+    required:
+      - distribution
+      - min
+      - max
+    properties:
+      distribution:
+        type: string
+        enum:
+          - uniform
+      min:
+        type: number
+        description: The minimum value in the uniform distribution
+      max:
+        type: number
+        description: The maximum value in the uniform distribution
+  discreteDistribution:
+    type: object
+    required:
+      - distribution
+      - values
+      - weights
+    properties:
+      distribution:
+        type: string
+        enum:
+          - discrete
+      values:
+        type: array
+        description: The possible values in the discrete distribution
+        minItems: 1
+        items:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+      weights:
+        type: array
+        description: The weights/probabilities for each value
+        minItems: 1
+        items:
+          type: number
+          minimum: 0
+          maximum: 1

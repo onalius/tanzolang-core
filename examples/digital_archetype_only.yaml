@@ -1,57 +1,35 @@
 version: "0.1.0"
-profile_type: "archetype_only"
-archetype:
-  name: "Nova"
-  description: "A specialized digital archetype focused on scientific exploration and discovery"
-  core_traits:
-    intelligence:
-      base: 9.5
-      range: [8.5, 10.0]
-    creativity:
-      base: 7.5
-      range: [6.5, 8.5]
-    sociability:
-      base: 6.0
-      range: [5.0, 7.0]
-    curiosity:
-      base: 9.8
-      range: [8.8, 10.0]
-    methodical:
-      base: 8.7
-      range: [7.7, 9.7]
-  skills:
-    - name: "Research Methods"
-      proficiency:
-        base: 9.5
-      category: "Academic"
-    - name: "Data Visualization"
-      proficiency:
-        base: 8.8
-      category: "Technical"
-    - name: "Scientific Writing"
-      proficiency:
-        base: 8.5
-      category: "Communication"
-    - name: "Experimental Design"
-      proficiency:
-        base: 9.2
-      category: "Scientific"
-  interests:
-    - "Astrophysics"
-    - "Quantum Mechanics"
-    - "Computational Biology"
-    - "Mathematical Models"
-  values:
-    - "Truth"
-    - "Precision"
-    - "Discovery"
-    - "Innovation"
-    - "Intellectual Honesty"
-
-metadata:
-  author: "Research Division"
-  created_at: "2023-06-20T15:45:00Z"
-  tags:
-    - "scientific"
-    - "research"
-    - "analytical"
+profile:
+  name: "Digital Avatar Only"
+  description: "A purely digital archetype profile without physical attributes"
+  archetypes:
+    - type: "digital"
+      name: "Digital Avatar"
+      description: "A purely digital entity"
+      attributes:
+        - name: "digital_id"
+          value: "DA-27491"
+          description: "Unique digital identifier"
+        - name: "creation_date"
+          value: "2023-04-15"
+          description: "Date of creation"
+        - name: "popularity_score"
+          value:
+            distribution: "normal"
+            mean: 85
+            stdDev: 10
+          description: "Popularity metric"
+          unit: "points"
+        - name: "access_level"
+          value:
+            distribution: "discrete"
+            values: ["basic", "premium", "admin"]
+            weights: [0.7, 0.25, 0.05]
+          description: "System access privilege level"
+        - name: "processing_power"
+          value:
+            distribution: "uniform"
+            min: 1.0
+            max: 5.0
+          description: "Computational resources allocated"
+          unit: "TFlops"

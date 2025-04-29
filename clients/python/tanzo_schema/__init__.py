@@ -1,29 +1,33 @@
 """
-Tanzo Schema Python SDK package.
+TanzoLang Python SDK
 
-This package provides Pydantic models and validation utilities for working
-with TanzoLang schema in Python applications.
+This package provides classes and utilities for working with TanzoLang profiles.
 """
 
 __version__ = "0.1.0"
 
-from .models import (
-    TraitScore,
-    Skill,
-    Archetype,
-    SimulationParameters,
-    Metadata,
+from tanzo_schema.models import (
     TanzoProfile,
+    Archetype,
+    Attribute,
+    ProbabilityDistribution,
+    NormalDistribution,
+    UniformDistribution,
+    DiscreteDistribution,
 )
-from .validation import validate_profile, SchemaValidationError
+from tanzo_schema.validator import validate_profile
+from tanzo_schema.simulator import simulate_profile
+from tanzo_schema.exporter import export_profile
 
 __all__ = [
-    "TraitScore",
-    "Skill",
-    "Archetype",
-    "SimulationParameters",
-    "Metadata",
     "TanzoProfile",
+    "Archetype",
+    "Attribute",
+    "ProbabilityDistribution",
+    "NormalDistribution",
+    "UniformDistribution",
+    "DiscreteDistribution",
     "validate_profile",
-    "SchemaValidationError",
+    "simulate_profile",
+    "export_profile",
 ]

@@ -1,121 +1,100 @@
 """
-Pydantic models for Tanzo Schema.
-
-This module contains Pydantic models that represent the structure and validation
-rules of the TanzoLang schema.
+Pydantic models for TanzoLang profiles
 """
 
-import enum
-from datetime import datetime
-from typing import Dict, List, Literal, Optional, Tuple, Union
-
-from pydantic import BaseModel, Field, conlist, field_validator
+from typing import Dict, List, Literal, Optional, Union, Any
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator
 
 
-class DistributionType(str, enum.Enum):
-    """Statistical distribution types for simulations."""
-
+class DistributionType(str, Enum):
+    """Types of probability distributions"""
     NORMAL = "normal"
     UNIFORM = "uniform"
-    EXPONENTIAL = "exponential"
+    DISCRETE = "discrete"
 
 
-class ProfileType(str, enum.Enum):
-    """Types of Tanzo profiles."""
+class NormalDistribution(BaseModel):
+    """Normal (Gaussian) probability distribution"""
+    distribution: Literal["normal"]
+    mean: float
+    stdDev: float
 
-    FULL = "full"
-    ARCHETYPE_ONLY = "archetype_only"
-    SIMULATION = "simulation"
-
-
-class TraitScore(BaseModel):
-    """Model for trait and skill scores with optional simulation parameters."""
-
-    base: float = Field(..., description="Base score for the trait", ge=0, le=10)
-    range: Optional[Tuple[float, float]] = Field(
-        None, description="Range of possible values [min, max]"
-    )
-    distribution: Optional[DistributionType] = Field(
-        None, description="Statistical distribution for simulation"
-    )
-
-    @field_validator("range")
-    @classmethod
-    def validate_range(cls, v):
-        """Validate that the range values are within 0-10 and min <= max."""
-        if v is None:
-            return v
-        
-        min_val, max_val = v
-        if not (0 <= min_val <= 10 and 0 <= max_val <= 10):
-            raise ValueError("Range values must be between 0 and 10")
-        if min_val > max_val:
-            raise ValueError("Minimum value must be less than or equal to maximum value")
+    @field_validator("stdDev")
+    def validate_std_dev(cls, v: float) -> float:
+        """Ensure standard deviation is positive"""
+        if v <= 0:
+            raise ValueError("Standard deviation must be greater than 0")
         return v
 
 
-class Skill(BaseModel):
-    """Model for skills in a Tanzo profile."""
+class UniformDistribution(BaseModel):
+    """Uniform probability distribution"""
+    distribution: Literal["uniform"]
+    min: float
+    max: float
 
-    name: str = Field(..., description="Name of the skill")
-    proficiency: TraitScore = Field(..., description="Proficiency level for this skill")
-    category: Optional[str] = Field(None, description="Skill category")
-    experience_years: Optional[float] = Field(
-        None, description="Years of experience with this skill", ge=0
-    )
+    @field_validator("max")
+    def validate_max(cls, v: float, values: Dict[str, Any]) -> float:
+        """Ensure max is greater than min"""
+        if "min" in values and v <= values["min"]:
+            raise ValueError("Max must be greater than min")
+        return v
+
+
+class DiscreteDistribution(BaseModel):
+    """Discrete probability distribution with weighted values"""
+    distribution: Literal["discrete"]
+    values: List[Union[str, float, bool]]
+    weights: List[float]
+
+    @field_validator("weights")
+    def validate_weights(cls, v: List[float], values: Dict[str, Any]) -> List[float]:
+        """Ensure weights are valid probabilities and match the number of values"""
+        if any(weight < 0 or weight > 1 for weight in v):
+            raise ValueError("All weights must be between 0 and 1")
+        
+        if "values" in values and len(v) != len(values["values"]):
+            raise ValueError("Number of weights must match number of values")
+        
+        return v
+
+
+ProbabilityDistribution = Union[NormalDistribution, UniformDistribution, DiscreteDistribution]
+AttributeValue = Union[str, float, bool, ProbabilityDistribution]
+
+
+class Attribute(BaseModel):
+    """An attribute in a TanzoLang profile"""
+    name: str
+    value: AttributeValue
+    description: Optional[str] = None
+    unit: Optional[str] = None
+
+
+class ArchetypeType(str, Enum):
+    """Types of archetypes"""
+    DIGITAL = "digital"
+    PHYSICAL = "physical"
+    HYBRID = "hybrid"
 
 
 class Archetype(BaseModel):
-    """Model for a digital archetype in a Tanzo profile."""
-
-    name: str = Field(..., description="Name of the digital archetype")
-    description: Optional[str] = Field(None, description="Description of the digital archetype")
-    core_traits: Dict[str, TraitScore] = Field(
-        ..., description="Core personality traits of the archetype"
-    )
-    skills: List[Skill] = Field(..., description="Skills possessed by the archetype", min_length=1)
-    interests: Optional[List[str]] = Field(None, description="Interests of the archetype")
-    values: Optional[List[str]] = Field(None, description="Core values of the archetype")
-
-    @field_validator("core_traits")
-    @classmethod
-    def validate_core_traits(cls, v):
-        """Validate that required core traits are present."""
-        required_traits = {"intelligence", "creativity", "sociability"}
-        missing_traits = required_traits - set(v.keys())
-        if missing_traits:
-            raise ValueError(f"Missing required core traits: {', '.join(missing_traits)}")
-        return v
+    """An archetype in a TanzoLang profile"""
+    type: ArchetypeType
+    name: Optional[str] = None
+    description: Optional[str] = None
+    attributes: List[Attribute]
 
 
-class SimulationParameters(BaseModel):
-    """Model for simulation parameters in a Tanzo profile."""
-
-    variation_factor: Optional[float] = Field(
-        None, description="Factor for variation in simulations", ge=0, le=1
-    )
-    seed: Optional[int] = Field(None, description="Random seed for reproducible simulations")
-    iterations: Optional[int] = Field(
-        100, description="Number of simulation iterations", ge=1
-    )
-    environments: Optional[List[str]] = Field(None, description="Simulation environments")
-
-
-class Metadata(BaseModel):
-    """Model for metadata in a Tanzo profile."""
-
-    author: Optional[str] = None
-    created_at: Optional[datetime] = None
-    tags: Optional[List[str]] = None
+class Profile(BaseModel):
+    """The main profile section in a TanzoLang profile"""
+    name: str
+    description: Optional[str] = None
+    archetypes: List[Archetype]
 
 
 class TanzoProfile(BaseModel):
-    """Top-level model for a complete Tanzo profile."""
-
-    version: str = Field(..., description="The TanzoLang schema version", pattern=r"^\d+\.\d+\.\d+$")
-    profile_type: ProfileType = Field(..., description="Type of Tanzo profile")
-    archetype: Archetype = Field(..., description="Digital archetype definition")
-    simulation_parameters: Optional[SimulationParameters] = Field(
-        None, description="Parameters for simulation runs"
-    )
-    metadata: Optional[Metadata] = Field(None, description="Additional metadata")
+    """A complete TanzoLang profile"""
+    version: str = Field("0.1.0", description="The TanzoLang version")
+    profile: Profile

@@ -1,45 +1,26 @@
 # Contributing to TanzoLang Core
 
-Thank you for your interest in contributing to TanzoLang Core! This document provides guidelines and instructions for contributing to this project.
-
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Environment](#development-environment)
-- [Branch Naming Convention](#branch-naming-convention)
-- [Commit Messages](#commit-messages)
-- [Pull Request Process](#pull-request-process)
-- [Coding Standards](#coding-standards)
-- [Testing](#testing)
+Thank you for considering contributing to TanzoLang! This document outlines the process for contributing to the project.
 
 ## Code of Conduct
 
-This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
+Please read and follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-## Getting Started
+## Development Workflow
 
-1. Fork the repository on GitHub
-2. Clone your fork locally:
-   ```bash
-   git clone https://github.com/your-username/tanzo-lang-core.git
-   cd tanzo-lang-core
-   ```
-3. Set up your development environment (see below)
-4. Create a new branch for your contribution
-5. Make your changes
-6. Submit a pull request
+### Branch Naming
 
-## Development Environment
+We use the following branch naming convention:
 
-This project uses Poetry for dependency management:
+- `feature/short-description` - For new features
+- `fix/short-description` - For bug fixes
+- `docs/short-description` - For documentation changes
+- `refactor/short-description` - For code refactoring
+- `test/short-description` - For adding or updating tests
 
-```bash
-# Install Poetry
-curl -sSL https://install.python-poetry.org | python3 -
+### Conventional Commits
 
-# Install dependencies
-poetry install
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for our commit messages. This enables automatic versioning and changelog generation.
 
-# Activate virtual environment
-poetry shell
+The commit message should be structured as follows:
+

@@ -1,8 +1,11 @@
 site_name: TanzoLang Documentation
-site_description: Documentation for the TanzoLang schema specification
+site_description: Documentation for the TanzoLang schema specification and SDK
+site_author: Onalius Team
 site_url: https://onalius.github.io/tanzo-lang-core/
-repo_url: https://github.com/onalius/tanzo-lang-core
+
 repo_name: onalius/tanzo-lang-core
+repo_url: https://github.com/onalius/tanzo-lang-core
+edit_uri: edit/main/docs/
 
 theme:
   name: material
@@ -10,24 +13,10 @@ theme:
     primary: indigo
     accent: indigo
   features:
-    - navigation.instant
-    - navigation.tracking
     - navigation.sections
-    - navigation.expand
+    - navigation.top
     - content.code.annotate
     - content.tabs.link
-    - search.highlight
-    - search.share
-  icon:
-    repo: fontawesome/brands/github
-
-nav:
-  - Home: index.md
-  - Schema Reference: schema.md
-  - CLI Reference: cli.md
-  - SDK References:
-    - Python SDK: python-sdk.md
-    - TypeScript SDK: typescript-sdk.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -35,22 +24,35 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - admonition
+  - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
-  - admonition
   - tables
-  - attr_list
-  - md_in_html
+  - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+nav:
+  - Home: index.md
+  - Schema: schema.md
+  - Python SDK: python-sdk.md
+  - TypeScript SDK: typescript-sdk.md
+  - CLI: cli.md
+  - GitHub: https://github.com/onalius/tanzo-lang-core
 
 plugins:
   - search
-  - autorefs
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_submodules: true
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/onalius/tanzo-lang-core
-  version:
-    provider: mike
-
-copyright: Copyright &copy; 2023 Tomodaichi Tanzo Team

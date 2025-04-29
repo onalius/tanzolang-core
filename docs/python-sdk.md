@@ -1,8 +1,10 @@
-# Python SDK Reference
+# Python SDK for TanzoLang
 
-The Tanzo Schema Python SDK provides Pydantic models and validation utilities for working with TanzoLang profiles in Python applications.
+The TanzoLang Python SDK provides classes and utilities for working with TanzoLang profiles in Python applications. It is built on top of [Pydantic](https://docs.pydantic.dev/) for robust data validation and typing.
 
 ## Installation
+
+Install the package using pip:
 
 ```bash
 pip install tanzo-schema

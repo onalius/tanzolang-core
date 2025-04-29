@@ -1,104 +1,81 @@
 /**
- * Zod schemas for Tanzo Schema validation
+ * Zod schema definitions for TanzoLang
  */
 
 import { z } from 'zod';
 
 // Enums
-export enum ProfileType {
-  FULL = 'full',
-  ARCHETYPE_ONLY = 'archetype_only',
-  SIMULATION = 'simulation'
-}
+export const ProfileTypeEnum = z.enum(['human', 'digital', 'hybrid']);
+export type ProfileType = z.infer<typeof ProfileTypeEnum>;
 
-export enum DistributionType {
-  NORMAL = 'normal',
-  UNIFORM = 'uniform',
-  EXPONENTIAL = 'exponential'
-}
+export const RelationshipTypeEnum = z.enum([
+  'friend', 
+  'family', 
+  'colleague', 
+  'acquaintance', 
+  'mentor', 
+  'student', 
+  'other'
+]);
+export type RelationshipType = z.infer<typeof RelationshipTypeEnum>;
 
-// Trait score schema
-export const TraitScoreSchema = z.object({
-  base: z.number().min(0).max(10).describe('Base score for the trait'),
-  range: z.tuple([z.number(), z.number()]).optional()
-    .describe('Range of possible values [min, max]')
-    .refine(
-      (range) => range ? range[0] <= range[1] : true,
-      { message: 'Minimum value must be less than or equal to maximum value' }
-    ),
-  distribution: z.nativeEnum(DistributionType).optional()
-    .describe('Statistical distribution for simulation')
+// Trait schema
+export const TraitSchema = z.object({
+  name: z.string(),
+  value: z.number().min(0).max(100),
+  variance: z.number().min(0).max(50).optional(),
 });
-
-export type TraitScore = z.infer<typeof TraitScoreSchema>;
-
-// Skill schema
-export const SkillSchema = z.object({
-  name: z.string().describe('Name of the skill'),
-  proficiency: TraitScoreSchema.describe('Proficiency level for this skill'),
-  category: z.string().optional().describe('Skill category'),
-  experience_years: z.number().min(0).optional()
-    .describe('Years of experience with this skill')
-});
-
-export type Skill = z.infer<typeof SkillSchema>;
+export type Trait = z.infer<typeof TraitSchema>;
 
 // Archetype schema
 export const ArchetypeSchema = z.object({
-  name: z.string().describe('Name of the digital archetype'),
-  description: z.string().optional().describe('Description of the digital archetype'),
-  core_traits: z.record(TraitScoreSchema).describe('Core personality traits of the archetype')
-    .refine(
-      (traits) => {
-        const requiredTraits = ['intelligence', 'creativity', 'sociability'];
-        return requiredTraits.every(trait => trait in traits);
-      },
-      {
-        message: 'Core traits must include: intelligence, creativity, and sociability'
-      }
-    ),
-  skills: z.array(SkillSchema).min(1).describe('Skills possessed by the archetype'),
-  interests: z.array(z.string()).optional().describe('Interests of the archetype'),
-  values: z.array(z.string()).optional().describe('Core values of the archetype')
+  name: z.string(),
+  influence: z.number().min(0).max(100),
+  description: z.string().optional(),
+  traits: z.array(TraitSchema).optional(),
 });
-
 export type Archetype = z.infer<typeof ArchetypeSchema>;
 
-// Simulation parameters schema
-export const SimulationParametersSchema = z.object({
-  variation_factor: z.number().min(0).max(1).optional()
-    .describe('Factor for variation in simulations'),
-  seed: z.number().int().optional()
-    .describe('Random seed for reproducible simulations'),
-  iterations: z.number().int().min(1).default(100)
-    .describe('Number of simulation iterations'),
-  environments: z.array(z.string()).optional()
-    .describe('Simulation environments')
+// Capability schema
+export const CapabilitySchema = z.object({
+  name: z.string(),
+  level: z.number().min(0).max(100),
+  description: z.string().optional(),
 });
+export type Capability = z.infer<typeof CapabilitySchema>;
 
-export type SimulationParameters = z.infer<typeof SimulationParametersSchema>;
-
-// Metadata schema
-export const MetadataSchema = z.object({
-  author: z.string().optional(),
-  created_at: z.string().datetime().optional(),
-  tags: z.array(z.string()).optional()
+// Relationship schema
+export const RelationshipSchema = z.object({
+  target: z.string(),
+  type: RelationshipTypeEnum,
+  strength: z.number().min(0).max(100),
+  description: z.string().optional(),
 });
+export type Relationship = z.infer<typeof RelationshipSchema>;
 
-export type Metadata = z.infer<typeof MetadataSchema>;
-
-// Top-level Tanzo profile schema
-export const TanzoProfileSchema = z.object({
-  version: z.string().regex(/^\d+\.\d+\.\d+$/)
-    .describe('The TanzoLang schema version'),
-  profile_type: z.nativeEnum(ProfileType)
-    .describe('Type of Tanzo profile'),
-  archetype: ArchetypeSchema
-    .describe('Digital archetype definition'),
-  simulation_parameters: SimulationParametersSchema.optional()
-    .describe('Parameters for simulation runs'),
-  metadata: MetadataSchema.optional()
-    .describe('Additional metadata')
+// Profile properties schema
+export const ProfilePropertiesSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  traits: z.array(TraitSchema).optional(),
+  archetypes: z.array(ArchetypeSchema).optional(),
+  capabilities: z.array(CapabilitySchema).optional(),
+  relationships: z.array(RelationshipSchema).optional(),
 });
+export type ProfileProperties = z.infer<typeof ProfilePropertiesSchema>;
 
-export type TanzoProfile = z.infer<typeof TanzoProfileSchema>;
+// Profile schema
+export const ProfileSchema = z.object({
+  id: z.string().regex(/^[a-zA-Z0-9_-]+$/),
+  type: ProfileTypeEnum,
+  properties: ProfilePropertiesSchema,
+  metadata: z.record(z.any()).optional(),
+});
+export type Profile = z.infer<typeof ProfileSchema>;
+
+// TanzoDocument schema (top-level)
+export const TanzoDocumentSchema = z.object({
+  version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  profile: ProfileSchema,
+});
+export type TanzoDocument = z.infer<typeof TanzoDocumentSchema>;

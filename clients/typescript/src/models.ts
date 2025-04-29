@@ -1,153 +1,115 @@
 /**
- * Zod schema definitions for TanzoLang.
- * 
- * This module provides Zod schemas for validating TanzoLang documents,
- * as well as TypeScript type definitions derived from these schemas.
+ * Zod schema models for TanzoLang profiles
  */
 
 import { z } from 'zod';
 
-// Enum definitions
-export const TemperamentEnum = z.enum([
-  'analytical',
-  'diplomatic',
-  'assertive',
-  'supportive',
-  'creative',
-  'practical',
-  'mixed',
+/**
+ * Types of probability distributions
+ */
+export const DistributionType = z.enum(['normal', 'uniform', 'discrete']);
+export type DistributionType = z.infer<typeof DistributionType>;
+
+/**
+ * Normal (Gaussian) probability distribution
+ */
+export const NormalDistribution = z.object({
+  distribution: z.literal('normal'),
+  mean: z.number(),
+  stdDev: z.number().positive('Standard deviation must be greater than 0'),
+});
+export type NormalDistribution = z.infer<typeof NormalDistribution>;
+
+/**
+ * Uniform probability distribution
+ */
+export const UniformDistribution = z.object({
+  distribution: z.literal('uniform'),
+  min: z.number(),
+  max: z.number(),
+}).refine(data => data.max > data.min, {
+  message: 'Max must be greater than min',
+  path: ['max'],
+});
+export type UniformDistribution = z.infer<typeof UniformDistribution>;
+
+/**
+ * Discrete probability distribution with weighted values
+ */
+export const DiscreteDistribution = z.object({
+  distribution: z.literal('discrete'),
+  values: z.array(z.union([z.string(), z.number(), z.boolean()])),
+  weights: z.array(z.number().min(0).max(1)),
+}).refine(data => data.values.length === data.weights.length, {
+  message: 'Number of weights must match number of values',
+  path: ['weights'],
+});
+export type DiscreteDistribution = z.infer<typeof DiscreteDistribution>;
+
+/**
+ * Any probability distribution
+ */
+export const ProbabilityDistribution = z.union([
+  NormalDistribution,
+  UniformDistribution,
+  DiscreteDistribution,
 ]);
+export type ProbabilityDistribution = z.infer<typeof ProbabilityDistribution>;
 
-export type Temperament = z.infer<typeof TemperamentEnum>;
-
-export const LanguageProficiencyEnum = z.enum([
-  'native',
-  'fluent',
-  'advanced',
-  'intermediate',
-  'basic',
+/**
+ * Value of an attribute
+ */
+export const AttributeValue = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  ProbabilityDistribution,
 ]);
+export type AttributeValue = z.infer<typeof AttributeValue>;
 
-export type LanguageProficiency = z.infer<typeof LanguageProficiencyEnum>;
-
-// Base schema components
-export const PersonalityTraitSchema = z.object({
-  name: z.string().min(2).max(50),
-  value: z.number().min(0).max(10),
-  description: z.string().max(500).optional(),
+/**
+ * An attribute in a TanzoLang profile
+ */
+export const Attribute = z.object({
+  name: z.string(),
+  value: AttributeValue,
+  description: z.string().optional(),
+  unit: z.string().optional(),
 });
+export type Attribute = z.infer<typeof Attribute>;
 
-export type PersonalityTrait = z.infer<typeof PersonalityTraitSchema>;
+/**
+ * Types of archetypes
+ */
+export const ArchetypeType = z.enum(['digital', 'physical', 'hybrid']);
+export type ArchetypeType = z.infer<typeof ArchetypeType>;
 
-export const DomainSchema = z.object({
-  name: z.string().min(2).max(100),
-  proficiency: z.number().min(0).max(10),
-  description: z.string().max(500).optional(),
+/**
+ * An archetype in a TanzoLang profile
+ */
+export const Archetype = z.object({
+  type: ArchetypeType,
+  name: z.string().optional(),
+  description: z.string().optional(),
+  attributes: z.array(Attribute).nonempty('Archetype must have at least one attribute'),
 });
+export type Archetype = z.infer<typeof Archetype>;
 
-export type Domain = z.infer<typeof DomainSchema>;
-
-export const LanguageSchema = z.object({
-  name: z.string().min(2).max(50),
-  proficiency: LanguageProficiencyEnum,
+/**
+ * The main profile section in a TanzoLang profile
+ */
+export const Profile = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  archetypes: z.array(Archetype).nonempty('Profile must have at least one archetype'),
 });
+export type Profile = z.infer<typeof Profile>;
 
-export type Language = z.infer<typeof LanguageSchema>;
-
-export const CapabilitySchema = z.object({
-  name: z.string().min(2).max(100),
-  proficiency: z.number().min(0).max(10),
-  description: z.string().max(500).optional(),
+/**
+ * A complete TanzoLang profile
+ */
+export const TanzoProfile = z.object({
+  version: z.string().default('0.1.0'),
+  profile: Profile,
 });
-
-export type Capability = z.infer<typeof CapabilitySchema>;
-
-// Archetype component schemas
-export const ArchetypePersonalitySchema = z.object({
-  traits: z.array(PersonalityTraitSchema).min(1).max(20),
-  values: z.array(z.string().min(2).max(50)).max(10).optional(),
-  temperament: TemperamentEnum.optional(),
-});
-
-export type ArchetypePersonality = z.infer<typeof ArchetypePersonalitySchema>;
-
-export const ArchetypeKnowledgeSchema = z.object({
-  domains: z.array(DomainSchema).min(1).max(20),
-  languages: z.array(LanguageSchema).max(10).optional(),
-});
-
-export type ArchetypeKnowledge = z.infer<typeof ArchetypeKnowledgeSchema>;
-
-export const ArchetypeCapabilitiesSchema = z.object({
-  skills: z.array(CapabilitySchema).min(1).max(30),
-  tools: z.array(z.string().min(2).max(100)).max(20).optional(),
-});
-
-export type ArchetypeCapabilities = z.infer<typeof ArchetypeCapabilitiesSchema>;
-
-export const ArchetypeAttributesSchema = z.object({
-  personality: ArchetypePersonalitySchema,
-  knowledge: ArchetypeKnowledgeSchema,
-  capabilities: ArchetypeCapabilitiesSchema,
-});
-
-export type ArchetypeAttributes = z.infer<typeof ArchetypeAttributesSchema>;
-
-export const ArchetypeIdentitySchema = z.object({
-  name: z.string().min(2).max(100),
-  role: z.string().min(2).max(100),
-  description: z.string().max(1000).optional(),
-  tags: z.array(z.string().min(1).max(50)).max(10).optional(),
-});
-
-export type ArchetypeIdentity = z.infer<typeof ArchetypeIdentitySchema>;
-
-export const ArchetypeSchema = z.object({
-  identity: ArchetypeIdentitySchema,
-  attributes: ArchetypeAttributesSchema,
-});
-
-export type Archetype = z.infer<typeof ArchetypeSchema>;
-
-// Profile component schemas
-export const ProfileInstanceSchema = z.object({
-  name: z.string().min(2).max(100),
-  created_at: z.string().datetime(),
-  version: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
-  description: z.string().max(1000).optional(),
-});
-
-export type ProfileInstance = z.infer<typeof ProfileInstanceSchema>;
-
-export const ProfileParametersSchema = z.object({
-  temperature: z.number().min(0).max(2).optional(),
-  max_tokens: z.number().int().min(1).max(32000).optional(),
-  constraints: z.array(z.string().min(2).max(500)).max(10).optional(),
-});
-
-export type ProfileParameters = z.infer<typeof ProfileParametersSchema>;
-
-export const ProfileCustomizationsSchema = z.object({
-  traits: z.array(PersonalityTraitSchema).max(20).optional(),
-  knowledge: z.array(DomainSchema).max(10).optional(),
-  skills: z.array(CapabilitySchema).max(10).optional(),
-});
-
-export type ProfileCustomizations = z.infer<typeof ProfileCustomizationsSchema>;
-
-export const ProfileSchema = z.object({
-  instance: ProfileInstanceSchema,
-  parameters: ProfileParametersSchema.optional(),
-  customizations: ProfileCustomizationsSchema.optional(),
-});
-
-export type Profile = z.infer<typeof ProfileSchema>;
-
-// Top-level document schema
-export const TanzoDocumentSchema = z.object({
-  version: z.string().regex(/^\d+\.\d+\.\d+$/),
-  archetype: ArchetypeSchema,
-  profile: ProfileSchema.optional(),
-});
-
-export type TanzoDocument = z.infer<typeof TanzoDocumentSchema>;
+export type TanzoProfile = z.infer<typeof TanzoProfile>;

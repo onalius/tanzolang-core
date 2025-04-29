@@ -1,193 +1,111 @@
 """
-Tests for the TanzoLang CLI.
+Tests for the TanzoLang CLI
 """
 
-import json
 import os
-import pathlib
-import pytest
-import yaml
-from click.testing import CliRunner
+import sys
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+from io import StringIO
 
-from cli.tanzo_cli import cli
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-
-@pytest.fixture
-def cli_runner():
-    """Return a Click CLI runner."""
-    return CliRunner()
+from cli.tanzo-cli import cli  # This assumes the CLI uses click for commands
 
 
-@pytest.fixture
-def examples_dir():
-    """Return the path to the examples directory."""
-    return pathlib.Path(__file__).parent.parent / "examples"
-
-
-@pytest.fixture
-def kai_profile(examples_dir):
-    """Return the path to the Kai profile example."""
-    return examples_dir / "Kai_profile.yaml"
-
-
-@pytest.fixture
-def archetype_only(examples_dir):
-    """Return the path to the archetype-only example."""
-    return examples_dir / "digital_archetype_only.yaml"
-
-
-@pytest.fixture
-def invalid_profile(tmp_path):
-    """Create and return the path to an invalid profile."""
-    invalid_data = {
-        "version": "0.1.0",
-        "profile_type": "invalid_type",
-        "archetype": {
-            "name": "Invalid Archetype"
-            # Missing required fields
-        }
-    }
-    invalid_path = tmp_path / "invalid.yaml"
-    with open(invalid_path, "w") as f:
-        yaml.dump(invalid_data, f)
-    return invalid_path
-
-
-# Test validate command
-def test_validate_command_valid(cli_runner, kai_profile):
-    """Test the validate command with a valid profile."""
-    result = cli_runner.invoke(cli, ["validate", str(kai_profile)])
-    assert result.exit_code == 0
-    assert "Validation successful!" in result.output
-    assert "Kai" in result.output
-
-
-def test_validate_command_invalid(cli_runner, invalid_profile):
-    """Test the validate command with an invalid profile."""
-    result = cli_runner.invoke(cli, ["validate", str(invalid_profile)])
-    assert result.exit_code == 1
-    assert "Validation failed" in result.output
-
-
-def test_validate_command_nonexistent(cli_runner):
-    """Test the validate command with a nonexistent file."""
-    result = cli_runner.invoke(cli, ["validate", "/nonexistent/file.yaml"])
-    assert result.exit_code == 1
-    assert "File not found" in result.output
-
-
-# Test simulate command
-def test_simulate_command_basic(cli_runner, kai_profile):
-    """Test the basic simulate command."""
-    result = cli_runner.invoke(cli, ["simulate", str(kai_profile)])
-    assert result.exit_code == 0
-    assert "Running simulation with 100 iterations" in result.output
-    assert "Simulation Results" in result.output
-    assert "Core Traits" in result.output
-    assert "Skills" in result.output
-    assert "Environments" in result.output
-
-
-def test_simulate_command_custom_iterations(cli_runner, kai_profile):
-    """Test the simulate command with custom iterations."""
-    result = cli_runner.invoke(cli, ["simulate", str(kai_profile), "--iterations", "50"])
-    assert result.exit_code == 0
-    assert "Running simulation with 50 iterations" in result.output
-
-
-def test_simulate_command_specific_environment(cli_runner, kai_profile):
-    """Test the simulate command with a specific environment."""
-    result = cli_runner.invoke(
-        cli, ["simulate", str(kai_profile), "--environment", "Test Environment"]
-    )
-    assert result.exit_code == 0
-    assert "Test Environment" in result.output
-
-
-def test_simulate_command_output_file(cli_runner, kai_profile, tmp_path):
-    """Test the simulate command with output to a file."""
-    output_file = tmp_path / "simulation_results.json"
-    result = cli_runner.invoke(
-        cli, ["simulate", str(kai_profile), "--output", str(output_file)]
-    )
-    assert result.exit_code == 0
-    assert f"Results saved to {output_file}" in result.output
-    assert output_file.exists()
+class TestTanzoCLI(unittest.TestCase):
+    """Tests for the tanzo-cli.py command-line interface"""
     
-    # Check that the output file contains valid JSON
-    with open(output_file, "r") as f:
-        data = json.load(f)
+    def setUp(self):
+        """Setup test files and paths"""
+        self.examples_dir = Path(__file__).parent.parent / "examples"
+        self.valid_example = self.examples_dir / "Kai_profile.yaml"
+        self.digital_example = self.examples_dir / "digital_archetype_only.yaml"
+        
+        # Ensure example files exist
+        self.assertTrue(self.valid_example.exists(), f"Example file not found: {self.valid_example}")
+        self.assertTrue(self.digital_example.exists(), f"Example file not found: {self.digital_example}")
     
-    assert "traits" in data
-    assert "skills" in data
-    assert "environments" in data
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_validate_valid_file(self, mock_stdout):
+        """Test validation of a valid file"""
+        # Use the click test runner to invoke the CLI
+        from click.testing import CliRunner
+        runner = CliRunner()
+        
+        result = runner.invoke(cli, ['validate', str(self.valid_example)])
+        
+        # Check exit code and output
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("valid", result.output)
+        self.assertIn("Kai's Digital Twin", result.output)
+    
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_validate_nonexistent_file(self, mock_stdout):
+        """Test validation of a nonexistent file"""
+        from click.testing import CliRunner
+        runner = CliRunner()
+        
+        result = runner.invoke(cli, ['validate', 'nonexistent.yaml'])
+        
+        # Should fail with non-zero exit code
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("failed", result.output.lower())
+    
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_simulate_command(self, mock_stdout):
+        """Test the simulate command"""
+        from click.testing import CliRunner
+        runner = CliRunner()
+        
+        # Run with fewer iterations for speed
+        result = runner.invoke(cli, ['simulate', str(self.valid_example), '--iterations', '10'])
+        
+        # Check exit code and output
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Simulation completed", result.output)
+        self.assertIn("Kai's Digital Twin", result.output)
+        
+        # Should have archetypes section
+        self.assertIn("Archetype:", result.output)
+        
+        # Should have attribute statistics
+        self.assertIn("Mean:", result.output)
+    
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_export_command(self, mock_stdout):
+        """Test the export command"""
+        from click.testing import CliRunner
+        runner = CliRunner()
+        
+        result = runner.invoke(cli, ['export', str(self.digital_example)])
+        
+        # Check exit code and output
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("TanzoProfile: Digital Avatar Only", result.output)
+        self.assertIn("DIGITAL:Digital Avatar", result.output)
+        
+        # Should have formatted attributes
+        self.assertIn("digital_id=\"DA-27491\"", result.output)
+    
+    def test_help_command(self):
+        """Test the help output"""
+        from click.testing import CliRunner
+        runner = CliRunner()
+        
+        result = runner.invoke(cli, ['--help'])
+        
+        # Check exit code and output
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("TanzoLang CLI", result.output)
+        
+        # Should list all commands
+        self.assertIn("validate", result.output)
+        self.assertIn("simulate", result.output)
+        self.assertIn("export", result.output)
 
 
-def test_simulate_command_invalid(cli_runner, invalid_profile):
-    """Test the simulate command with an invalid profile."""
-    result = cli_runner.invoke(cli, ["simulate", str(invalid_profile)])
-    assert result.exit_code == 1
-    assert "Validation failed" in result.output
-
-
-# Test export command
-def test_export_command_full(cli_runner, kai_profile):
-    """Test the export command with a full profile."""
-    result = cli_runner.invoke(cli, ["export", str(kai_profile)])
-    assert result.exit_code == 0
-    assert "Kai" in result.output
-    assert "[T:" in result.output
-    assert "S:" in result.output
-    assert result.output.startswith("F:")  # Full profile indicator
-
-
-def test_export_command_archetype_only(cli_runner, archetype_only):
-    """Test the export command with an archetype-only profile."""
-    result = cli_runner.invoke(cli, ["export", str(archetype_only)])
-    assert result.exit_code == 0
-    assert "Nova" in result.output
-    assert "[T:" in result.output
-    assert "S:" in result.output
-    assert result.output.startswith("A:")  # Archetype-only indicator
-
-
-def test_export_command_invalid(cli_runner, invalid_profile):
-    """Test the export command with an invalid profile."""
-    result = cli_runner.invoke(cli, ["export", str(invalid_profile)])
-    assert result.exit_code == 1
-    assert "Validation failed" in result.output
-
-
-# Test CLI help text
-def test_cli_help(cli_runner):
-    """Test the CLI help text."""
-    result = cli_runner.invoke(cli, ["--help"])
-    assert result.exit_code == 0
-    assert "Tanzo CLI" in result.output
-    assert "validate" in result.output
-    assert "simulate" in result.output
-    assert "export" in result.output
-
-
-def test_validate_command_help(cli_runner):
-    """Test the validate command help text."""
-    result = cli_runner.invoke(cli, ["validate", "--help"])
-    assert result.exit_code == 0
-    assert "Validate a Tanzo profile" in result.output
-
-
-def test_simulate_command_help(cli_runner):
-    """Test the simulate command help text."""
-    result = cli_runner.invoke(cli, ["simulate", "--help"])
-    assert result.exit_code == 0
-    assert "Run a Monte Carlo simulation" in result.output
-    assert "--iterations" in result.output
-    assert "--environment" in result.output
-    assert "--output" in result.output
-
-
-def test_export_command_help(cli_runner):
-    """Test the export command help text."""
-    result = cli_runner.invoke(cli, ["export", "--help"])
-    assert result.exit_code == 0
-    assert "Export a Tanzo profile as a shorthand string" in result.output
+if __name__ == "__main__":
+    unittest.main()

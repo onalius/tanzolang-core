@@ -1,6 +1,6 @@
 # Tanzo Schema Python SDK
 
-This package provides Pydantic models and validation utilities for working with TanzoLang schema in Python applications.
+A Python SDK for working with TanzoLang schemas, providing validation, simulation, and exporting capabilities for Tomodaichi Tanzo ecosystem profiles.
 
 ## Installation
 

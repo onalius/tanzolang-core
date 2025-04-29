@@ -1,10 +1,8 @@
 # Tanzo Schema TypeScript SDK
 
-TypeScript SDK for working with TanzoLang schema using Zod for validation.
+A TypeScript SDK for working with TanzoLang schemas, providing validation, simulation, and exporting capabilities for Tomodaichi Tanzo ecosystem profiles.
 
 ## Installation
 
 ```bash
-npm install tanzo-schema
-# or
-yarn add tanzo-schema
+npm install @onalius/tanzo-schema

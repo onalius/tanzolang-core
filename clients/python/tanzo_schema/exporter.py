@@ -1,111 +1,110 @@
 """
-Exporter module for TanzoLang profiles.
-
-This module provides functions to export TanzoLang profiles in various formats,
-including a shorthand string representation.
+Export utilities for TanzoLang profiles
 """
 
-import json
+from typing import Dict, Any, Optional, Union, List
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
 
-from tanzo_schema.validator import load_profile
+from tanzo_schema.models import (
+    TanzoProfile,
+    Attribute,
+    NormalDistribution,
+    UniformDistribution,
+    DiscreteDistribution,
+)
+from tanzo_schema.validator import validate_profile
 
 
-def _get_trait_shorthand(trait_data: Dict[str, Any]) -> str:
+def format_distribution(distribution: Union[NormalDistribution, UniformDistribution, DiscreteDistribution]) -> str:
     """
-    Convert a trait to shorthand notation.
+    Format a probability distribution as a concise string
     
     Args:
-        trait_data (Dict[str, Any]): The trait data.
+        distribution: The distribution to format
         
     Returns:
-        str: Shorthand notation for the trait.
+        str: A formatted string representation
     """
-    value = trait_data.get("value", 50)
-    variance = trait_data.get("variance")
+    if isinstance(distribution, NormalDistribution):
+        return f"N({distribution.mean:.2f}, {distribution.stdDev:.2f})"
     
-    if variance is not None:
-        return f"{value}±{variance}"
+    elif isinstance(distribution, UniformDistribution):
+        return f"U({distribution.min:.2f}, {distribution.max:.2f})"
+    
+    elif isinstance(distribution, DiscreteDistribution):
+        # Format discrete values and weights
+        pairs = []
+        for val, weight in zip(distribution.values, distribution.weights):
+            # Format the value based on its type
+            if isinstance(val, str):
+                formatted_val = f'"{val}"'
+            elif isinstance(val, bool):
+                formatted_val = str(val).lower()
+            else:
+                formatted_val = str(val)
+            
+            pairs.append(f"{formatted_val}:{weight:.2f}")
+        
+        return f"D({', '.join(pairs)})"
+    
     else:
-        return str(value)
+        raise ValueError(f"Unknown distribution type: {type(distribution)}")
 
 
-def _get_trait_summary(
-    traits: Dict[str, Dict[str, Any]]
-) -> str:
+def format_attribute(attribute: Attribute) -> str:
     """
-    Generate a trait summary string.
+    Format an attribute as a concise string
     
     Args:
-        traits (Dict[str, Dict[str, Any]]): Dictionary of traits.
+        attribute: The attribute to format
         
     Returns:
-        str: Trait summary string.
+        str: A formatted string representation
     """
-    trait_codes = {
-        "openness": "O",
-        "conscientiousness": "C",
-        "extraversion": "E",
-        "agreeableness": "A",
-        "neuroticism": "N"
-    }
+    value = attribute.value
     
-    parts = []
-    for trait_name, trait_code in trait_codes.items():
-        if trait_name in traits:
-            trait_data = traits[trait_name]
-            shorthand = _get_trait_shorthand(trait_data)
-            parts.append(f"{trait_code}:{shorthand}")
-    
-    return " ".join(parts)
-
-
-def generate_shorthand(profile_data: Dict[str, Any]) -> str:
-    """
-    Generate a shorthand string representation of a profile.
-    
-    Args:
-        profile_data (Dict[str, Any]): The profile data.
-        
-    Returns:
-        str: Shorthand representation.
-    """
-    # Extract profile name
-    name = profile_data.get("metadata", {}).get("name", "Unnamed")
-    
-    # Extract traits
-    traits = profile_data.get("digital_archetype", {}).get("traits", {})
-    trait_summary = _get_trait_summary(traits)
-    
-    # Combine into shorthand
-    return f"{name} [{trait_summary}]"
-
-
-def export_profile(
-    profile_path: Union[str, Path], 
-    output_format: str = "shorthand"
-) -> Union[str, Dict[str, Any]]:
-    """
-    Export a profile in the specified format.
-    
-    Args:
-        profile_path (Union[str, Path]): Path to the profile file.
-        output_format (str, optional): Output format - "shorthand", "json", or "dict". Defaults to "shorthand".
-        
-    Returns:
-        Union[str, Dict[str, Any]]: Exported profile in requested format.
-        
-    Raises:
-        ValueError: If the file format is not supported or output_format is invalid.
-    """
-    profile_data = load_profile(profile_path)
-    
-    if output_format == "shorthand":
-        return generate_shorthand(profile_data)
-    elif output_format == "json":
-        return json.dumps(profile_data, indent=2)
-    elif output_format == "dict":
-        return profile_data
+    # Format based on value type
+    if isinstance(value, (NormalDistribution, UniformDistribution, DiscreteDistribution)):
+        formatted_value = format_distribution(value)
+    elif isinstance(value, str):
+        formatted_value = f'"{value}"'
+    elif isinstance(value, bool):
+        formatted_value = str(value).lower()
     else:
-        raise ValueError(f"Unsupported output format: {output_format}")
+        formatted_value = str(value)
+    
+    # Include unit if available
+    if attribute.unit:
+        return f"{attribute.name}={formatted_value} {attribute.unit}"
+    else:
+        return f"{attribute.name}={formatted_value}"
+
+
+def export_profile(profile_path: Union[str, Path]) -> str:
+    """
+    Export a TanzoLang profile as a concise string representation
+    
+    Args:
+        profile_path: Path to the profile file
+        
+    Returns:
+        str: A formatted string representation of the profile
+    """
+    # Validate the profile first
+    profile = validate_profile(profile_path)
+    
+    # Format the profile
+    lines = [f"TanzoProfile: {profile.profile.name} (v{profile.version})"]
+    
+    # Format each archetype
+    for archetype in profile.profile.archetypes:
+        archetype_name = archetype.name or archetype.type.value
+        archetype_line = f"  {archetype.type.value.upper()}:{archetype_name}"
+        lines.append(archetype_line)
+        
+        # Format attributes for this archetype
+        for attribute in archetype.attributes:
+            attribute_line = f"    {format_attribute(attribute)}"
+            lines.append(attribute_line)
+    
+    return "\n".join(lines)
