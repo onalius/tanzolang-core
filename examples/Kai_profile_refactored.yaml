@@ -1,0 +1,205 @@
+version: "0.1.0"
+profile:
+  name: "Kai's Digital Twin"
+  description: "A digital representation of Kai with physical and digital attributes, built on archetypal foundations"
+  
+  # Core parent archetypes (required)
+  parent_archetypes:
+    - name: "The Magician"
+      influence: 0.7
+      reference: "registry/archetypes/Magician.yaml"
+      description: "Forms the creative, transformative core of Kai's personality"
+    
+    - name: "The Hermit"
+      influence: 0.5
+      reference: "registry/archetypes/Hermit.yaml"
+      description: "Provides Kai's reflective, independent qualities"
+    
+    - name: "The Lover"
+      influence: 0.4
+      reference: "registry/archetypes/Lover.yaml"
+      description: "Contributes Kai's appreciation for beauty and connection"
+  
+  # Developmental narrative (required)
+  development:
+    nurturing_influences:
+      - name: "Digital Native Environment"
+        description: "Grew up during the rise of personal computing and social media"
+        effect: "Transformed the Magician's creative power into digital expression"
+      
+      - name: "Design Education"
+        description: "Formal training in UX/UI design"
+        effect: "Channeled the Magician's manifestation abilities into digital interfaces"
+      
+      - name: "Remote Work Culture"
+        description: "Professional experience in distributed teams"
+        effect: "Adapted the Hermit's solitude into productive digital independence"
+    
+    formative_trials:
+      - name: "Power Corruption"
+        source_archetype: "The Magician"
+        description: "Faced the temptation to use design skills manipulatively"
+        outcome: "Developed ethical framework for design that respects user agency"
+      
+      - name: "Loneliness"
+        source_archetype: "The Hermit"
+        description: "Experienced isolation during early remote work years"
+        outcome: "Learned to build meaningful digital connections while maintaining boundaries"
+      
+      - name: "Loss"
+        source_archetype: "The Lover"
+        description: "Lost touch with tactile creativity during digital transition"
+        outcome: "Integrated digital and physical creative practices"
+    
+    integrated_scars:
+      - name: "Misused Power"
+        source_archetype: "The Magician"
+        description: "Early project that prioritized business goals over user needs"
+        manifestation: "Heightened sensitivity to dark patterns and manipulation tactics"
+      
+      - name: "Rejection"
+        source_archetype: "The Hermit"
+        description: "Feedback on early designs was harshly critical"
+        manifestation: "Careful process for sharing work and receiving feedback"
+      
+      - name: "Heartbreak"
+        source_archetype: "The Lover"
+        description: "Deep attachment to project that was abandoned"
+        manifestation: "Balance between passionate investment and professional detachment"
+  
+  # Emergent archetypal expressions (dynamic)
+  archetypes:
+    - type: "digital"
+      name: "Digital Shapeshifter"
+      description: "Kai's online persona that adapts across platforms"
+      derived_from:
+        - archetype: "The Magician"
+          traits: ["transformation", "manifestation"]
+          modification: "Applied to digital environments"
+      attributes:
+        - name: "username"
+          value: "kai_digital"
+          description: "Kai's online username"
+        
+        - name: "digital_creativity"
+          derived_from:
+            archetype: "The Magician"
+            attribute: "creativity"
+            modification_factor: 1.2
+          value: 0.9
+          description: "Ability to generate novel digital solutions"
+        
+        - name: "screen_time"
+          value:
+            distribution: "normal"
+            mean: 4.5
+            stdDev: 1.2
+          description: "Daily screen time"
+          unit: "hours"
+        
+        - name: "social_discernment"
+          derived_from:
+            archetype: "The Hermit"
+            attribute: "discernment" 
+            modification: "Applied to online interactions"
+          value: 0.8
+          description: "Ability to evaluate digital information thoughtfully"
+        
+        - name: "social_influence"
+          value:
+            distribution: "uniform"
+            min: 100
+            max: 1000
+          description: "Number of followers across platforms"
+    
+    - type: "physical"
+      name: "Design Craftsperson"
+      description: "Kai's embodied, creative self"
+      derived_from:
+        - archetype: "The Lover"
+          traits: ["appreciation", "sensuality"]
+          modification: "Focused on design and aesthetics"
+        - archetype: "The Magician"
+          traits: ["manifestation"]
+          modification: "Applied to physical creative work"
+      attributes:
+        - name: "height"
+          value: 175
+          description: "Physical height"
+          unit: "cm"
+        
+        - name: "weight"
+          value:
+            distribution: "normal"
+            mean: 70
+            stdDev: 2
+          description: "Physical weight"
+          unit: "kg"
+        
+        - name: "aesthetic_sense"
+          derived_from:
+            archetype: "The Lover"
+            attribute: "beauty"
+            modification_factor: 1.1
+          value: 0.85
+          description: "Sensitivity to visual harmony and design principles"
+        
+        - name: "hands_on_creativity"
+          derived_from:
+            archetype: "The Magician"
+            attribute: "manifestation"
+            modification: "Applied to physical materials"
+          value: 0.8
+          description: "Ability to create tangible prototypes and designs"
+        
+        - name: "focused_solitude"
+          derived_from:
+            archetype: "The Hermit"
+            attribute: "solitude"
+            modification: "Channeled into deep work sessions"
+          value: 0.75
+          description: "Capacity for sustained creative focus"
+        
+        - name: "activity_level"
+          value:
+            distribution: "discrete"
+            values: ["low", "medium", "high"]
+            weights: [0.2, 0.5, 0.3]
+          description: "Physical activity level"
+  
+  # Symbolic elements inherited and transformed
+  symbolism:
+    primary_elements:
+      - element: "fire"
+        source_archetype: "The Magician"
+        transformation: "Digital fire - illuminating screens and ideas"
+      - element: "water"
+        source_archetype: "The Lover"
+        transformation: "Flow state in creative work"
+    
+    colors:
+      - color: "electric blue"
+        source_archetype: "The Magician"
+        transformation: "Screen glow interpretation of magical energy"
+      - color: "deep purple"
+        source_archetype: "The Hermit"
+        transformation: "Mystery of digital spaces"
+    
+    animals:
+      - animal: "fox"
+        source_archetype: "The Magician"
+        significance: "Adaptability across digital contexts"
+      - animal: "owl"
+        source_archetype: "The Hermit"
+        significance: "Digital wisdom and perspective"
+    
+    objects:
+      - object: "wand"
+        source_archetype: "The Magician"
+        transformation: "Digital stylus/cursor as tool of creation"
+      - object: "lantern"
+        source_archetype: "The Hermit"
+        transformation: "Search function illuminating information darkness"
+      - object: "heart"
+        source_archetype: "The Lover"
+        transformation: "Like/favorite mechanisms in digital spaces"

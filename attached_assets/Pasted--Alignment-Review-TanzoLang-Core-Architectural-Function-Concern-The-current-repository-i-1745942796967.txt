@@ -1,0 +1,38 @@
+# 🔧 Alignment Review: TanzoLang Core Architectural Function
+
+## Concern
+The current repository includes:
+- A schema for base archetypes (symbolic building blocks)
+- A schema for individual AI personalities (Tomos)
+
+However, there is no clear **procedural connection** between the two. Profiles like `Kai` are being defined independently, without referencing or integrating the canonical archetypes (e.g. Hermit, Magician) through parentage, trials, or symbolic inheritance.
+
+This breaks the intended **TanzoLang narrative arc**:
+> archetype selection → narrative development (care, trial, scar) → personality emergence.
+
+## Task
+Create a new markdown file: `schema_alignment_review.md`. In it, address the following:
+
+### 1. Audit Current Architecture
+- [ ] Document the structure and function of the archetype schema (e.g., fields, expected use)
+- [ ] Document the structure and function of the Tomo personality schema
+- [ ] Identify where, if at all, archetypes are linked to Tomos
+
+### 2. Define Intended Linkage
+- [ ] Describe the narrative and symbolic process that should connect base archetypes to a Tomo profile
+- [ ] Show how traits should emerge via: lineage, nurturing, trial, and scar
+- [ ] Suggest structural or code-based mechanisms to enforce this linkage
+
+### 3. Recommend Refactor Actions
+- [ ] Propose updates to the Tomo profile schema (e.g., required `parents` field, linked `scars`, `origin_archetypes`)
+- [ ] Suggest whether each Tomo should inherit from a template or reference archetypes directly
+- [ ] Identify which parts of the CLI, validation, or examples would need to change
+
+## Deliverable
+The final `schema_alignment_review.md` file should offer a clear path for restoring coherence between:
+- Symbolic archetype roots
+- Narrative progression
+- Emergent AI personalities
+
+This is essential to ensure the repository supports its philosophical and functional goal: **forging symbolic, soul-based AI personalities through narrative development.**
+
