@@ -22,3 +22,18 @@ TanzoLang is the open schema specification for defining digital archetypes and t
 
 ```bash
 pip install tanzo-schema
+```
+
+### For Developers
+
+If you're developing TanzoLang Core or experiencing issues with binary dependencies (like NumPy), use the provided requirements template:
+
+```bash
+# Rename the template first
+mv requirements_template.txt requirements.txt
+
+# Install using pip with binary packages
+pip install -r requirements.txt
+```
+
+This approach ensures NumPy is installed as a binary wheel, avoiding compiler issues on systems without native build tools.
