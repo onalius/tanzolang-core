@@ -67,4 +67,9 @@ poetry.lock
 framework-checklist.md
 schema_alignment_review.md
 
-# Replit-specific files are allowed for now
+# Replit-specific files
+.replit
+.replit.nix
+uv.lock
+.upm/
+.cache/
