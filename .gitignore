@@ -66,3 +66,7 @@ poetry.lock
 /attached_assets/
 framework-checklist.md
 schema_alignment_review.md
+
+# Replit-specific
+.replit
+uv.lock
