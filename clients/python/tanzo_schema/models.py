@@ -4,7 +4,7 @@ Pydantic models for TanzoLang profiles
 
 from typing import Dict, List, Literal, Optional, Union, Any
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, validator
 
 
 class DistributionType(str, Enum):
@@ -20,7 +20,7 @@ class NormalDistribution(BaseModel):
     mean: float
     stdDev: float
 
-    @field_validator("stdDev")
+    @validator("stdDev")
     def validate_std_dev(cls, v: float) -> float:
         """Ensure standard deviation is positive"""
         if v <= 0:
@@ -34,7 +34,7 @@ class UniformDistribution(BaseModel):
     min: float
     max: float
 
-    @field_validator("max")
+    @validator("max")
     def validate_max(cls, v: float, values: Dict[str, Any]) -> float:
         """Ensure max is greater than min"""
         if "min" in values and v <= values["min"]:
@@ -48,7 +48,7 @@ class DiscreteDistribution(BaseModel):
     values: List[Union[str, float, bool]]
     weights: List[float]
 
-    @field_validator("weights")
+    @validator("weights")
     def validate_weights(cls, v: List[float], values: Dict[str, Any]) -> List[float]:
         """Ensure weights are valid probabilities and match the number of values"""
         if any(weight < 0 or weight > 1 for weight in v):

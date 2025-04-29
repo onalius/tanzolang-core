@@ -7,7 +7,7 @@ This module defines the Pydantic models that correspond to the TanzoLang JSON Sc
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, validator
 
 class Skill(BaseModel):
     """Represents a skill in a TanzoLang profile."""
@@ -102,8 +102,7 @@ class Archetype(BaseModel):
     attributes: Attributes = Field(..., description="Attributes of the archetype")
     interaction: Optional[Interaction] = Field(None, description="Interaction characteristics of the archetype")
 
-    @field_validator('weight')
-    @classmethod
+    @validator('weight')
     def validate_weight(cls, v: float) -> float:
         """Validate that the weight is between 0 and 1."""
         if v < 0 or v > 1:
@@ -119,8 +118,7 @@ class Identity(BaseModel):
     author: Optional[str] = Field(None, description="Author of the profile")
     tags: Optional[List[str]] = Field(None, description="Tags associated with the profile")
 
-    @field_validator('version')
-    @classmethod
+    @validator('version')
     def validate_version(cls, v: str) -> str:
         """Validate that the version follows semantic versioning."""
         import re
@@ -142,8 +140,7 @@ class ProfileContent(BaseModel):
     archetypes: List[Archetype] = Field(..., description="List of archetypes in the profile")
     metadata: Optional[Metadata] = Field(None, description="Metadata of the profile")
 
-    @field_validator('archetypes')
-    @classmethod
+    @validator('archetypes')
     def validate_archetypes(cls, v: List[Archetype]) -> List[Archetype]:
         """Validate that there is at least one archetype."""
         if not v:
