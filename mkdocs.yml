@@ -9,9 +9,11 @@ edit_uri: edit/main/docs/
 
 theme:
   name: material
+  logo: static/images/android-chrome-192x192.png
+  favicon: static/images/favicon.ico
   palette:
-    primary: indigo
-    accent: indigo
+    primary: deep-purple
+    accent: deep-purple
   features:
     - navigation.sections
     - navigation.top

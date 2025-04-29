@@ -1,5 +1,9 @@
 # TanzoLang Specification
 
+<p align="center">
+  <img src="static/images/android-chrome-512x512.png" alt="TanzoLang Logo" width="120" height="120">
+</p>
+
 ## Introduction
 
 TanzoLang is a structured language for encoding AI personality blueprints. It provides a way to define digital archetypes and their attributes using a combination of symbolic elements, psychological traits, and behavioral patterns. The goal is to create a framework that allows for the creation of rich, complex AI personalities with depth, nuance, and symbolic meaning through archetypal foundations and narrative development.

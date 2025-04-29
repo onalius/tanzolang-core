@@ -1,5 +1,9 @@
 # TanzoLang Core
 
+<p align="center">
+  <img src="static/images/android-chrome-512x512.png" alt="TanzoLang Logo" width="120" height="120">
+</p>
+
 [![CI](https://github.com/onalius/tanzo-lang-core/actions/workflows/ci.yml/badge.svg)](https://github.com/onalius/tanzo-lang-core/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/onalius/tanzo-lang-core/branch/main/graph/badge.svg)](https://codecov.io/gh/onalius/tanzo-lang-core)
 [![PyPI version](https://badge.fury.io/py/tanzo-schema.svg)](https://badge.fury.io/py/tanzo-schema)
