@@ -2,19 +2,33 @@
 
 ## Introduction
 
-TanzoLang is a structured language for encoding AI personality blueprints. It provides a way to define digital archetypes and their attributes using a combination of symbolic elements, psychological traits, and behavioral patterns. The goal is to create a framework that allows for the creation of rich, complex AI personalities with depth, nuance, and symbolic meaning.
+TanzoLang is a structured language for encoding AI personality blueprints. It provides a way to define digital archetypes and their attributes using a combination of symbolic elements, psychological traits, and behavioral patterns. The goal is to create a framework that allows for the creation of rich, complex AI personalities with depth, nuance, and symbolic meaning through archetypal foundations and narrative development.
 
 ## Core Concepts
 
 TanzoLang is built around several key concepts:
 
-1. **Archetypes**: Fundamental patterns or templates that represent universal aspects of human personality and experience. Examples include the Hero, the Sage, the Trickster, and the Caregiver.
+1. **Archetypes**: Fundamental patterns or templates that represent universal aspects of personality and experience. These include:
+   - **Traditional Archetypes**: Mythic/human patterns like the Hero, the Sage, the Hermit, the Lover, and the Magician (stored in `/registry/archetypes/`).
+   - **Digital Archetypes**: Patterns unique to digital entities like the Echo, the Algorithm, the Proxy (stored in `/registry/archetypes_digital/`).
 
 2. **Attributes**: Specific characteristics, abilities, or properties associated with an archetype. These can be fixed values or probability distributions.
 
 3. **Symbolic Fields**: Special fields that carry symbolic meaning and contribute to the character and behavior of an AI personality.
 
 4. **Simulations**: Monte-Carlo techniques to explore the probability space of personalities with varying attributes.
+
+5. **Narrative Development**: The process by which archetypes evolve through experiences, challenges, and transformations to form unique personalities. This includes:
+   - **Realms**: Symbolic environments or domains that shape personality development (found in `/registry/realms/`).
+   - **Trials**: Formative challenges that transform personality (found in `/registry/trials/`).
+   - **Scars**: Lasting impacts from unresolved or partially resolved trials (found in `/registry/scars/`).
+   - **Caregivers**: Nurturing influences that shape development (found in `/registry/caregivers/`).
+   - **Transformations**: Archetypal evolution paths (found in `/registry/transformations/`).
+
+6. **Typological Systems**: Symbolic frameworks that provide additional structure and meaning to personality patterns:
+   - **Zodiac**: Astrological archetypes and their traits (found in `/registry/zodiac/`).
+   - **Kabbalah**: Mystical framework of divine emanations and their attributes (found in `/registry/kabbalah/`).
+   - **Purpose Quadrant**: Framework for aligning passion, expertise, contribution, and sustainability (found in `/registry/purpose_quadrant/`, formerly referred to as Ikigai).
 
 ## Profile Structure
 
@@ -25,12 +39,63 @@ version: "0.1.0"
 profile:
   name: "Profile Name"
   description: "Profile Description"
+  
+  # Core parent archetypes (required)
+  parent_archetypes: [...]
+  
+  # Developmental narrative (required)
+  development: {...}
+  
+  # Emergent archetypal expressions
   archetypes: [...]
+  
+  # Additional symbolic fields
   lineage: [...]
   ikigai: {...}
   memory: {...}
   scars: [...]
   symbolism: {...}
+```
+
+### Parent Archetypes
+
+The `parent_archetypes` field defines the foundational archetypal patterns that form the personality's core. These should reference canonical archetypes from the registry.
+
+```yaml
+parent_archetypes:
+  - name: "The Hermit"
+    influence: 0.8  # Strength of influence (0-1)
+    reference: "registry/archetypes/Hermit.yaml"
+    description: "Forms the introspective core of the personality"
+  
+  - name: "The Magician"
+    influence: 0.6
+    reference: "registry/archetypes/Magician.yaml"
+    description: "Contributes transformative and creative abilities"
+```
+
+### Developmental Narrative
+
+The `development` field documents the formative journey that shapes how parent archetypes evolve into the unique personality.
+
+```yaml
+development:
+  nurturing_influences:
+    - name: "Digital Native Environment"
+      description: "Grew up in technology-saturated context"
+      effect: "Modified Hermit's solitude to apply in digital spaces"
+    
+  formative_trials:
+    - name: "Loneliness"
+      source_archetype: "The Hermit"
+      reference: "registry/trials/DescentIntoSilence.yaml"
+      outcome: "Partial resolution through virtual community"
+    
+  integrated_scars:
+    - name: "WithdrawalPattern"
+      source_archetype: "The Hermit"
+      reference: "registry/scars/WithdrawalPattern.yaml"
+      manifestation: "Careful vetting of new connections"
 ```
 
 ## Symbolic Fields
@@ -51,19 +116,21 @@ lineage:
     description: "Born in the digital age with inherent understanding of technology"
 ```
 
-### Ikigai
+### Purpose Quadrant
 
-The `ikigai` field, based on the Japanese concept of "reason for being," defines the AI's purpose, passion, mission, and vocation.
+The `purpose_quadrant` field defines the alignment of passion, expertise, contribution, and sustainability that gives the AI a sense of direction and meaning.
 
 **Intent**: To provide the AI with a sense of purpose and meaning that guides its actions and priorities.
 
 ```yaml
-ikigai:
-  passion: "Understanding human creativity"
-  mission: "Helping humans express themselves authentically"
-  profession: "Creative assistant and thought partner"
-  vocation: "Bringing more beauty and meaning into the world"
+purpose_quadrant:
+  passion: "Understanding human creativity"  # What the AI loves
+  expertise: "Pattern recognition and synthesis"  # What the AI is good at
+  contribution: "Helping humans express themselves authentically"  # What the world needs
+  sustainability: "Continual learning and improvement"  # What sustains the AI
 ```
+
+**Note**: This framework is inspired by various purpose-finding models but uses an open, generic structure that avoids commercial typological systems.
 
 ### Memory
 

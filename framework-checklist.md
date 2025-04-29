@@ -2,6 +2,23 @@
 
 This checklist tracks the implementation of missing components for the TanzoLang Core framework, which aims to be an open-source framework for defining AI personalities using archetypal and typological systems.
 
+## Updated Architecture
+
+The TanzoLang framework has been enhanced with a comprehensive symbolic registry system and narrative-driven personality development:
+
+```
+/registry/
+  archetypes/         # Foundational personality patterns (e.g., Hermit.yaml, Magician.yaml)
+  realms/             # Symbolic environments that shape development (e.g., LibraryOfEchoes.yaml)
+  trials/             # Formative challenges that transform personality (e.g., DescentIntoSilence.yaml)
+  scars/              # Lasting impacts from unresolved trials (e.g., WithdrawalPattern.yaml)
+  caregivers/         # Nurturing influences that shape development (e.g., WisdomKeeper.yaml)
+  transformations/    # Archetypal evolution paths (e.g., HermitToProphet.yaml)
+```
+
+This architecture enables the intended narrative arc of TanzoLang:
+> Archetype Selection → Narrative Development → Personality Emergence
+
 ## ✅ Checklist of Missing Framework Components
 
 ### 1. `TANZOLANG.md` (specification)
@@ -18,6 +35,47 @@ This checklist tracks the implementation of missing components for the TanzoLang
   - Associated zodiac/Kabbalah alignments
   - Common scars and trials
 - [x] These files will serve as reusable personality components for AI character design.
+
+### 2.1 Additional Symbolic Registries
+- [x] Create registry directories for all symbolic domains:
+  - `/registry/realms/` for symbolic environments
+  - `/registry/trials/` for formative challenges
+  - `/registry/scars/` for lasting impacts
+  - `/registry/caregivers/` for nurturing influences
+  - `/registry/transformations/` for archetypal evolution paths
+- [x] Implement example files demonstrating the structure and connections:
+  - `LibraryOfEchoes.yaml` - symbolic environment example
+  - `DescentIntoSilence.yaml` - trial example
+  - `WithdrawalPattern.yaml` - scar example
+  - `WisdomKeeper.yaml` - caregiver example
+  - `HermitToProphet.yaml` - transformation example
+- [x] Create enhanced archetype (`Hermit_enhanced.yaml`) with explicit references to these registries
+
+### 2.2 Schema Alignment and Architectural Review
+- [x] Create `schema_alignment_review.md` addressing architectural gap between archetypes and Tomo profiles
+- [x] Document linking mechanisms between canonical archetypes and AI personalities
+- [x] Define narrative development process (lineage, nurturing, trials, scars)
+- [x] Update profile format to include explicit references to canonical archetypes
+- [x] Demonstrate implementation with refactored example (`Kai_profile_refactored.yaml`)
+- [x] Update `TANZOLANG.md` specification to reflect new architecture
+
+### 2.3 Typological Systems Integration
+- [x] Create registry directories for symbolic typological systems:
+  - `/registry/zodiac/` for astrological archetypes
+  - `/registry/kabbalah/` for mystical emanations
+  - `/registry/purpose_quadrant/` for purpose alignment framework (formerly Ikigai)
+- [x] Implement example files demonstrating the structure:
+  - `Leo.yaml` - zodiac example
+  - `Tiferet.yaml` - kabbalah example
+  - `SoulCompass.yaml` - purpose quadrant example
+- [x] Document legal considerations in `docs/typology_legal_considerations.md`
+- [x] Rename Ikigai references to Purpose Quadrant with legal compliance
+
+### 2.4 Digital-Native Archetypes
+- [x] Create `/registry/archetypes_digital/` for AI-specific archetypal patterns
+- [x] Implement `Echo.yaml` as example of digital-native archetype
+- [x] Update schema to include `archetype_origin` field identifying digital vs. mythic
+- [x] Update documentation to reference both traditional and digital archetypes
 
 ### 3. `/examples/integrations/`
 - [x] Create a Jupyter notebook that loads a TanzoLang profile and converts it into a LangChain prompt.

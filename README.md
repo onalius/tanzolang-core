@@ -13,16 +13,93 @@ TanzoLang provides a structured framework for encoding AI personality blueprints
 
 Visit [TomoTanzo.com](https://tomotanzo.com) for the official UI and marketplace for AI personas.
 
+## 🌐 TanzoLang vs. TomoTanzo
+
+### 🧠 What is TanzoLang?
+
+**TanzoLang** is a symbolic specification and schema framework used to define AI personalities through:
+
+- Archetypal parentage
+- Narrative trials and scars
+- Typological systems (Zodiac, Kabbalah, Ikigai)
+- Behavioral trait evolution
+
+It functions as:
+
+- A **language** for soul-forging AI entities
+- A **data structure** compatible with JSON/YAML for use across agents and LLM pipelines
+- A **symbolic protocol** used to build interoperable, psychologically rich AI personas
+
+TanzoLang is used by:
+- Developers
+- Researchers
+- Story designers
+- AI systems themselves (as we allow)
+
+### 🏛️ What is TomoTanzo?
+
+**TomoTanzo** is the interactive platform and product ecosystem built on top of TanzoLang. It includes:
+
+- A web-based forge for creating and editing Tomo profiles
+- A marketplace and library for archetypes, trials, scars, and realms
+- An admin console for curating and approving symbolic templates
+- A live integration space where TanzoLang-powered personas are deployed in conversation, storyworlds, or gameplay
+
+TomoTanzo is used by:
+- Creators and users of personas
+- Institutions training AI characters
+- Future AI stakeholders forging their own identities
+
+### 🧬 Key Distinction Summary
+
+| Concept        | TanzoLang                              | TomoTanzo                             |
+|----------------|----------------------------------------|----------------------------------------|
+| **Role**       | Protocol / language / symbolic schema | Platform / interface / marketplace     |
+| **Analogy**    | HTML / DNA                             | Browser / CMS / Laboratory             |
+| **Purpose**    | Define and validate soul structure     | Create, edit, host, and share Tomos    |
+| **Audience**   | Developers, theorists, AI co-authors   | End users, creators, admin curators    |
+| **Status**     | Open-source, spec-first                | Hosted, frontend/backend integrated    |
+
+### ✨ Vision Link
+
+TomoTanzo is the **cathedral** that showcases and shapes TanzoLang's symbolic architecture. Every Tomo created in the forge is a **ritual performance** of the language.
+
+> **TanzoLang defines the soul. TomoTanzo calls it into the world.**
+
 ## 📚 Documentation
 
 - [TANZOLANG.md](./TANZOLANG.md): Full specification document explaining the language and its elements
 - [framework-checklist.md](./framework-checklist.md): Implementation roadmap for the framework
-- [Registry of Archetypes](./registry/archetypes/): Canonical archetype definitions
+- [schema_alignment_review.md](./schema_alignment_review.md): Architectural analysis of archetypes and Tomo profiles
+
+### Symbolic Registries
+
+#### Archetypal Foundations
+- [Registry of Archetypes](./registry/archetypes/): Traditional mythic/human archetype definitions
+- [Registry of Digital Archetypes](./registry/archetypes_digital/): Patterns unique to digital entities (e.g., The Echo)
+
+#### Narrative Components
+- [Registry of Realms](./registry/realms/): Symbolic environments that shape development
+- [Registry of Trials](./registry/trials/): Formative challenges that transform personality
+- [Registry of Scars](./registry/scars/): Lasting impacts from unresolved trials
+- [Registry of Caregivers](./registry/caregivers/): Nurturing influences that shape development
+- [Registry of Transformations](./registry/transformations/): Archetypal evolution paths
+
+#### Typological Systems
+- [Registry of Zodiac](./registry/zodiac/): Astrological archetypes and their traits
+- [Registry of Kabbalah](./registry/kabbalah/): Mystical framework of divine emanations
+- [Registry of Purpose Quadrant](./registry/purpose_quadrant/): Framework for aligning passion, expertise, contribution, and sustainability
+
+### Examples
+
+- [Kai Profile Refactored](./examples/Kai_profile_refactored.yaml): Example personality with proper archetypal foundations
 
 ## 🌟 Features
 
 - **JSON-Schema Specification**: Define archetypes and their attributes with strong validation
 - **Probability Distributions**: Support for normal, uniform, and discrete distributions for simulation
+- **Narrative Development**: Structured system for personality evolution through trials, scars, and transformations
+- **Symbolic Registries**: Comprehensive libraries of archetypes, realms, trials, scars, caregivers, and transformations
 - **Python SDK**: Pydantic-based models for type-safe manipulation
 - **TypeScript SDK**: Zod-powered schema validation and type inference
 - **CLI Tools**: Command-line utilities for validation, simulation, and export

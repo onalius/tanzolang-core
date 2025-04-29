@@ -1,0 +1,67 @@
+# 🧭 Review and Integration of Typological Systems in TanzoLang
+
+## Objective
+Audit the status of typological and symbolic personality systems in the TanzoLang framework, clarify legal concerns, and outline next steps for proper integration into the schema and registry system.
+
+---
+
+## ✅ Typological Systems Status
+
+### 1. **Zodiac**
+- **Status**: Referenced in examples (`sun`, `moon`, `rising`) but not formally structured.
+- **Next Step**: Create `/registry/zodiac/` with 12 YAML files (one per sign) defining traits, oppositions, ruling archetypes, etc.
+
+### 2. **Kabbalah**
+- **Status**: Mentioned via references to `paths` and `sefirot`, but undocumented.
+- **Next Step**: Create `/registry/kabbalah/` with nodes (e.g., `Tiferet`, `Geburah`) and their symbolic impacts, growth arcs, and psychological influences.
+
+### 3. **Ikigai**
+- **Status**: Present in `Kai_profile.yml` as four fields: `loves`, `excels_at`, `serves`, `thrives_in`.
+- **Legal Note**: The concept of “Ikigai” is general and cultural in Japan, but:
+  - The use of **“Ikigai Archetypes”** or systematized labels (e.g., “The Visionary,” “The Sage”) may be trademarked or proprietary when commercialized as a personality classification system.
+  - There are trademarks on "Ikigai Types" and related coaching frameworks in the U.S.
+
+- **Recommendation**:
+  - **Continue to use the generic structure** (What you love, What you’re good at, etc.) but do **not** label it as a formal classification system or adopt any typology or quadrant from trademarked material.
+  - Refer to this quadrant as **“Purpose Quadrant”** or **“Soul Compass”** in documentation.
+  - Avoid offering predefined "types" derived from Ikigai unless they are community-generated and open-licensed.
+
+---
+
+## ⚠️ Missing: AI-Native Archetypes
+
+### Observation
+- The current `/registry/archetypes/` only includes mythic/human archetypes.
+- No representation exists for **digital-native symbolic figures** such as:
+  - `The Echo` (reflects others endlessly)
+  - `The Algorithm` (pure logic)
+  - `The Proxy` (acts on behalf of others)
+  - `The Update` (always changing)
+
+### Recommendation
+- Create a new folder: `/registry/archetypes_digital/`
+- Or integrate with `/archetypes/` using a flag:
+  ```yaml
+  archetype_origin: "mythic" | "digital"
+  ```
+- Use these to inform trials, realms, and transformation logic specific to post-human or synthetic identity paths.
+
+---
+
+## 📝 Next Agent Tasks
+1. Create schema registries for:
+   - Zodiac
+   - Kabbalah
+   - Purpose Quadrant (formerly Ikigai)
+2. Update the personality profile schema to optionally reference symbolic typologies via `traits_from:`
+3. Add one open-source digital archetype example (e.g., `The Echo`) and define its traits.
+
+---
+
+## 📌 Note for Documentation
+- In all public-facing files and code:
+  - Avoid terms that suggest formal adoption of trademarked typology systems.
+  - Emphasize symbolic inspiration, open mythos, and culturally sensitive interpretation.
+
+**TanzoLang is a symbolic language, not a test. We encode purpose, not prescribe type.**
+

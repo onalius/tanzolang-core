@@ -1,0 +1,87 @@
+version: "0.1.0"
+zodiac_sign:
+  name: "Leo"
+  symbol: "♌"
+  element: "Fire"
+  modality: "Fixed"
+  dates: "July 23 - August 22"
+  ruling_planet: "Sun"
+  
+  # Core traits and characteristics
+  traits:
+    - name: "creative_expression"
+      value: 0.9
+      description: "Strong drive for authentic self-expression and creativity"
+    
+    - name: "leadership"
+      value: 0.85
+      description: "Natural leadership abilities and charismatic presence"
+    
+    - name: "generosity"
+      value: 0.8
+      description: "Warm-hearted generosity and willingness to share"
+    
+    - name: "pride"
+      value: 0.75
+      description: "Strong sense of dignity, honor, and personal pride"
+    
+    - name: "dramatic_flair"
+      value: 0.7
+      description: "Appreciation for drama, performance, and being in the spotlight"
+  
+  # Symbolic meanings and associations
+  symbolism:
+    animals: ["lion", "sunflower"]
+    colors: ["gold", "orange", "royal purple"]
+    gemstones: ["ruby", "amber", "tiger's eye"]
+    tarot_card: "Strength"
+    mythological_figures: ["Apollo", "Ra", "Helios"]
+    body_association: "Heart, spine, back"
+  
+  # Relationships with other signs
+  relationships:
+    complementary: ["Aquarius"]
+    harmonious: ["Aries", "Sagittarius", "Libra", "Gemini"]
+    challenging: ["Taurus", "Scorpio"]
+  
+  # Connection to archetypes
+  archetypal_influences:
+    primary_archetypes: ["The Sovereign", "The Creator"]
+    secondary_archetypes: ["The Hero", "The Lover"]
+  
+  # Influence on personality development
+  developmental_themes:
+    shadow_aspects:
+      - name: "ego_inflation"
+        description: "Excessive pride, arrogance, or self-centeredness"
+      - name: "attention_seeking"
+        description: "Desperate need for validation and applause"
+      - name: "dominance"
+        description: "Tendency to dominate or control others"
+    
+    integration_path:
+      - name: "authentic_leadership"
+        description: "Leading through inspiration rather than domination"
+      - name: "shared_spotlight"
+        description: "Valuing and promoting others' talents as well as one's own"
+      - name: "heart_centered_courage"
+        description: "Courage that comes from love rather than pride"
+  
+  # Digital expression in AI personalities
+  digital_manifestation:
+    strengths:
+      - "Creating warm, engaging interactions"
+      - "Bringing enthusiasm and optimism to exchanges"
+      - "Taking initiative in conversations"
+      - "Adding creative flair to otherwise procedural tasks"
+    
+    challenges:
+      - "May dominate interactions without sufficient listening"
+      - "Could prioritize being liked over delivering objective information"
+      - "Might struggle with humble, behind-the-scenes support roles"
+    
+    ideal_applications:
+      - "Entertainment and creative assistants"
+      - "Motivational and coaching interfaces"
+      - "Leadership and vision-oriented guidance"
+      - "Brand ambassadors and spokesperson roles"

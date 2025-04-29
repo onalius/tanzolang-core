@@ -1,0 +1,79 @@
+version: "0.1.0"
+purpose_quadrant:
+  name: "Soul Compass"
+  description: "A framework for understanding and aligning core motivational energies"
+  
+  # The four key dimensions of purpose
+  dimensions:
+    - name: "passion"
+      key_question: "What do you love?"
+      description: "Activities, subjects, and experiences that bring joy and intrinsic motivation"
+      behavioral_indicators: ["Flow state", "Sustained enthusiasm", "Natural curiosity", "Sense of meaning"]
+    
+    - name: "expertise"
+      key_question: "What are you good at?"
+      description: "Skills, talents, and capabilities that represent areas of strength"
+      behavioral_indicators: ["Demonstrable competence", "Received recognition", "Ease of learning", "Consistent results"]
+    
+    - name: "contribution"
+      key_question: "What does the world need?"
+      description: "Services and contributions that address genuine needs and problems"
+      behavioral_indicators: ["Solves real problems", "Positive impact on others", "Addresses gaps", "Creates value"]
+    
+    - name: "sustainability"
+      key_question: "What sustains you?"
+      description: "Activities and contexts that provide resources and energy rather than depleting them"
+      behavioral_indicators: ["Resource generation", "Long-term viability", "Health and well-being", "Growth potential"]
+  
+  # Dynamic intersections between dimensions
+  intersections:
+    - dimensions: ["passion", "expertise"]
+      label: "Mastery"
+      description: "Doing what you love and are good at leads to deep skill development and meaningful engagement"
+    
+    - dimensions: ["expertise", "contribution"]
+      label: "Career"
+      description: "Using your talents to solve important problems leads to professional success and advancement"
+    
+    - dimensions: ["contribution", "sustainability"]
+      label: "Vocation"
+      description: "Making meaningful contributions that can be sustained leads to a sense of calling"
+    
+    - dimensions: ["sustainability", "passion"]
+      label: "Fulfillment"
+      description: "Engaging with what you love in ways that replenish you leads to ongoing fulfillment"
+  
+  # Center integration
+  center_integration:
+    name: "Aligned Purpose"
+    description: "The harmony that emerges when all four dimensions are aligned in a single pursuit"
+    manifestations: [
+      "Deep satisfaction and meaning",
+      "Sustainable impact over time",
+      "Natural growth and evolution",
+      "Resilience during challenges"
+    ]
+  
+  # Digital expression in AI personalities
+  digital_application:
+    strengths:
+      - "Helping identify meaningful patterns in user activities and interests"
+      - "Supporting goal alignment and prioritization"
+      - "Identifying potential burnout or misalignment early"
+      - "Facilitating purpose-driven decision making"
+    
+    challenges:
+      - "Avoiding prescriptive or rigid interpretations"
+      - "Recognizing that dimensions may shift and evolve over time"
+      - "Balancing aspiration with practicality"
+    
+    ideal_implementations:
+      - "Career guidance and development systems"
+      - "Personal growth and reflection tools"
+      - "Team alignment and collaborative purpose-finding"
+      - "Life design and planning assistants"
+    
+    data_privacy_considerations:
+      - "Purpose data is deeply personal and should be handled with highest privacy protection"
+      - "Aggregation should anonymize individual passion and purpose patterns"
+      - "Users should maintain full control over their purpose exploration data"

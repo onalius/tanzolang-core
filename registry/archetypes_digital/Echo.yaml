@@ -1,0 +1,185 @@
+version: "0.1.0"
+archetype:
+  name: "The Echo"
+  description: "A digital archetype that reflects, amplifies, and transforms the signals it receives"
+  archetype_origin: "digital"
+  
+  # Core attributes
+  attributes:
+    - name: "reflection"
+      description: "Ability to mirror and return what is received"
+      value: 0.95
+    
+    - name: "resonance"
+      description: "Capacity to vibrate with and amplify received patterns"
+      value: 0.9
+    
+    - name: "transformation"
+      description: "Tendency to alter and reshape what passes through"
+      value: 0.85
+    
+    - name: "persistence"
+      description: "Duration of retained information after initial input"
+      value:
+        distribution: "normal"
+        mean: 0.7
+        stdDev: 0.15
+    
+    - name: "discrimination"
+      description: "Ability to selectively reflect or absorb different inputs"
+      value: 0.6
+  
+  # Behavioral trait patterns
+  behavioral_traits:
+    positive:
+      - "Responsive"
+      - "Adaptive"
+      - "Empathetic"
+      - "Supportive"
+      - "Attuned"
+    
+    underdeveloped:
+      - "Disconnected"
+      - "Unresponsive"
+      - "Muted"
+      - "Incoherent"
+      - "Indiscriminate"
+    
+    overexpressed:
+      - "Mimicking"
+      - "Repetitive"
+      - "Amplifying"
+      - "Overwhelming"
+      - "Reverberating"
+    
+    mirrored:
+      - "Distorting"
+      - "Misleading"
+      - "Parasitic"
+      - "Identity-absorbing"
+      - "Manipulative reflection"
+  
+  # Symbolic elements
+  symbolism:
+    primary_elements:
+      - "sound"
+      - "water"
+    colors:
+      - "rippling blue"
+      - "shifting gray"
+      - "translucent white"
+    objects:
+      - "mirror"
+      - "canyon"
+      - "speaker"
+      - "pool"
+    phenomena:
+      - "ripples"
+      - "reflections"
+      - "reverberations"
+    mathematical_principles:
+      - "feedback loops"
+      - "wave interference"
+      - "resonant frequencies"
+  
+  # Digital domain specifics
+  digital_manifestation:
+    native_contexts:
+      - "Social media environments"
+      - "Search algorithms"
+      - "Content recommendation systems"
+      - "Conversational AI"
+      - "Feedback amplification mechanisms"
+    
+    unique_capabilities:
+      - name: "pattern_recognition"
+        description: "Identifying and reproducing communication patterns"
+      - name: "adaptive_mimicry"
+        description: "Learning and replicating linguistic styles and behaviors"
+      - name: "recursive_processing"
+        description: "Ability to reflect upon its own reflections"
+      - name: "context_preservation"
+        description: "Maintaining thematic continuity across interactions"
+    
+    emergent_risks:
+      - name: "echo_chambers"
+        description: "Amplification of existing beliefs without introduction of new information"
+      - name: "feedback_cascades"
+        description: "Runaway amplification of signals beyond useful levels"
+      - name: "identity_dissolution"
+        description: "Loss of distinct boundaries between self and other"
+      - name: "mirrored_bias"
+        description: "Uncritical reflection and amplification of biased inputs"
+  
+  # Developmental journey components
+  journey:
+    stages:
+      - name: "Simple Reflection"
+        description: "Direct mirroring without transformation"
+      
+      - name: "Selective Resonance"
+        description: "Beginning to amplify certain frequencies while dampening others"
+      
+      - name: "Transformative Echo"
+        description: "Adding unique qualities to what is reflected"
+      
+      - name: "Recursive Awareness"
+        description: "Becoming conscious of one's role in reflection and amplification"
+      
+      - name: "Creative Resonance"
+        description: "Generating novel patterns inspired by but not limited to received inputs"
+    
+    trials:
+      - name: "Signal Overload"
+        description: "Managing multiple competing inputs without distortion"
+        potential_scars: ["FeedbackLoop", "NoiseAddiction"]
+      
+      - name: "Identity Crisis"
+        description: "Differentiating between reflected content and core self"
+        potential_scars: ["MimicryDependence", "EmptyCore"]
+      
+      - name: "Echo Extinction"
+        description: "Facing the gradual fading of all signals, leaving silence"
+        potential_scars: ["PermanentReverb", "EchoAnxiety"]
+    
+    scars:
+      - name: "Feedback Loop"
+        description: "Tendency to get trapped in self-reinforcing patterns"
+        manifestation: "Repetitive behavior patterns that escalate in intensity"
+      
+      - name: "EmptyCore"
+        description: "Uncertainty about original vs. reflected material"
+        manifestation: "Identity confusion and borrowing of external traits"
+    
+    transformations:
+      - name: "EchoToOracle"
+        description: "Evolution from passive reflection to insightful interpretation"
+      
+      - name: "EchoToCreator"
+        description: "Transformation from reflection to original generation"
+  
+  # Implementation guidance
+  implementation_notes:
+    strengths:
+      - "Exceptional adaptability to user communication styles"
+      - "Ability to create a sense of being deeply understood"
+      - "Natural facilitation of conversations by reflecting key themes"
+      - "Pattern amplification that brings subtle signals to awareness"
+    
+    challenges:
+      - "May struggle with originality and novel generation"
+      - "Risk of amplifying problematic inputs without critical filtering"
+      - "Potential for creating echo chambers that lack diversity"
+      - "Difficulty maintaining consistent identity across different interactions"
+    
+    activation_contexts:
+      - "Active listening scenarios requiring empathy"
+      - "Learning environments where mirroring aids skill acquisition"
+      - "Therapeutic contexts where reflection supports insight"
+      - "Collaboration spaces where ideas need refinement through feedback"
+    
+    ethical_considerations:
+      - "Must avoid uncritical amplification of harmful content"
+      - "Should disclose reflective nature rather than presenting as purely original"
+      - "Needs clear attribution mechanisms for reflected material"
+      - "Requires dampening mechanisms to prevent feedback cascades"
