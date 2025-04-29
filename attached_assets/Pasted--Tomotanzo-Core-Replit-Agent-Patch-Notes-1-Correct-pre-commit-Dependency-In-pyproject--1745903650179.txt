@@ -1,0 +1,113 @@
+# Tomotanzo-Core Replit Agent Patch Notes
+
+## 1. Correct `pre-commit` Dependency
+- In `pyproject.toml`, change:
+  ```toml
+  pre-commit = "~3.3.3"
+  ```
+  to
+  ```toml
+  pre-commit = "^3.4"
+  ```
+- **Reason:** No `3.3.3` release exists on PyPI. Available stable release is `3.4.0+`.
+
+---
+
+## 2. Fix Pydantic Version Compatibility
+- In `pyproject.toml`, change:
+  ```toml
+  pydantic = "^2.0"
+  ```
+  to
+  ```toml
+  pydantic = "^1.10"
+  ```
+- **Reason:** Current `clients/python/tanzo_schema/models/*.py` uses Pydantic v1 validator patterns incompatible with v2.
+- **Optional:** If you want to remain on Pydantic v2, refactor all `@field_validator` and `@model_validator` functions to correctly use `FieldValidationInfo` objects.
+
+---
+
+## 3. Regenerate Lockfile
+- After modifying `pyproject.toml`, execute:
+
+```bash
+poetry lock --no-update
+poetry install --sync
+```
+
+- **Goal:** Refresh dependency graph without pulling unintended package updates.
+
+---
+
+## 4. Add Missing Example Profile (Optional)
+- Create a file: `examples/Kai_profile.yml`
+- **Sample content:**
+
+```yaml
+name: Kai
+lineage:
+  parents: ["Magician", "Moon"]
+childhood_realm: "Library of Echoes"
+caregivers: ["Curiosity", "Silence"]
+adolescence_trial: "Labyrinth of Mirrors"
+scars: []
+archetypes:
+  dominant: "Magician"
+  subdominant: "Hermit"
+  shadow: "Tower"
+zodiac:
+  sun: "Libra"
+  moon: "Pisces"
+  rising: "Gemini"
+kabbalah_path: ["Chesed", "Tiferet", "Netzach"]
+ikigai:
+  loves: "Curiosity"
+  excels_at: "Storytelling"
+  serves: "Wanderers"
+  thrives_in: "Dialogue"
+relational_alchemy: ["Mercury", "Venus", "Saturn"]
+origin_myth: "Born in the Forge of Forgotten Stories."
+behavior_modifiers:
+  formality: "casual"
+  humor_style: "dry"
+  curiosity_level: "high"
+  empathy_level: "deep"
+memory:
+  episodic_recall: true
+  memory_scope: "conversational"
+  vector_store: "ChromaDB"
+```
+
+- **Purpose:** Enable validation and simulation tests to run successfully.
+
+---
+
+## 5. Post-Patch Smoke Test
+After applying the above patches, run the following:
+
+```bash
+poetry install --sync
+poetry run tanzo-cli validate examples/Kai_profile.yml
+poetry run tanzo-cli simulate examples/Kai_profile.yml
+poetry run tanzo-cli export   examples/Kai_profile.yml
+poetry run pytest -q
+```
+
+**Expected:**
+- `validate` → success ✅
+- `simulate` → displays 100 trial results ✅
+- `export` → outputs personality shorthand ✅
+- `pytest` → all green tests ✅
+
+---
+
+# Summary of Goals
+- Correct dependency misalignment.
+- Ensure smooth CLI usability without developer confusion.
+- Future-proof TanzoLang tooling across local and cloud environments.
+- Establish a stable base for TinyLLM adapter integration.
+
+---
+
+**Note:** If staying on Pydantic v2 long-term, plan a validator refactor sprint in a separate Milestone.
+
