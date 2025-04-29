@@ -61,3 +61,8 @@ poetry.lock
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# Project-specific
+/attached_assets/
+framework-checklist.md
+schema_alignment_review.md
