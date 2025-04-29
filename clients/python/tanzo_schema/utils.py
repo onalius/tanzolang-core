@@ -1,163 +1,129 @@
-"""Utility functions for working with TanzoLang profiles."""
+"""
+Utility functions for working with TanzoLang profiles.
 
-import random
-from typing import Dict, Any, List, Optional, Union
-import statistics
-from pathlib import Path
+This module provides helper functions for common tasks such as
+exporting profiles to different formats.
+"""
+
+import json
+from typing import Dict, Any, Union
+
+import yaml
+from pydantic import BaseModel
 
 from tanzo_schema.models import TanzoProfile
-from tanzo_schema.validators import load_profile_from_file
 
 
-def export_profile(profile: Union[TanzoProfile, str, Path]) -> str:
+def to_dict(obj: Union[BaseModel, Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Export a profile to a shorthand string representation.
+    Convert a Pydantic model or dictionary to a plain dictionary.
     
     Args:
-        profile: TanzoProfile instance or path to profile file
+        obj: The object to convert
         
     Returns:
-        A shorthand string representation of the profile
+        Dict[str, Any]: A plain dictionary representation
     """
-    # Load profile if string or Path is provided
-    if isinstance(profile, (str, Path)):
-        profile = load_profile_from_file(profile)
-    
-    # Extract key components for the shorthand
-    personality = profile.digital_archetype.personality_traits
-    
-    # Format: Name(O{openness}C{conscientiousness}E{extraversion}A{agreeableness}N{neuroticism})
-    # Example: "Kai(O8C9E6A9N2)" - Kai with openness 0.8, conscientiousness 0.9, etc.
-    shorthand = f"{profile.digital_archetype.identity.name}("
-    shorthand += f"O{int(personality.openness * 10)}"
-    shorthand += f"C{int(personality.conscientiousness * 10)}"
-    shorthand += f"E{int(personality.extraversion * 10)}"
-    shorthand += f"A{int(personality.agreeableness * 10)}"
-    shorthand += f"N{int(personality.neuroticism * 10)}"
-    shorthand += ")"
-    
-    return shorthand
+    if isinstance(obj, BaseModel):
+        return obj.model_dump(exclude_none=True)
+    return obj
 
 
-def _random_variant(value: float, variance: float = 0.1) -> float:
+def to_json(obj: Union[BaseModel, Dict[str, Any]], indent: int = 2) -> str:
     """
-    Generate a random variant of a value within a specified variance.
+    Convert a Pydantic model or dictionary to a JSON string.
     
     Args:
-        value: Base value
-        variance: Maximum variance as a fraction of the base value
+        obj: The object to convert
+        indent: Number of spaces for indentation
         
     Returns:
-        Random variant within the specified range
+        str: A JSON string representation
     """
-    # Calculate the amount to vary by (up to variance in either direction)
-    variation = random.uniform(-variance, variance)
-    
-    # Apply the variation
-    result = value + variation
-    
-    # Ensure the result is within [0, 1]
-    return max(0.0, min(1.0, result))
+    return json.dumps(to_dict(obj), indent=indent)
 
 
-def simulate_profile(
-    profile: Union[TanzoProfile, str, Path], 
-    iterations: int = 100,
-    variance: float = 0.1
-) -> Dict[str, Any]:
+def to_yaml(obj: Union[BaseModel, Dict[str, Any]]) -> str:
     """
-    Run a Monte Carlo simulation of a profile with variations.
+    Convert a Pydantic model or dictionary to a YAML string.
     
     Args:
-        profile: TanzoProfile instance or path to profile file
-        iterations: Number of simulation iterations
-        variance: Maximum variance as a fraction of the base values
+        obj: The object to convert
         
     Returns:
-        Dictionary containing simulation results
+        str: A YAML string representation
     """
-    # Load profile if string or Path is provided
-    if isinstance(profile, (str, Path)):
-        profile = load_profile_from_file(profile)
+    return yaml.dump(to_dict(obj), sort_keys=False)
+
+
+def save_to_json(obj: Union[BaseModel, Dict[str, Any]], file_path: str, indent: int = 2) -> None:
+    """
+    Save a Pydantic model or dictionary to a JSON file.
     
-    # Initialize simulation results
-    results: Dict[str, List[float]] = {
-        "openness": [],
-        "conscientiousness": [],
-        "extraversion": [],
-        "agreeableness": [],
-        "neuroticism": [],
-    }
+    Args:
+        obj: The object to save
+        file_path: Path to the output file
+        indent: Number of spaces for indentation
+    """
+    with open(file_path, "w") as f:
+        json.dump(to_dict(obj), f, indent=indent)
+
+
+def save_to_yaml(obj: Union[BaseModel, Dict[str, Any]], file_path: str) -> None:
+    """
+    Save a Pydantic model or dictionary to a YAML file.
     
-    # Optional metrics if available in the profile
-    optional_metrics = [
-        "problem_solving", "creativity", "memory", "learning", "spatial_awareness",
-        "verbosity", "formality", "humor", "empathy", "assertiveness"
-    ]
+    Args:
+        obj: The object to save
+        file_path: Path to the output file
+    """
+    with open(file_path, "w") as f:
+        yaml.dump(to_dict(obj), f, sort_keys=False)
+
+
+def export_shorthand(profile: TanzoProfile) -> str:
+    """
+    Export a TanzoLang profile to a concise string representation.
     
-    for metric in optional_metrics:
-        # Initialize lists for metrics that exist in the profile
-        if (hasattr(profile.digital_archetype, "cognitive_abilities") and 
-            profile.digital_archetype.cognitive_abilities and
-            hasattr(profile.digital_archetype.cognitive_abilities, metric)):
-            results[metric] = []
-        elif (hasattr(profile.digital_archetype, "communication_style") and 
-              profile.digital_archetype.communication_style and
-              hasattr(profile.digital_archetype.communication_style, metric)):
-            results[metric] = []
+    This creates a short summary string that captures the key aspects of the profile.
     
-    # Run iterations
-    for _ in range(iterations):
-        # Personality traits (required)
-        personality = profile.digital_archetype.personality_traits
-        results["openness"].append(_random_variant(personality.openness, variance))
-        results["conscientiousness"].append(_random_variant(personality.conscientiousness, variance))
-        results["extraversion"].append(_random_variant(personality.extraversion, variance))
-        results["agreeableness"].append(_random_variant(personality.agreeableness, variance))
-        results["neuroticism"].append(_random_variant(personality.neuroticism, variance))
+    Args:
+        profile: The TanzoProfile to export
         
-        # Optional cognitive abilities
-        if profile.digital_archetype.cognitive_abilities:
-            cog = profile.digital_archetype.cognitive_abilities
-            if cog.problem_solving is not None:
-                results["problem_solving"].append(_random_variant(cog.problem_solving, variance))
-            if cog.creativity is not None:
-                results["creativity"].append(_random_variant(cog.creativity, variance))
-            if cog.memory is not None:
-                results["memory"].append(_random_variant(cog.memory, variance))
-            if cog.learning is not None:
-                results["learning"].append(_random_variant(cog.learning, variance))
-            if cog.spatial_awareness is not None:
-                results["spatial_awareness"].append(_random_variant(cog.spatial_awareness, variance))
+    Returns:
+        str: A shorthand string representation
+    """
+    archetype = profile.digital_archetype
+    identity = archetype.identity
+    
+    # Start with basic information
+    parts = [f"{identity.name}"]
+    
+    # Add identity information if available
+    if identity.age is not None:
+        parts.append(f"age:{identity.age}")
+    if identity.occupation is not None:
+        parts.append(f"job:{identity.occupation}")
+    
+    # Add top traits (up to 3)
+    top_traits = sorted(
+        [(name, trait.value) for name, trait in archetype.traits.items()],
+        key=lambda x: x[1],
+        reverse=True
+    )[:3]
+    
+    traits_str = ",".join([f"{name}:{value:.1f}" for name, value in top_traits])
+    parts.append(f"traits:[{traits_str}]")
+    
+    # Add behavioral rules if available (up to 2)
+    if profile.behavioral_rules:
+        top_rules = sorted(
+            [(rule.rule, rule.priority) for rule in profile.behavioral_rules],
+            key=lambda x: x[1],
+            reverse=True
+        )[:2]
         
-        # Optional communication style
-        if profile.digital_archetype.communication_style:
-            comm = profile.digital_archetype.communication_style
-            if comm.verbosity is not None:
-                results["verbosity"].append(_random_variant(comm.verbosity, variance))
-            if comm.formality is not None:
-                results["formality"].append(_random_variant(comm.formality, variance))
-            if comm.humor is not None:
-                results["humor"].append(_random_variant(comm.humor, variance))
-            if comm.empathy is not None:
-                results["empathy"].append(_random_variant(comm.empathy, variance))
-            if comm.assertiveness is not None:
-                results["assertiveness"].append(_random_variant(comm.assertiveness, variance))
+        rules_str = ";".join([rule for rule, _ in top_rules])
+        parts.append(f"rules:[{rules_str}]")
     
-    # Compute statistics for each metric
-    summary = {}
-    for metric, values in results.items():
-        if values:  # Only process metrics that have values
-            summary[metric] = {
-                "mean": statistics.mean(values),
-                "min": min(values),
-                "max": max(values),
-                "std_dev": statistics.stdev(values) if len(values) > 1 else 0.0,
-            }
-    
-    # Add some aggregate information
-    summary["iterations"] = iterations
-    summary["profile_name"] = profile.profile_name or profile.digital_archetype.identity.name
-    summary["profile_id"] = str(profile.profile_id)
-    
-    return summary
+    return " | ".join(parts)

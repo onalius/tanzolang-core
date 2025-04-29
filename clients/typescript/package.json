@@ -1,11 +1,12 @@
 {
   "name": "tanzo-schema",
   "version": "0.1.0",
-  "description": "TypeScript SDK for TanzoLang schema validation and processing",
+  "description": "TypeScript SDK for TanzoLang schema",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "schema"
   ],
   "scripts": {
     "build": "tsc",
@@ -13,35 +14,32 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/onalius/tanzo-lang-core.git"
-  },
   "keywords": [
     "tanzo",
     "schema",
-    "json-schema",
-    "validation"
+    "validation",
+    "zod"
   ],
-  "author": "Onalius Team",
+  "author": "Tomodaichi Tanzo Team",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/onalius/tanzo-lang-core/issues"
-  },
-  "homepage": "https://github.com/onalius/tanzo-lang-core#readme",
-  "devDependencies": {
-    "@types/jest": "^29.5.3",
-    "@types/node": "^20.4.8",
-    "@typescript-eslint/eslint-plugin": "^6.3.0",
-    "@typescript-eslint/parser": "^6.3.0",
-    "eslint": "^8.46.0",
-    "jest": "^29.6.2",
-    "prettier": "^3.0.1",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5.1.6"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onalius/tanzo-lang-core"
   },
   "dependencies": {
     "zod": "^3.21.4",
     "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.2",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^20.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
+    "eslint": "^8.42.0",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.8",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.1.3"
   }
 }

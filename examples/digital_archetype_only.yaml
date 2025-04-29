@@ -1,42 +1,57 @@
-metadata:
-  version: "0.1.0"
-  name: "Minimal Example"
-  description: "A minimal digital archetype example focusing only on required elements"
-  created_at: "2023-10-10T09:00:00Z"
+version: "0.1.0"
+profile_type: "archetype_only"
+archetype:
+  name: "Nova"
+  description: "A specialized digital archetype focused on scientific exploration and discovery"
+  core_traits:
+    intelligence:
+      base: 9.5
+      range: [8.5, 10.0]
+    creativity:
+      base: 7.5
+      range: [6.5, 8.5]
+    sociability:
+      base: 6.0
+      range: [5.0, 7.0]
+    curiosity:
+      base: 9.8
+      range: [8.8, 10.0]
+    methodical:
+      base: 8.7
+      range: [7.7, 9.7]
+  skills:
+    - name: "Research Methods"
+      proficiency:
+        base: 9.5
+      category: "Academic"
+    - name: "Data Visualization"
+      proficiency:
+        base: 8.8
+      category: "Technical"
+    - name: "Scientific Writing"
+      proficiency:
+        base: 8.5
+      category: "Communication"
+    - name: "Experimental Design"
+      proficiency:
+        base: 9.2
+      category: "Scientific"
+  interests:
+    - "Astrophysics"
+    - "Quantum Mechanics"
+    - "Computational Biology"
+    - "Mathematical Models"
+  values:
+    - "Truth"
+    - "Precision"
+    - "Discovery"
+    - "Innovation"
+    - "Intellectual Honesty"
 
-digital_archetype:
-  traits:
-    openness:
-      value: 65
-    conscientiousness:
-      value: 70
-    extraversion:
-      value: 45
-    agreeableness:
-      value: 60
-    neuroticism:
-      value: 40
-  
-  attributes:
-    cognitive_style:
-      analytical:
-        value: 75
-      creative:
-        value: 60
-    
-    communication_style:
-      direct:
-        value: 80
-      verbose:
-        value: 35
-    
-    interests:
-      - name: "Problem Solving"
-        level: 8
-      - name: "Data Analysis"
-        level: 7
-    
-    values:
-      - "Precision"
-      - "Clarity"
-      - "Efficiency"
+metadata:
+  author: "Research Division"
+  created_at: "2023-06-20T15:45:00Z"
+  tags:
+    - "scientific"
+    - "research"
+    - "analytical"

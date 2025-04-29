@@ -1,109 +1,141 @@
 """
-Validation functions for Tanzo profiles
+Validation utilities for Tanzo Schema.
+
+This module provides functions for validating Tanzo profiles against
+the canonical JSON Schema.
 """
 
 import json
 import os
 import pathlib
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import jsonschema
 import yaml
+from jsonschema import ValidationError
+from pydantic import ValidationError as PydanticValidationError
 
-from tanzo_schema.models import TanzoProfile
+from .models import TanzoProfile
 
 
-def _load_schema() -> Dict[str, Any]:
+class SchemaValidationError(Exception):
+    """Exception raised for schema validation errors."""
+
+    def __init__(self, message: str, details: Optional[List[Dict]] = None):
+        self.message = message
+        self.details = details or []
+        super().__init__(self.message)
+
+
+def get_schema_path() -> str:
     """
-    Load the TanzoLang schema from the package directory
+    Get the path to the canonical schema file.
     
     Returns:
-        Dict[str, Any]: The schema as a Python dictionary
+        str: Path to the schema file
     """
-    schema_path = pathlib.Path(__file__).parent.parent.parent.parent / "spec" / "tanzo-schema.json"
-    if not schema_path.exists():
-        # If not found in the repo structure, try package data
-        module_dir = pathlib.Path(__file__).parent
-        schema_path = module_dir / "tanzo-schema.json"
-        if not schema_path.exists():
-            raise FileNotFoundError("Could not locate tanzo-schema.json")
+    # Try to find the schema in a few common locations
+    possible_paths = [
+        # Current package directory's parent's parent's parent + spec
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), 
+            "..", "..", "..", "spec", "tanzo-schema.json"
+        ),
+        # Current working directory + spec
+        os.path.join(os.getcwd(), "spec", "tanzo-schema.json"),
+        # Installed package data
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "tanzo-schema.json"),
+    ]
     
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    
+    raise FileNotFoundError(
+        "Could not find tanzo-schema.json. Please ensure the schema file is accessible."
+    )
+
+
+def load_schema() -> Dict:
+    """
+    Load the canonical JSON Schema.
+    
+    Returns:
+        Dict: The schema as a dictionary
+    
+    Raises:
+        FileNotFoundError: If the schema file cannot be found
+        json.JSONDecodeError: If the schema file contains invalid JSON
+    """
+    schema_path = get_schema_path()
     with open(schema_path, "r") as f:
         return json.load(f)
 
 
-def load_yaml_file(file_path: Union[str, pathlib.Path]) -> Dict[str, Any]:
+def validate_profile(profile_data: Union[Dict, str, pathlib.Path]) -> TanzoProfile:
     """
-    Load a YAML file into a Python dictionary
+    Validate a Tanzo profile against the schema.
     
     Args:
-        file_path: Path to the YAML file
-        
+        profile_data: Profile data as a dictionary, YAML string, or path to a YAML file
+    
     Returns:
-        Dict[str, Any]: The loaded YAML content
-        
+        TanzoProfile: A validated Pydantic model of the profile
+    
     Raises:
-        FileNotFoundError: If the file does not exist
-        yaml.YAMLError: If the file cannot be parsed as YAML
+        SchemaValidationError: If validation fails
+        FileNotFoundError: If a provided file path doesn't exist
     """
-    with open(file_path, "r") as f:
-        return yaml.safe_load(f)
-
-
-def validate_tanzo_profile(
-    data: Union[Dict[str, Any], str, pathlib.Path]
-) -> Tuple[bool, Optional[List[str]]]:
-    """
-    Validate a Tanzo profile against the schema
-    
-    Args:
-        data: Either a dictionary containing profile data, a file path to a YAML file,
-              or a string containing YAML content
-              
-    Returns:
-        Tuple[bool, Optional[List[str]]]: A tuple containing (is_valid, error_messages)
-        
-    Raises:
-        ValueError: If the input data cannot be parsed
-    """
-    # Load the schema
-    schema = _load_schema()
-    
-    # Process the input data
-    profile_data: Dict[str, Any]
-    
-    if isinstance(data, dict):
-        profile_data = data
-    elif isinstance(data, (str, pathlib.Path)):
-        # Check if it's a file path
-        path = pathlib.Path(data)
-        if path.exists() and path.is_file():
-            profile_data = load_yaml_file(path)
-        else:
-            # Assume it's YAML content
-            try:
-                profile_data = yaml.safe_load(data)
-                if not isinstance(profile_data, dict):
-                    raise ValueError("YAML content does not represent a dictionary")
-            except yaml.YAMLError as e:
-                return False, [f"Invalid YAML content: {str(e)}"]
+    # Load profile data if it's a file path
+    if isinstance(profile_data, (str, pathlib.Path)) and os.path.exists(str(profile_data)):
+        with open(profile_data, "r") as f:
+            if str(profile_data).endswith((".yaml", ".yml")):
+                try:
+                    profile_dict = yaml.safe_load(f)
+                except yaml.YAMLError as e:
+                    raise SchemaValidationError(f"Invalid YAML: {str(e)}")
+            else:
+                try:
+                    profile_dict = json.load(f)
+                except json.JSONDecodeError as e:
+                    raise SchemaValidationError(f"Invalid JSON: {str(e)}")
+    # Parse YAML string
+    elif isinstance(profile_data, str) and (
+        profile_data.strip().startswith(("{", "[")) or profile_data.strip().startswith(("---"))
+    ):
+        try:
+            if profile_data.strip().startswith(("{", "[")):
+                profile_dict = json.loads(profile_data)
+            else:
+                profile_dict = yaml.safe_load(profile_data)
+        except (json.JSONDecodeError, yaml.YAMLError) as e:
+            raise SchemaValidationError(f"Invalid profile data: {str(e)}")
+    # Use dictionary directly
+    elif isinstance(profile_data, dict):
+        profile_dict = profile_data
     else:
-        return False, ["Input must be a dictionary, file path, or YAML string"]
+        raise SchemaValidationError(
+            "Profile data must be a dictionary, valid YAML/JSON string, or file path"
+        )
     
     # Validate against JSON Schema
-    validator = jsonschema.Draft7Validator(schema)
-    errors = list(validator.iter_errors(profile_data))
-    
-    if errors:
-        error_messages = [
-            f"{error.path}: {error.message}" if error.path else error.message
-            for error in errors
-        ]
-        return False, error_messages
-    
-    # Additional validation with Pydantic
     try:
-        TanzoProfile.model_validate(profile_data)
-        return True, None
-    except Exception as e:
-        return False, [str(e)]
+        schema = load_schema()
+        jsonschema.validate(instance=profile_dict, schema=schema)
+    except ValidationError as e:
+        raise SchemaValidationError(
+            f"JSON Schema validation failed: {e.message}",
+            details=[{"path": "/".join(str(p) for p in e.path), "message": e.message}]
+        )
+    except FileNotFoundError as e:
+        raise SchemaValidationError(f"Schema file not found: {str(e)}")
+    
+    # Validate using Pydantic model
+    try:
+        return TanzoProfile.model_validate(profile_dict)
+    except PydanticValidationError as e:
+        errors = e.errors()
+        raise SchemaValidationError(
+            "Pydantic validation failed",
+            details=[{"path": "/".join(str(p) for p in err["loc"]), "message": err["msg"]} for err in errors]
+        )

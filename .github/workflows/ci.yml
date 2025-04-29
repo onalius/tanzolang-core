@@ -9,88 +9,87 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
     steps:
     - uses: actions/checkout@v3
     
-    - name: Set up Python 3.11
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
-    
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-    
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
+        python -m pip install poetry
+        poetry config virtualenvs.create false
         poetry install
     
-    - name: Run linting
+    - name: Check code formatting with Black
       run: |
         poetry run black --check .
+    
+    - name: Check code style with isort
+      run: |
         poetry run isort --check .
-        poetry run mypy clients/python/tanzo_schema cli/tanzo-cli.py tests
+    
+    - name: Lint with ruff
+      run: |
         poetry run ruff check .
     
-    - name: Run tests
+    - name: Check types with mypy
       run: |
-        poetry run pytest --cov=tanzo_schema --cov=cli tests/
+        poetry run mypy cli tests clients/python
     
-    - name: Upload coverage report
+    - name: Test with pytest
+      run: |
+        poetry run pytest --cov=./ --cov-report=xml
+    
+    - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
+        file: ./coverage.xml
         fail_ci_if_error: false
 
-  docs:
-    runs-on: ubuntu-latest
+  semantic-release:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        pip install mkdocs-material mkdocs-minify-plugin
-    
-    - name: Build docs
-      run: |
-        mkdocs build
-    
-    - name: Deploy docs
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./site
-
-  release:
     runs-on: ubuntu-latest
-    needs: [test, docs]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
+        
+    - name: Python Semantic Release
+      uses: relekang/python-semantic-release@master
       with:
-        node-version: '16'
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository_username: __token__
+        repository_password: ${{ secrets.PYPI_API_TOKEN }}
+
+  docs:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     
-    - name: Install semantic-release
-      run: |
-        npm install -g semantic-release @semantic-release/git @semantic-release/changelog
+    steps:
+    - uses: actions/checkout@v3
     
-    - name: Semantic Release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
       run: |
-        npx semantic-release
+        python -m pip install --upgrade pip
+        python -m pip install mkdocs-material
+    
+    - name: Build and deploy docs
+      run: |
+        mkdocs gh-deploy --force

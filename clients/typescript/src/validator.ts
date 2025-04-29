@@ -1,117 +1,130 @@
 /**
- * Validator functions for TanzoLang profiles.
+ * Validation functions for TanzoLang profiles.
+ * 
+ * This module provides functions to validate TanzoLang profiles against
+ * the schema and load profiles from various formats.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
-import { TanzoProfile, TanzoProfileSchema } from './models';
-import { z } from 'zod';
+import fs from 'fs';
+import path from 'path';
+import { ZodError } from 'zod';
+import Ajv from 'ajv';
+import YAML from 'yaml';
+
+import { TanzoProfileSchema, TanzoProfile } from './schema';
 
 /**
- * File formats supported for loading profiles.
+ * Load and parse the TanzoLang JSON schema
+ * 
+ * @returns The JSON schema as an object
  */
-export type FileFormat = 'json' | 'yaml' | 'yml';
-
-/**
- * Result of a profile validation.
- */
-export interface ValidationResult {
-  valid: boolean;
-  errors: string[];
-}
-
-/**
- * Load a profile from a file.
- *
- * @param filePath - The path to the profile file.
- * @returns The loaded profile data.
- * @throws Error if the file format is not supported or if the file cannot be read.
- */
-export function loadProfile(filePath: string): any {
-  // Check if file exists
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`File not found: ${filePath}`);
-  }
-
-  // Read file content
-  const content = fs.readFileSync(filePath, 'utf8');
-  const extension = path.extname(filePath).toLowerCase();
-
-  // Parse based on file extension
-  if (extension === '.json') {
-    return JSON.parse(content);
-  } else if (extension === '.yaml' || extension === '.yml') {
-    return yaml.load(content);
-  } else {
-    throw new Error(`Unsupported file format: ${extension}`);
-  }
-}
-
-/**
- * Validate a profile using Zod schema.
- *
- * @param profile - The profile data to validate.
- * @returns Validation result with a list of errors if any.
- */
-export function validateProfile(profile: any): ValidationResult {
-  try {
-    TanzoProfileSchema.parse(profile);
-    return { valid: true, errors: [] };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      // Format Zod validation errors
-      const errors = error.errors.map(
-        (err) => `${err.path.join('.')}: ${err.message}`
-      );
-      return { valid: false, errors };
+export function loadJsonSchema(): Record<string, any> {
+  // Try to locate the schema in a few different places
+  const possibleLocations = [
+    path.resolve(process.cwd(), 'spec/tanzo-schema.json'),
+    path.resolve(__dirname, '../../..', 'spec/tanzo-schema.json'),
+    path.resolve(process.env.HOME || '', '.tanzo/tanzo-schema.json'),
+  ];
+  
+  for (const location of possibleLocations) {
+    try {
+      const schema = JSON.parse(fs.readFileSync(location, 'utf-8'));
+      return schema;
+    } catch (error) {
+      // Continue to the next location
     }
-    // Handle unexpected errors
-    return {
-      valid: false,
-      errors: [`Unexpected validation error: ${String(error)}`],
-    };
   }
+  
+  throw new Error(
+    'Could not find tanzo-schema.json. Please ensure the tanzo-lang-core ' +
+    'repository is properly installed or provide a path to the schema file.'
+  );
 }
 
 /**
- * Validate a profile file.
- *
- * @param filePath - The path to the profile file.
- * @returns Validation result with a list of errors if any.
- * @throws Error if the file format is not supported or if the file cannot be read.
+ * Validate data against the TanzoLang JSON schema using Ajv
+ * 
+ * @param data - The data to validate
+ * @param schema - Optional schema to use instead of the default
+ * @returns True if validation succeeds, throws exception otherwise
  */
-export function validateProfileFile(filePath: string): ValidationResult {
-  const profile = loadProfile(filePath);
-  return validateProfile(profile);
+export function validateWithAjv(
+  data: Record<string, any>,
+  schema?: Record<string, any>
+): boolean {
+  const ajv = new Ajv();
+  const actualSchema = schema || loadJsonSchema();
+  
+  const validate = ajv.compile(actualSchema);
+  const valid = validate(data);
+  
+  if (!valid && validate.errors) {
+    throw new Error(`Validation failed: ${ajv.errorsText(validate.errors)}`);
+  }
+  
+  return true;
 }
 
 /**
- * Check if a profile is valid.
- *
- * @param profile - The profile data to validate.
- * @returns True if the profile is valid, false otherwise.
+ * Validate data using Zod schema
+ * 
+ * @param data - The data to validate
+ * @returns A validated TanzoProfile object
  */
-export function isValidProfile(profile: any): boolean {
-  return validateProfile(profile).valid;
+export function validateWithZod(data: Record<string, any>): TanzoProfile {
+  return TanzoProfileSchema.parse(data);
 }
 
 /**
- * Export a profile to a JSON string.
- *
- * @param profile - The profile to export.
- * @returns The profile as a JSON string.
+ * Validate a TanzoLang profile using both Ajv and Zod
+ * 
+ * @param data - The profile data to validate
+ * @param options - Validation options
+ * @returns A validated TanzoProfile object
  */
-export function exportProfileToJson(profile: TanzoProfile): string {
-  return JSON.stringify(profile, null, 2);
+export function validateTanzoProfile(
+  data: Record<string, any>,
+  options: {
+    useAjv?: boolean;
+    useZod?: boolean;
+  } = { useAjv: true, useZod: true }
+): TanzoProfile {
+  const { useAjv = true, useZod = true } = options;
+  
+  if (useAjv) {
+    validateWithAjv(data);
+  }
+  
+  if (useZod) {
+    return validateWithZod(data);
+  }
+  
+  // If we don't use Zod validation but need to return a TanzoProfile
+  return data as TanzoProfile;
 }
 
 /**
- * Export a profile to a YAML string.
- *
- * @param profile - The profile to export.
- * @returns The profile as a YAML string.
+ * Load and validate a TanzoLang profile from a YAML file
+ * 
+ * @param filePath - Path to the YAML file
+ * @returns A validated TanzoProfile object
  */
-export function exportProfileToYaml(profile: TanzoProfile): string {
-  return yaml.dump(profile, { indent: 2 });
+export function loadProfileFromYaml(filePath: string): TanzoProfile {
+  const yamlContent = fs.readFileSync(filePath, 'utf-8');
+  const data = YAML.parse(yamlContent);
+  
+  return validateTanzoProfile(data);
+}
+
+/**
+ * Load and validate a TanzoLang profile from a JSON file
+ * 
+ * @param filePath - Path to the JSON file
+ * @returns A validated TanzoProfile object
+ */
+export function loadProfileFromJson(filePath: string): TanzoProfile {
+  const jsonContent = fs.readFileSync(filePath, 'utf-8');
+  const data = JSON.parse(jsonContent);
+  
+  return validateTanzoProfile(data);
 }

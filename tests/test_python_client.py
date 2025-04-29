@@ -1,190 +1,117 @@
 """
-Tests for the Python client library.
+Tests for the Python SDK client.
 """
-import json
+
 import os
 from pathlib import Path
 
 import pytest
-import yaml
+from pydantic import ValidationError
 
 from clients.python.tanzo_schema import (
-    TanzoProfile, 
-    validate_file, 
-    load_profile,
-)
-from clients.python.tanzo_schema.models import (
-    ArchetypeEnum,
-    CommunicationStyleEnum,
+    TanzoProfile,
+    DigitalArchetype,
+    Identity,
     Trait,
-    Expertise,
-    Communication,
-    ProfileAttributes,
-    PersonalityTraits,
-    Profile,
-    ProfileMetadata,
+    CognitiveModel,
+    simulate_profile,
+    export_shorthand,
 )
-
-
-def test_import_modules():
-    """Test that all modules can be imported."""
-    import clients.python.tanzo_schema
-    import clients.python.tanzo_schema.models
-    import clients.python.tanzo_schema.validators
-
-
-def test_load_profile(kai_profile_path):
-    """Test loading a profile from a file."""
-    profile = load_profile(kai_profile_path)
-    
-    assert isinstance(profile, TanzoProfile)
-    assert profile.metadata.name == "Kai"
-    assert profile.metadata.id == "kai-mentor-profile"
-    assert profile.profile.archetype == ArchetypeEnum.MENTOR
-    assert len(profile.profile.attributes.personality.traits) == 4
-
-
-def test_validate_file_with_jsonschema(kai_profile_path):
-    """Test validating a file using jsonschema."""
-    result = validate_file(kai_profile_path, validator="jsonschema")
-    assert result is True
+from clients.python.tanzo_schema.utils import (
+    to_dict,
+    to_json,
+    to_yaml,
+)
 
 
 def test_create_profile_programmatically():
-    """Test creating a profile programmatically."""
-    # Create a minimal valid profile
+    """Test creating a profile using the Python SDK."""
     profile = TanzoProfile(
-        metadata=ProfileMetadata(
-            version="0.1.0",
-            id="test-profile",
-            name="Test Profile",
-        ),
-        profile=Profile(
-            archetype=ArchetypeEnum.GUIDE,
-            attributes=ProfileAttributes(
-                personality=PersonalityTraits(
-                    traits=[
-                        Trait(name="helpfulness", value=90),
-                    ],
-                ),
-                expertise=[
-                    Expertise(domain="testing", level=80),
-                ],
-                communication=Communication(
-                    style=CommunicationStyleEnum.DIRECT,
-                ),
+        profile={
+            "name": "Test Profile",
+            "version": "0.1.0",
+            "author": "Test Author"
+        },
+        digital_archetype=DigitalArchetype(
+            identity=Identity(
+                name="Test Character",
+                age=25
             ),
-        ),
-    )
-    
-    assert profile.metadata.name == "Test Profile"
-    assert profile.profile.archetype == ArchetypeEnum.GUIDE
-    assert profile.profile.attributes.personality.traits[0].name == "helpfulness"
-    assert profile.profile.attributes.personality.traits[0].value == 90
-
-
-def test_profile_model_validation():
-    """Test that the profile model validates correctly."""
-    # Create an invalid profile (missing required fields)
-    with pytest.raises(Exception):
-        TanzoProfile(
-            metadata=ProfileMetadata(
-                # Missing required 'version', 'id', and 'name'
-                description="Invalid profile",
-            ),
-            profile=Profile(
-                archetype=ArchetypeEnum.GUIDE,
-                attributes=ProfileAttributes(
-                    personality=PersonalityTraits(
-                        traits=[
-                            Trait(name="helpfulness", value=90),
-                        ],
-                    ),
-                    expertise=[
-                        Expertise(domain="testing", level=80),
-                    ],
-                    communication=Communication(
-                        style=CommunicationStyleEnum.DIRECT,
-                    ),
-                ),
-            ),
+            traits={
+                "trait1": Trait(value=0.5),
+                "trait2": Trait(value=0.7, variance=0.1)
+            }
         )
-
-
-def test_profile_immutability():
-    """Test that profile models are immutable."""
-    profile = TanzoProfile(
-        metadata=ProfileMetadata(
-            version="0.1.0",
-            id="test-profile",
-            name="Test Profile",
-        ),
-        profile=Profile(
-            archetype=ArchetypeEnum.GUIDE,
-            attributes=ProfileAttributes(
-                personality=PersonalityTraits(
-                    traits=[
-                        Trait(name="helpfulness", value=90),
-                    ],
-                ),
-                expertise=[
-                    Expertise(domain="testing", level=80),
-                ],
-                communication=Communication(
-                    style=CommunicationStyleEnum.DIRECT,
-                ),
-            ),
-        ),
     )
     
-    # Attempting to modify should raise an error
-    with pytest.raises(Exception):
-        profile.metadata.name = "Modified Name"
+    assert profile.profile.name == "Test Profile"
+    assert profile.digital_archetype.identity.name == "Test Character"
+    assert profile.digital_archetype.traits["trait1"].value == 0.5
 
 
-def test_profile_model_dumping(tmp_path):
-    """Test that profile models can be dumped to dict and JSON."""
-    profile = TanzoProfile(
-        metadata=ProfileMetadata(
-            version="0.1.0",
-            id="test-profile",
-            name="Test Profile",
-        ),
-        profile=Profile(
-            archetype=ArchetypeEnum.GUIDE,
-            attributes=ProfileAttributes(
-                personality=PersonalityTraits(
-                    traits=[
-                        Trait(name="helpfulness", value=90),
-                    ],
-                ),
-                expertise=[
-                    Expertise(domain="testing", level=80),
-                ],
-                communication=Communication(
-                    style=CommunicationStyleEnum.DIRECT,
-                ),
-            ),
-        ),
-    )
+def test_trait_validations():
+    """Test trait value validations."""
+    # Valid trait
+    trait = Trait(value=0.5, variance=0.1)
+    assert trait.value == 0.5
     
-    # Dump to dict
-    profile_dict = profile.model_dump()
+    # Invalid trait value (too high)
+    with pytest.raises(ValidationError):
+        Trait(value=1.5)
+    
+    # Invalid trait value (too low)
+    with pytest.raises(ValidationError):
+        Trait(value=-0.5)
+    
+    # Invalid trait variance (too high)
+    with pytest.raises(ValidationError):
+        Trait(value=0.5, variance=1.5)
+
+
+def test_profile_simulation(sample_profile):
+    """Test profile simulation functionality."""
+    # Run simulation
+    results = simulate_profile(sample_profile, num_iterations=50, seed=42)
+    
+    # Check results
+    assert results.profile_name == "Test Profile"
+    assert results.num_iterations == 50
+    
+    # Check that we have all traits
+    for trait_name in sample_profile.digital_archetype.traits:
+        assert trait_name in results.trait_means
+        assert trait_name in results.trait_stddevs
+        assert trait_name in results.trait_ranges
+    
+    # Check output summary
+    summary = results.summary()
+    assert "Simulation Results for 'Test Profile'" in summary
+    assert "Number of iterations: 50" in summary
+
+
+def test_export_shorthand(sample_profile):
+    """Test shorthand export functionality."""
+    shorthand = export_shorthand(sample_profile)
+    
+    # Expected components in the shorthand
+    assert "Test Character" in shorthand
+    assert "age:25" in shorthand
+    assert "traits:" in shorthand
+
+
+def test_serialization_functions(sample_profile):
+    """Test serialization utility functions."""
+    # Convert to dict
+    profile_dict = to_dict(sample_profile)
     assert isinstance(profile_dict, dict)
-    assert profile_dict["metadata"]["name"] == "Test Profile"
+    assert profile_dict["profile"]["name"] == "Test Profile"
     
-    # Dump to JSON
-    profile_json = profile.model_dump_json()
-    assert isinstance(profile_json, str)
-    assert "Test Profile" in profile_json
+    # Convert to JSON
+    json_str = to_json(sample_profile)
+    assert isinstance(json_str, str)
+    assert "Test Profile" in json_str
     
-    # Save to file
-    output_path = tmp_path / "test_profile.json"
-    with open(output_path, "w") as f:
-        f.write(profile_json)
-    
-    # Reload from file
-    with open(output_path, "r") as f:
-        loaded_dict = json.load(f)
-    
-    assert loaded_dict["metadata"]["name"] == "Test Profile"
+    # Convert to YAML
+    yaml_str = to_yaml(sample_profile)
+    assert isinstance(yaml_str, str)
+    assert "Test Profile" in yaml_str

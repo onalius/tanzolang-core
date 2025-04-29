@@ -1,211 +1,149 @@
 $schema: http://json-schema.org/draft-07/schema#
-$id: https://github.com/onalius/tanzo-lang-core/blob/main/spec/tanzo-schema.yaml
+$id: https://github.com/onalius/tanzo-lang-core/spec/tanzo-schema.yaml
 title: TanzoLang Schema
-description: Schema for Tomodaichi Tanzo digital archetype definition language
+description: Schema definition for Tomodaichi Tanzo digital archetypes and profiles
 type: object
 required:
-  - metadata
-  - digital_archetype
+  - version
+  - profile_type
+  - archetype
 properties:
-  metadata:
+  version:
+    type: string
+    description: The TanzoLang schema version
+    pattern: ^\\d+\\.\\d+\\.\\d+$
+  profile_type:
+    type: string
+    description: Type of Tanzo profile
+    enum:
+      - full
+      - archetype_only
+      - simulation
+  archetype:
     type: object
+    description: Digital archetype definition
     required:
-      - version
       - name
+      - core_traits
+      - skills
     properties:
-      version:
-        type: string
-        description: Schema version
-        pattern: ^\\d+\\.\\d+\\.\\d+$
       name:
         type: string
-        description: Profile name
+        description: Name of the digital archetype
       description:
         type: string
-        description: Optional profile description
+        description: Description of the digital archetype
+      core_traits:
+        type: object
+        description: Core personality traits of the archetype
+        required:
+          - intelligence
+          - creativity
+          - sociability
+        properties:
+          intelligence:
+            $ref: '#/definitions/trait_score'
+          creativity:
+            $ref: '#/definitions/trait_score'
+          sociability:
+            $ref: '#/definitions/trait_score'
+          adaptability:
+            $ref: '#/definitions/trait_score'
+          resilience:
+            $ref: '#/definitions/trait_score'
+        additionalProperties:
+          $ref: '#/definitions/trait_score'
+      skills:
+        type: array
+        description: Skills possessed by the archetype
+        minItems: 1
+        items:
+          $ref: '#/definitions/skill'
+      interests:
+        type: array
+        description: Interests of the archetype
+        items:
+          type: string
+      values:
+        type: array
+        description: Core values of the archetype
+        items:
+          type: string
+  simulation_parameters:
+    type: object
+    description: Parameters for simulation runs
+    properties:
+      variation_factor:
+        type: number
+        description: Factor for variation in simulations
+        minimum: 0
+        maximum: 1
+      seed:
+        type: integer
+        description: Random seed for reproducible simulations
+      iterations:
+        type: integer
+        description: Number of simulation iterations
+        minimum: 1
+        default: 100
+      environments:
+        type: array
+        description: Simulation environments
+        items:
+          type: string
+  metadata:
+    type: object
+    description: Additional metadata
+    properties:
       author:
         type: string
-        description: Optional author information
       created_at:
         type: string
         format: date-time
-        description: Creation timestamp in ISO 8601 format
-      updated_at:
-        type: string
-        format: date-time
-        description: Last update timestamp in ISO 8601 format
-
-  digital_archetype:
-    type: object
-    required:
-      - traits
-      - attributes
-    properties:
-      traits:
-        type: object
-        description: Core personality traits on a scale of 0-100
-        required:
-          - openness
-          - conscientiousness
-          - extraversion
-          - agreeableness
-          - neuroticism
-        properties:
-          openness:
-            $ref: '#/definitions/trait'
-          conscientiousness:
-            $ref: '#/definitions/trait'
-          extraversion:
-            $ref: '#/definitions/trait'
-          agreeableness:
-            $ref: '#/definitions/trait'
-          neuroticism:
-            $ref: '#/definitions/trait'
-
-      attributes:
-        type: object
-        description: Character attributes and preferences
-        properties:
-          cognitive_style:
-            type: object
-            properties:
-              analytical:
-                $ref: '#/definitions/attribute'
-              creative:
-                $ref: '#/definitions/attribute'
-              practical:
-                $ref: '#/definitions/attribute'
-          communication_style:
-            type: object
-            properties:
-              formal:
-                $ref: '#/definitions/attribute'
-              casual:
-                $ref: '#/definitions/attribute'
-              direct:
-                $ref: '#/definitions/attribute'
-              verbose:
-                $ref: '#/definitions/attribute'
-          interests:
-            type: array
-            description: Topics of interest
-            items:
-              type: object
-              required:
-                - name
-              properties:
-                name:
-                  type: string
-                level:
-                  type: integer
-                  minimum: 1
-                  maximum: 10
-                  description: Interest level from 1-10
-          values:
-            type: array
-            description: Core values and beliefs
-            items:
-              type: string
-
-      behaviors:
-        type: object
-        description: Behavioral tendencies
-        properties:
-          social:
-            type: object
-            properties:
-              collaborative:
-                $ref: '#/definitions/attribute'
-              competitive:
-                $ref: '#/definitions/attribute'
-              supportive:
-                $ref: '#/definitions/attribute'
-              challenging:
-                $ref: '#/definitions/attribute'
-          problem_solving:
-            type: object
-            properties:
-              systematic:
-                $ref: '#/definitions/attribute'
-              intuitive:
-                $ref: '#/definitions/attribute'
-              innovative:
-                $ref: '#/definitions/attribute'
-              cautious:
-                $ref: '#/definitions/attribute'
-
-      backstory:
-        type: object
-        description: Character background information
-        properties:
-          background:
-            type: string
-            description: Backstory narrative
-          key_events:
-            type: array
-            items:
-              type: object
-              properties:
-                age:
-                  type: integer
-                  description: Age when event occurred
-                description:
-                  type: string
-                  description: Event description
-                impact:
-                  type: string
-                  description: How event shaped character
-
-  simulation_parameters:
-    type: object
-    description: Parameters for Monte-Carlo simulation
-    properties:
-      variance:
-        type: number
-        minimum: 0
-        maximum: 1
-        description: Variance factor for trait simulation (0-1)
-      contexts:
+      tags:
         type: array
-        description: Specific contexts to simulate behavior in
         items:
           type: string
-
 definitions:
-  trait:
+  trait_score:
     type: object
     required:
-      - value
+      - base
     properties:
-      value:
-        type: integer
+      base:
+        type: number
+        description: Base score for the trait
         minimum: 0
-        maximum: 100
-        description: Trait value on scale of 0-100
-      variance:
-        type: integer
-        minimum: 0
-        maximum: 50
-        description: Optional variance for simulation (0-50)
-      description:
+        maximum: 10
+      range:
+        type: array
+        description: Range of possible values [min, max]
+        minItems: 2
+        maxItems: 2
+        items:
+          type: number
+      distribution:
         type: string
-        description: Optional custom description of trait expression
-
-  attribute:
+        description: Statistical distribution for simulation
+        enum:
+          - normal
+          - uniform
+          - exponential
+  skill:
     type: object
     required:
-      - value
+      - name
+      - proficiency
     properties:
-      value:
-        type: integer
-        minimum: 0
-        maximum: 100
-        description: Attribute value on scale of 0-100
-      variance:
-        type: integer
-        minimum: 0
-        maximum: 50
-        description: Optional variance for simulation (0-50)
-      notes:
+      name:
         type: string
-        description: Optional notes about attribute expression
+        description: Name of the skill
+      proficiency:
+        $ref: '#/definitions/trait_score'
+      category:
+        type: string
+        description: Skill category
+      experience_years:
+        type: number
+        description: Years of experience with this skill
+        minimum: 0

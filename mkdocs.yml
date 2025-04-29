@@ -1,11 +1,8 @@
 site_name: TanzoLang Documentation
-site_description: Documentation for the TanzoLang schema and tooling
-site_author: Tomodaichi Tanzo Team
+site_description: Documentation for the TanzoLang schema specification
 site_url: https://onalius.github.io/tanzo-lang-core/
-
-repo_name: onalius/tanzo-lang-core
 repo_url: https://github.com/onalius/tanzo-lang-core
-edit_uri: edit/main/docs/
+repo_name: onalius/tanzo-lang-core
 
 theme:
   name: material
@@ -15,30 +12,45 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
+    - navigation.sections
     - navigation.expand
-    - navigation.indexes
     - content.code.annotate
-    - content.code.copy
-
-markdown_extensions:
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.tabbed:
-      alternate_style: true
-  - tables
+    - content.tabs.link
+    - search.highlight
+    - search.share
+  icon:
+    repo: fontawesome/brands/github
 
 nav:
   - Home: index.md
   - Schema Reference: schema.md
-  - CLI Tools: cli.md
-  - GitHub: https://github.com/onalius/tanzo-lang-core
+  - CLI Reference: cli.md
+  - SDK References:
+    - Python SDK: python-sdk.md
+    - TypeScript SDK: typescript-sdk.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search
+  - autorefs
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/onalius/tanzo-lang-core
+  version:
+    provider: mike
+
+copyright: Copyright &copy; 2023 Tomodaichi Tanzo Team

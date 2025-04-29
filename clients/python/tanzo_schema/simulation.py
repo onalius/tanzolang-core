@@ -1,193 +1,135 @@
 """
-Simulation functions for Tanzo profiles
+Simulation functions for TanzoLang profiles.
+
+This module provides functions to simulate and analyze TanzoLang
+profiles through Monte Carlo methods and other techniques.
 """
 
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Any, Optional, Tuple
 
 import numpy as np
 
-from tanzo_schema.models import TanzoProfile
+from tanzo_schema.models import TanzoProfile, Trait
 
 
+@dataclass
 class SimulationResult:
-    """
-    Class to hold the results of a profile simulation
-    """
+    """Results from a profile simulation."""
     
-    def __init__(self, profile: TanzoProfile):
-        """
-        Initialize a new simulation result
-        
-        Args:
-            profile: The profile being simulated
-        """
-        self.profile_name = profile.profile.name
-        self.iterations = 0
-        self.energy_values: List[float] = []
-        self.resilience_values: List[float] = []
-        self.adaptability_values: List[float] = []
-        self.capability_activations: Dict[str, int] = {}
-        
-        # Initialize capability activations counter
-        for capability in profile.properties.capabilities:
-            self.capability_activations[capability.name] = 0
+    profile_name: str
+    num_iterations: int
+    trait_means: Dict[str, float]
+    trait_stddevs: Dict[str, float]
+    trait_ranges: Dict[str, Tuple[float, float]]
     
-    def add_iteration(
-        self, energy: float, resilience: float, adaptability: float, activated_capability: Optional[str]
-    ) -> None:
+    def summary(self) -> str:
         """
-        Add the results of one simulation iteration
-        
-        Args:
-            energy: The energy value for this iteration
-            resilience: The resilience value for this iteration
-            adaptability: The adaptability value for this iteration
-            activated_capability: The name of any capability that was activated
-        """
-        self.iterations += 1
-        self.energy_values.append(energy)
-        self.resilience_values.append(resilience)
-        self.adaptability_values.append(adaptability)
-        
-        if activated_capability:
-            self.capability_activations[activated_capability] += 1
-    
-    def get_summary(self) -> Dict[str, Any]:
-        """
-        Get a summary of the simulation results
+        Generate a human-readable summary of the simulation results.
         
         Returns:
-            Dict[str, Any]: A dictionary containing the simulation summary
+            str: A formatted summary string
         """
-        return {
-            "profile_name": self.profile_name,
-            "iterations": self.iterations,
-            "energy": {
-                "min": min(self.energy_values),
-                "max": max(self.energy_values),
-                "mean": np.mean(self.energy_values),
-                "std": np.std(self.energy_values),
-            },
-            "resilience": {
-                "min": min(self.resilience_values),
-                "max": max(self.resilience_values),
-                "mean": np.mean(self.resilience_values),
-                "std": np.std(self.resilience_values),
-            },
-            "adaptability": {
-                "min": min(self.adaptability_values),
-                "max": max(self.adaptability_values),
-                "mean": np.mean(self.adaptability_values),
-                "std": np.std(self.adaptability_values),
-            },
-            "capability_activations": self.capability_activations,
-        }
-    
-    def __str__(self) -> str:
-        """
-        Get a string representation of the simulation results
-        
-        Returns:
-            str: A formatted string summary
-        """
-        summary = self.get_summary()
-        
-        result = [
-            f"Simulation Results for: {summary['profile_name']}",
-            f"Total Iterations: {summary['iterations']}",
-            "\nState Variables:",
-            f"  Energy: min={summary['energy']['min']:.2f}, max={summary['energy']['max']:.2f}, "
-            f"mean={summary['energy']['mean']:.2f}, std={summary['energy']['std']:.2f}",
-            f"  Resilience: min={summary['resilience']['min']:.2f}, max={summary['resilience']['max']:.2f}, "
-            f"mean={summary['resilience']['mean']:.2f}, std={summary['resilience']['std']:.2f}",
-            f"  Adaptability: min={summary['adaptability']['min']:.2f}, max={summary['adaptability']['max']:.2f}, "
-            f"mean={summary['adaptability']['mean']:.2f}, std={summary['adaptability']['std']:.2f}",
-            "\nCapability Activations:",
+        lines = [
+            f"Simulation Results for '{self.profile_name}'",
+            f"Number of iterations: {self.num_iterations}",
+            "",
+            "Traits:",
         ]
         
-        for capability, count in summary["capability_activations"].items():
-            percentage = 0
-            if summary["iterations"] > 0:
-                percentage = (count / summary["iterations"]) * 100
-            result.append(f"  {capability}: {count} times ({percentage:.1f}%)")
+        # Sort traits by mean value (descending)
+        sorted_traits = sorted(
+            self.trait_means.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
         
-        return "\n".join(result)
+        for trait_name, mean_value in sorted_traits:
+            stddev = self.trait_stddevs[trait_name]
+            min_val, max_val = self.trait_ranges[trait_name]
+            
+            lines.append(
+                f"  {trait_name}:"
+                f" mean={mean_value:.2f},"
+                f" stddev={stddev:.2f},"
+                f" range=[{min_val:.2f}, {max_val:.2f}]"
+            )
+        
+        return "\n".join(lines)
 
 
-def _apply_variance(base_value: float, variance: Optional[float]) -> float:
+def simulate_trait(trait: Trait, num_iterations: int = 100) -> List[float]:
     """
-    Apply random variance to a base value
+    Simulate a trait's value over multiple iterations.
     
     Args:
-        base_value: The base value
-        variance: The maximum variance to apply
+        trait: The trait to simulate
+        num_iterations: Number of simulation iterations
         
     Returns:
-        float: The value after applying variance
+        List[float]: List of simulated values
     """
-    if variance is None or variance <= 0:
-        return base_value
+    mean = trait.value
+    stddev = trait.variance
     
-    actual_variance = random.uniform(-variance, variance)
-    result = base_value + actual_variance
+    # Generate values from a normal distribution, truncated to [0, 1]
+    values = []
+    for _ in range(num_iterations):
+        value = random.normalvariate(mean, stddev)
+        # Truncate to valid range
+        value = max(0.0, min(1.0, value))
+        values.append(value)
     
-    # Ensure the result is within valid range (0-100)
-    return max(0.0, min(100.0, result))
+    return values
 
 
-def _should_activate_capability(capability_power: float) -> bool:
+def simulate_profile(
+    profile: TanzoProfile, 
+    num_iterations: int = 100,
+    seed: Optional[int] = None
+) -> SimulationResult:
     """
-    Determine if a capability should be activated based on its power
+    Perform a Monte Carlo simulation of a TanzoLang profile.
     
-    Args:
-        capability_power: The power level of the capability (1-10)
-        
-    Returns:
-        bool: Whether the capability should be activated
-    """
-    # Convert power (1-10) to a probability (0.1-1.0)
-    activation_probability = capability_power / 10.0
-    return random.random() < activation_probability
-
-
-def simulate_profile(profile: TanzoProfile, iterations: int = 100) -> SimulationResult:
-    """
-    Run a Monte Carlo simulation of a Tanzo profile
+    This simulates the profile by varying traits according to their
+    variance values over multiple iterations.
     
     Args:
         profile: The profile to simulate
-        iterations: The number of iterations to simulate
+        num_iterations: Number of simulation iterations
+        seed: Optional random seed for reproducibility
         
     Returns:
-        SimulationResult: The simulation results
+        SimulationResult: Results of the simulation
     """
-    result = SimulationResult(profile)
+    if seed is not None:
+        random.seed(seed)
     
-    for _ in range(iterations):
-        # Get base values
-        base_energy = profile.properties.state.baseline.energy
-        base_resilience = profile.properties.state.baseline.resilience
-        base_adaptability = profile.properties.state.baseline.adaptability
-        
-        # Get variance values
-        energy_variance = getattr(profile.properties.state.variance, 'energy', None) if profile.properties.state.variance else None
-        resilience_variance = getattr(profile.properties.state.variance, 'resilience', None) if profile.properties.state.variance else None
-        adaptability_variance = getattr(profile.properties.state.variance, 'adaptability', None) if profile.properties.state.variance else None
-        
-        # Apply variance
-        energy = _apply_variance(base_energy, energy_variance)
-        resilience = _apply_variance(base_resilience, resilience_variance)
-        adaptability = _apply_variance(base_adaptability, adaptability_variance)
-        
-        # Simulate capability activation
-        activated_capability = None
-        for capability in profile.properties.capabilities:
-            if _should_activate_capability(capability.power):
-                activated_capability = capability.name
-                break
-        
-        # Record this iteration
-        result.add_iteration(energy, resilience, adaptability, activated_capability)
+    archetype = profile.digital_archetype
+    traits = archetype.traits
     
-    return result
+    # Run simulations for each trait
+    simulated_traits: Dict[str, List[float]] = {}
+    for trait_name, trait in traits.items():
+        simulated_traits[trait_name] = simulate_trait(trait, num_iterations)
+    
+    # Calculate statistics
+    trait_means: Dict[str, float] = {}
+    trait_stddevs: Dict[str, float] = {}
+    trait_ranges: Dict[str, Tuple[float, float]] = {}
+    
+    for trait_name, values in simulated_traits.items():
+        trait_means[trait_name] = sum(values) / len(values)
+        # Calculate standard deviation
+        variance = sum((x - trait_means[trait_name]) ** 2 for x in values) / len(values)
+        trait_stddevs[trait_name] = variance ** 0.5
+        trait_ranges[trait_name] = (min(values), max(values))
+    
+    return SimulationResult(
+        profile_name=profile.profile.name,
+        num_iterations=num_iterations,
+        trait_means=trait_means,
+        trait_stddevs=trait_stddevs,
+        trait_ranges=trait_ranges
+    )

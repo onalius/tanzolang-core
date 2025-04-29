@@ -1,187 +1,153 @@
 /**
- * Zod schema models for the TanzoLang schema.
+ * Zod schema definitions for TanzoLang.
+ * 
+ * This module provides Zod schemas for validating TanzoLang documents,
+ * as well as TypeScript type definitions derived from these schemas.
  */
 
 import { z } from 'zod';
 
-/**
- * Schema for a personality trait.
- */
-export const TraitSchema = z.object({
-  value: z.number().int().min(0).max(100).describe('Trait value on scale of 0-100'),
-  variance: z.number().int().min(0).max(50).optional().describe('Variance for simulation'),
-  description: z.string().optional(),
+// Enum definitions
+export const TemperamentEnum = z.enum([
+  'analytical',
+  'diplomatic',
+  'assertive',
+  'supportive',
+  'creative',
+  'practical',
+  'mixed',
+]);
+
+export type Temperament = z.infer<typeof TemperamentEnum>;
+
+export const LanguageProficiencyEnum = z.enum([
+  'native',
+  'fluent',
+  'advanced',
+  'intermediate',
+  'basic',
+]);
+
+export type LanguageProficiency = z.infer<typeof LanguageProficiencyEnum>;
+
+// Base schema components
+export const PersonalityTraitSchema = z.object({
+  name: z.string().min(2).max(50),
+  value: z.number().min(0).max(10),
+  description: z.string().max(500).optional(),
 });
 
-export type Trait = z.infer<typeof TraitSchema>;
+export type PersonalityTrait = z.infer<typeof PersonalityTraitSchema>;
 
-/**
- * Schema for a character attribute.
- */
-export const AttributeSchema = z.object({
-  value: z.number().int().min(0).max(100).describe('Attribute value on scale of 0-100'),
-  variance: z.number().int().min(0).max(50).optional().describe('Variance for simulation'),
-  notes: z.string().optional(),
+export const DomainSchema = z.object({
+  name: z.string().min(2).max(100),
+  proficiency: z.number().min(0).max(10),
+  description: z.string().max(500).optional(),
 });
 
-export type Attribute = z.infer<typeof AttributeSchema>;
+export type Domain = z.infer<typeof DomainSchema>;
 
-/**
- * Schema for an interest.
- */
-export const InterestSchema = z.object({
-  name: z.string(),
-  level: z.number().int().min(1).max(10).optional().describe('Interest level from 1-10'),
+export const LanguageSchema = z.object({
+  name: z.string().min(2).max(50),
+  proficiency: LanguageProficiencyEnum,
 });
 
-export type Interest = z.infer<typeof InterestSchema>;
+export type Language = z.infer<typeof LanguageSchema>;
 
-/**
- * Schema for a key event in a character's backstory.
- */
-export const KeyEventSchema = z.object({
-  age: z.number().int().optional(),
-  description: z.string(),
-  impact: z.string().optional(),
+export const CapabilitySchema = z.object({
+  name: z.string().min(2).max(100),
+  proficiency: z.number().min(0).max(10),
+  description: z.string().max(500).optional(),
 });
 
-export type KeyEvent = z.infer<typeof KeyEventSchema>;
+export type Capability = z.infer<typeof CapabilitySchema>;
 
-/**
- * Schema for cognitive style attributes.
- */
-export const CognitiveStyleSchema = z.object({
-  analytical: AttributeSchema.optional(),
-  creative: AttributeSchema.optional(),
-  practical: AttributeSchema.optional(),
+// Archetype component schemas
+export const ArchetypePersonalitySchema = z.object({
+  traits: z.array(PersonalityTraitSchema).min(1).max(20),
+  values: z.array(z.string().min(2).max(50)).max(10).optional(),
+  temperament: TemperamentEnum.optional(),
 });
 
-export type CognitiveStyle = z.infer<typeof CognitiveStyleSchema>;
+export type ArchetypePersonality = z.infer<typeof ArchetypePersonalitySchema>;
 
-/**
- * Schema for communication style attributes.
- */
-export const CommunicationStyleSchema = z.object({
-  formal: AttributeSchema.optional(),
-  casual: AttributeSchema.optional(),
-  direct: AttributeSchema.optional(),
-  verbose: AttributeSchema.optional(),
+export const ArchetypeKnowledgeSchema = z.object({
+  domains: z.array(DomainSchema).min(1).max(20),
+  languages: z.array(LanguageSchema).max(10).optional(),
 });
 
-export type CommunicationStyle = z.infer<typeof CommunicationStyleSchema>;
+export type ArchetypeKnowledge = z.infer<typeof ArchetypeKnowledgeSchema>;
 
-/**
- * Schema for social behavior attributes.
- */
-export const SocialBehaviorSchema = z.object({
-  collaborative: AttributeSchema.optional(),
-  competitive: AttributeSchema.optional(),
-  supportive: AttributeSchema.optional(),
-  challenging: AttributeSchema.optional(),
+export const ArchetypeCapabilitiesSchema = z.object({
+  skills: z.array(CapabilitySchema).min(1).max(30),
+  tools: z.array(z.string().min(2).max(100)).max(20).optional(),
 });
 
-export type SocialBehavior = z.infer<typeof SocialBehaviorSchema>;
+export type ArchetypeCapabilities = z.infer<typeof ArchetypeCapabilitiesSchema>;
 
-/**
- * Schema for problem-solving behavior attributes.
- */
-export const ProblemSolvingBehaviorSchema = z.object({
-  systematic: AttributeSchema.optional(),
-  intuitive: AttributeSchema.optional(),
-  innovative: AttributeSchema.optional(),
-  cautious: AttributeSchema.optional(),
+export const ArchetypeAttributesSchema = z.object({
+  personality: ArchetypePersonalitySchema,
+  knowledge: ArchetypeKnowledgeSchema,
+  capabilities: ArchetypeCapabilitiesSchema,
 });
 
-export type ProblemSolvingBehavior = z.infer<typeof ProblemSolvingBehaviorSchema>;
+export type ArchetypeAttributes = z.infer<typeof ArchetypeAttributesSchema>;
 
-/**
- * Schema for character behaviors.
- */
-export const BehaviorsSchema = z.object({
-  social: SocialBehaviorSchema.optional(),
-  problem_solving: ProblemSolvingBehaviorSchema.optional(),
+export const ArchetypeIdentitySchema = z.object({
+  name: z.string().min(2).max(100),
+  role: z.string().min(2).max(100),
+  description: z.string().max(1000).optional(),
+  tags: z.array(z.string().min(1).max(50)).max(10).optional(),
 });
 
-export type Behaviors = z.infer<typeof BehaviorsSchema>;
+export type ArchetypeIdentity = z.infer<typeof ArchetypeIdentitySchema>;
 
-/**
- * Schema for character backstory information.
- */
-export const BackstorySchema = z.object({
-  background: z.string().optional(),
-  key_events: z.array(KeyEventSchema).optional(),
+export const ArchetypeSchema = z.object({
+  identity: ArchetypeIdentitySchema,
+  attributes: ArchetypeAttributesSchema,
 });
 
-export type Backstory = z.infer<typeof BackstorySchema>;
+export type Archetype = z.infer<typeof ArchetypeSchema>;
 
-/**
- * Schema for character attributes.
- */
-export const AttributesSchema = z.object({
-  cognitive_style: CognitiveStyleSchema.optional(),
-  communication_style: CommunicationStyleSchema.optional(),
-  interests: z.array(InterestSchema).optional(),
-  values: z.array(z.string()).optional(),
+// Profile component schemas
+export const ProfileInstanceSchema = z.object({
+  name: z.string().min(2).max(100),
+  created_at: z.string().datetime(),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
+  description: z.string().max(1000).optional(),
 });
 
-export type Attributes = z.infer<typeof AttributesSchema>;
+export type ProfileInstance = z.infer<typeof ProfileInstanceSchema>;
 
-/**
- * Schema for the Big Five personality traits.
- */
-export const TraitsSchema = z.object({
-  openness: TraitSchema,
-  conscientiousness: TraitSchema,
-  extraversion: TraitSchema,
-  agreeableness: TraitSchema,
-  neuroticism: TraitSchema,
+export const ProfileParametersSchema = z.object({
+  temperature: z.number().min(0).max(2).optional(),
+  max_tokens: z.number().int().min(1).max(32000).optional(),
+  constraints: z.array(z.string().min(2).max(500)).max(10).optional(),
 });
 
-export type Traits = z.infer<typeof TraitsSchema>;
+export type ProfileParameters = z.infer<typeof ProfileParametersSchema>;
 
-/**
- * Schema for the digital archetype definition.
- */
-export const DigitalArchetypeSchema = z.object({
-  traits: TraitsSchema,
-  attributes: AttributesSchema,
-  behaviors: BehaviorsSchema.optional(),
-  backstory: BackstorySchema.optional(),
+export const ProfileCustomizationsSchema = z.object({
+  traits: z.array(PersonalityTraitSchema).max(20).optional(),
+  knowledge: z.array(DomainSchema).max(10).optional(),
+  skills: z.array(CapabilitySchema).max(10).optional(),
 });
 
-export type DigitalArchetype = z.infer<typeof DigitalArchetypeSchema>;
+export type ProfileCustomizations = z.infer<typeof ProfileCustomizationsSchema>;
 
-/**
- * Schema for Monte-Carlo simulation parameters.
- */
-export const SimulationParametersSchema = z.object({
-  variance: z.number().min(0).max(1).optional().describe('Variance factor'),
-  contexts: z.array(z.string()).optional(),
+export const ProfileSchema = z.object({
+  instance: ProfileInstanceSchema,
+  parameters: ProfileParametersSchema.optional(),
+  customizations: ProfileCustomizationsSchema.optional(),
 });
 
-export type SimulationParameters = z.infer<typeof SimulationParametersSchema>;
+export type Profile = z.infer<typeof ProfileSchema>;
 
-/**
- * Schema for profile metadata.
- */
-export const MetadataSchema = z.object({
-  version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be in the format X.Y.Z'),
-  name: z.string(),
-  description: z.string().optional(),
-  author: z.string().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+// Top-level document schema
+export const TanzoDocumentSchema = z.object({
+  version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  archetype: ArchetypeSchema,
+  profile: ProfileSchema.optional(),
 });
 
-export type Metadata = z.infer<typeof MetadataSchema>;
-
-/**
- * Root schema for a complete TanzoLang profile.
- */
-export const TanzoProfileSchema = z.object({
-  metadata: MetadataSchema,
-  digital_archetype: DigitalArchetypeSchema,
-  simulation_parameters: SimulationParametersSchema.optional(),
-});
-
-export type TanzoProfile = z.infer<typeof TanzoProfileSchema>;
+export type TanzoDocument = z.infer<typeof TanzoDocumentSchema>;

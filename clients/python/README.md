@@ -1,6 +1,6 @@
-# TanzoLang Python SDK
+# Tanzo Schema Python SDK
 
-Python client for working with TanzoLang profiles using Pydantic.
+This package provides Pydantic models and validation utilities for working with TanzoLang schema in Python applications.
 
 ## Installation
 

@@ -1,10 +1,10 @@
-# Tanzo CLI
+# Tanzo CLI Reference
 
-The Tanzo Command Line Interface (CLI) provides a convenient way to work with TanzoLang profiles. It offers commands for validating, simulating, and exporting profiles.
+The Tanzo CLI provides command-line tools for working with TanzoLang profiles.
 
 ## Installation
 
-The CLI is installed as part of the tanzo-schema Python package:
+The CLI is installed as part of the Python package:
 
 ```bash
 pip install tanzo-schema

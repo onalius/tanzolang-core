@@ -1,14 +1,11 @@
-"""Pytest configuration for tanzo-lang-core."""
+"""
+Common test fixtures for the Tanzo Schema test suite.
+"""
 
-import sys
 import os
+import sys
 from pathlib import Path
 
-# Add repository root to Python path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-# Import main modules to ensure they're available for tests
-try:
-    from clients.python.tanzo_schema import TanzoProfile
-except ImportError:
-    pass
+# Add project root to path to allow imports
+root_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(root_dir))

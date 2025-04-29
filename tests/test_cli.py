@@ -1,157 +1,193 @@
 """
-Tests for the TanzoLang CLI commands.
+Tests for the TanzoLang CLI.
 """
 
 import json
 import os
-import subprocess
-import sys
-from pathlib import Path
-
+import pathlib
 import pytest
 import yaml
+from click.testing import CliRunner
 
-# Find the root directory of the project
-ROOT_DIR = Path(__file__).resolve().parent.parent
-EXAMPLES_DIR = ROOT_DIR / "examples"
-CLI_PATH = ROOT_DIR / "cli" / "tanzo-cli.py"
+from cli.tanzo_cli import cli
 
 
-def run_cli_command(command, *args, expected_exit_code=0):
-    """Run a CLI command and check the exit code."""
-    full_command = [sys.executable, str(CLI_PATH), command, *args]
-    result = subprocess.run(full_command, capture_output=True, text=True)
-    
-    if result.returncode != expected_exit_code:
-        print(f"Command failed with exit code {result.returncode}")
-        print(f"STDOUT: {result.stdout}")
-        print(f"STDERR: {result.stderr}")
-        
-    assert result.returncode == expected_exit_code, \
-        f"Command {full_command} returned exit code {result.returncode}, expected {expected_exit_code}"
-    
-    return result
+@pytest.fixture
+def cli_runner():
+    """Return a Click CLI runner."""
+    return CliRunner()
 
 
-@pytest.mark.parametrize("example_file", [
-    "Kai_profile.yaml",
-    "digital_archetype_only.yaml",
-])
-def test_validate_command_with_valid_profile(example_file):
-    """Test that the validate command succeeds with valid profiles."""
-    example_path = EXAMPLES_DIR / example_file
-    result = run_cli_command("validate", str(example_path))
-    assert "Profile is valid" in result.stdout
+@pytest.fixture
+def examples_dir():
+    """Return the path to the examples directory."""
+    return pathlib.Path(__file__).parent.parent / "examples"
 
 
-def test_validate_command_with_verbose_flag():
-    """Test that the validate command works with the verbose flag."""
-    example_path = EXAMPLES_DIR / "Kai_profile.yaml"
-    result = run_cli_command("validate", str(example_path), "--verbose")
-    assert "Profile is valid" in result.stdout
+@pytest.fixture
+def kai_profile(examples_dir):
+    """Return the path to the Kai profile example."""
+    return examples_dir / "Kai_profile.yaml"
 
 
-def test_validate_command_with_nonexistent_file():
-    """Test that the validate command fails with a nonexistent file."""
-    with pytest.raises(AssertionError):
-        run_cli_command("validate", "nonexistent.yaml", expected_exit_code=2)
+@pytest.fixture
+def archetype_only(examples_dir):
+    """Return the path to the archetype-only example."""
+    return examples_dir / "digital_archetype_only.yaml"
 
 
-@pytest.mark.parametrize("example_file", [
-    "Kai_profile.yaml",
-    "digital_archetype_only.yaml",
-])
-def test_simulate_command(example_file, tmp_path):
-    """Test that the simulate command works."""
-    example_path = EXAMPLES_DIR / example_file
+@pytest.fixture
+def invalid_profile(tmp_path):
+    """Create and return the path to an invalid profile."""
+    invalid_data = {
+        "version": "0.1.0",
+        "profile_type": "invalid_type",
+        "archetype": {
+            "name": "Invalid Archetype"
+            # Missing required fields
+        }
+    }
+    invalid_path = tmp_path / "invalid.yaml"
+    with open(invalid_path, "w") as f:
+        yaml.dump(invalid_data, f)
+    return invalid_path
+
+
+# Test validate command
+def test_validate_command_valid(cli_runner, kai_profile):
+    """Test the validate command with a valid profile."""
+    result = cli_runner.invoke(cli, ["validate", str(kai_profile)])
+    assert result.exit_code == 0
+    assert "Validation successful!" in result.output
+    assert "Kai" in result.output
+
+
+def test_validate_command_invalid(cli_runner, invalid_profile):
+    """Test the validate command with an invalid profile."""
+    result = cli_runner.invoke(cli, ["validate", str(invalid_profile)])
+    assert result.exit_code == 1
+    assert "Validation failed" in result.output
+
+
+def test_validate_command_nonexistent(cli_runner):
+    """Test the validate command with a nonexistent file."""
+    result = cli_runner.invoke(cli, ["validate", "/nonexistent/file.yaml"])
+    assert result.exit_code == 1
+    assert "File not found" in result.output
+
+
+# Test simulate command
+def test_simulate_command_basic(cli_runner, kai_profile):
+    """Test the basic simulate command."""
+    result = cli_runner.invoke(cli, ["simulate", str(kai_profile)])
+    assert result.exit_code == 0
+    assert "Running simulation with 100 iterations" in result.output
+    assert "Simulation Results" in result.output
+    assert "Core Traits" in result.output
+    assert "Skills" in result.output
+    assert "Environments" in result.output
+
+
+def test_simulate_command_custom_iterations(cli_runner, kai_profile):
+    """Test the simulate command with custom iterations."""
+    result = cli_runner.invoke(cli, ["simulate", str(kai_profile), "--iterations", "50"])
+    assert result.exit_code == 0
+    assert "Running simulation with 50 iterations" in result.output
+
+
+def test_simulate_command_specific_environment(cli_runner, kai_profile):
+    """Test the simulate command with a specific environment."""
+    result = cli_runner.invoke(
+        cli, ["simulate", str(kai_profile), "--environment", "Test Environment"]
+    )
+    assert result.exit_code == 0
+    assert "Test Environment" in result.output
+
+
+def test_simulate_command_output_file(cli_runner, kai_profile, tmp_path):
+    """Test the simulate command with output to a file."""
     output_file = tmp_path / "simulation_results.json"
-    
-    result = run_cli_command(
-        "simulate", 
-        str(example_path), 
-        "--iterations", "10", 
-        "--output", str(output_file)
+    result = cli_runner.invoke(
+        cli, ["simulate", str(kai_profile), "--output", str(output_file)]
     )
-    
-    # Check if the command ran successfully
-    assert "Running 10 simulation iterations" in result.stdout
-    assert "Simulation Summary" in result.stdout
-    
-    # Check if the output file was created
+    assert result.exit_code == 0
+    assert f"Results saved to {output_file}" in result.output
     assert output_file.exists()
     
-    # Check if the output file contains valid JSON
+    # Check that the output file contains valid JSON
     with open(output_file, "r") as f:
         data = json.load(f)
-        assert "summary" in data
-        assert "simulations" in data
-        assert len(data["simulations"]) == 10
+    
+    assert "traits" in data
+    assert "skills" in data
+    assert "environments" in data
 
 
-@pytest.mark.parametrize("example_file", [
-    "Kai_profile.yaml",
-    "digital_archetype_only.yaml",
-])
-def test_export_command_shorthand(example_file):
-    """Test that the export command works with shorthand format."""
-    example_path = EXAMPLES_DIR / example_file
-    result = run_cli_command("export", str(example_path), "--format", "shorthand")
-    
-    # Check that the output contains the profile name and at least one trait
-    profile_data = yaml.safe_load(open(example_path, "r"))
-    profile_name = profile_data["metadata"]["name"]
-    
-    assert profile_name in result.stdout
-    assert "O:" in result.stdout  # Openness trait
+def test_simulate_command_invalid(cli_runner, invalid_profile):
+    """Test the simulate command with an invalid profile."""
+    result = cli_runner.invoke(cli, ["simulate", str(invalid_profile)])
+    assert result.exit_code == 1
+    assert "Validation failed" in result.output
 
 
-@pytest.mark.parametrize("example_file", [
-    "Kai_profile.yaml",
-    "digital_archetype_only.yaml",
-])
-def test_export_command_json(example_file, tmp_path):
-    """Test that the export command works with JSON format."""
-    example_path = EXAMPLES_DIR / example_file
-    output_file = tmp_path / "exported.json"
-    
-    result = run_cli_command(
-        "export", 
-        str(example_path), 
-        "--format", "json",
-        "--output", str(output_file)
-    )
-    
-    # Check if the output file was created
-    assert output_file.exists()
-    
-    # Check if the output file contains valid JSON
-    with open(output_file, "r") as f:
-        data = json.load(f)
-        assert "metadata" in data
-        assert "digital_archetype" in data
+# Test export command
+def test_export_command_full(cli_runner, kai_profile):
+    """Test the export command with a full profile."""
+    result = cli_runner.invoke(cli, ["export", str(kai_profile)])
+    assert result.exit_code == 0
+    assert "Kai" in result.output
+    assert "[T:" in result.output
+    assert "S:" in result.output
+    assert result.output.startswith("F:")  # Full profile indicator
 
 
-@pytest.mark.parametrize("example_file", [
-    "Kai_profile.yaml",
-    "digital_archetype_only.yaml",
-])
-def test_export_command_yaml(example_file, tmp_path):
-    """Test that the export command works with YAML format."""
-    example_path = EXAMPLES_DIR / example_file
-    output_file = tmp_path / "exported.yaml"
-    
-    result = run_cli_command(
-        "export", 
-        str(example_path), 
-        "--format", "yaml",
-        "--output", str(output_file)
-    )
-    
-    # Check if the output file was created
-    assert output_file.exists()
-    
-    # Check if the output file contains valid YAML
-    with open(output_file, "r") as f:
-        data = yaml.safe_load(f)
-        assert "metadata" in data
-        assert "digital_archetype" in data
+def test_export_command_archetype_only(cli_runner, archetype_only):
+    """Test the export command with an archetype-only profile."""
+    result = cli_runner.invoke(cli, ["export", str(archetype_only)])
+    assert result.exit_code == 0
+    assert "Nova" in result.output
+    assert "[T:" in result.output
+    assert "S:" in result.output
+    assert result.output.startswith("A:")  # Archetype-only indicator
+
+
+def test_export_command_invalid(cli_runner, invalid_profile):
+    """Test the export command with an invalid profile."""
+    result = cli_runner.invoke(cli, ["export", str(invalid_profile)])
+    assert result.exit_code == 1
+    assert "Validation failed" in result.output
+
+
+# Test CLI help text
+def test_cli_help(cli_runner):
+    """Test the CLI help text."""
+    result = cli_runner.invoke(cli, ["--help"])
+    assert result.exit_code == 0
+    assert "Tanzo CLI" in result.output
+    assert "validate" in result.output
+    assert "simulate" in result.output
+    assert "export" in result.output
+
+
+def test_validate_command_help(cli_runner):
+    """Test the validate command help text."""
+    result = cli_runner.invoke(cli, ["validate", "--help"])
+    assert result.exit_code == 0
+    assert "Validate a Tanzo profile" in result.output
+
+
+def test_simulate_command_help(cli_runner):
+    """Test the simulate command help text."""
+    result = cli_runner.invoke(cli, ["simulate", "--help"])
+    assert result.exit_code == 0
+    assert "Run a Monte Carlo simulation" in result.output
+    assert "--iterations" in result.output
+    assert "--environment" in result.output
+    assert "--output" in result.output
+
+
+def test_export_command_help(cli_runner):
+    """Test the export command help text."""
+    result = cli_runner.invoke(cli, ["export", "--help"])
+    assert result.exit_code == 0
+    assert "Export a Tanzo profile as a shorthand string" in result.output

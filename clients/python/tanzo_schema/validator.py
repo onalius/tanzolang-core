@@ -1,155 +1,146 @@
 """
-Validator module for TanzoLang profiles.
+Validation functions for TanzoLang profiles.
 
-This module provides functions to validate TanzoLang profiles against the schema.
+This module provides functions to validate TanzoLang profiles against
+the schema and load profiles from various formats.
 """
 
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, Any, Optional, Union
 
-import jsonschema
 import yaml
-from jsonschema import Draft7Validator
+import jsonschema
+from pydantic import ValidationError
 
 from tanzo_schema.models import TanzoProfile
 
 
-def _load_schema() -> Dict[str, Any]:
+def get_schema_path() -> Path:
+    """
+    Get the path to the tanzo-schema.json file.
+    
+    Returns:
+        Path: Path to the schema file
+    """
+    # Try to locate the schema in a few different places
+    possible_locations = [
+        Path("spec/tanzo-schema.json"),
+        Path(__file__).parent.parent.parent.parent / "spec" / "tanzo-schema.json",
+        Path.home() / ".tanzo" / "tanzo-schema.json",
+    ]
+    
+    for path in possible_locations:
+        if path.exists():
+            return path
+    
+    raise FileNotFoundError(
+        "Could not find tanzo-schema.json. Please ensure the tanzo-lang-core "
+        "repository is properly installed or provide a path to the schema file."
+    )
+
+
+def load_schema() -> Dict[str, Any]:
     """
     Load the TanzoLang JSON schema.
     
     Returns:
-        Dict[str, Any]: The loaded schema as a dictionary.
+        Dict[str, Any]: The loaded schema as a dictionary
     """
-    # Try to find the schema in various locations
-    possible_paths = [
-        # Relative to the current file (in package)
-        Path(__file__).parent.parent.parent.parent / "spec" / "tanzo-schema.json",
-        # In a standard install location
-        Path("/") / "spec" / "tanzo-schema.json",
-        # In the current directory
-        Path.cwd() / "spec" / "tanzo-schema.json",
-    ]
-    
-    for path in possible_paths:
-        if path.exists():
-            with open(path, "r") as f:
-                return json.load(f)
-    
-    # If schema not found in filesystem, use embedded minimal schema
-    # This ensures the validator can work even if the schema file is not available
-    return {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "type": "object",
-        "required": ["metadata", "digital_archetype"],
-        "properties": {
-            "metadata": {
-                "type": "object",
-                "required": ["version", "name"],
-            },
-            "digital_archetype": {
-                "type": "object",
-                "required": ["traits", "attributes"],
-                "properties": {
-                    "traits": {
-                        "type": "object",
-                        "required": ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"],
-                    }
-                }
-            }
-        }
-    }
+    schema_path = get_schema_path()
+    with open(schema_path, "r") as schema_file:
+        return json.load(schema_file)
 
 
-def validate_profile_against_schema(profile_data: Dict[str, Any]) -> List[str]:
+def validate_with_jsonschema(data: Dict[str, Any], schema: Optional[Dict[str, Any]] = None) -> bool:
     """
-    Validate a profile against the TanzoLang JSON schema.
+    Validate data against the TanzoLang JSON schema using jsonschema.
     
     Args:
-        profile_data (Dict[str, Any]): Profile data as a dictionary.
+        data: The data to validate
+        schema: Optional schema to use instead of the default
         
     Returns:
-        List[str]: List of validation errors, empty if valid.
+        bool: True if validation succeeds, raises exception otherwise
     """
-    schema = _load_schema()
-    validator = Draft7Validator(schema)
+    if schema is None:
+        schema = load_schema()
     
-    errors = []
-    for error in validator.iter_errors(profile_data):
-        errors.append(f"{' -> '.join([str(p) for p in error.path])}: {error.message}")
-    
-    return errors
+    jsonschema.validate(instance=data, schema=schema)
+    return True
 
 
-def validate_profile_with_pydantic(profile_data: Dict[str, Any]) -> List[str]:
+def validate_with_pydantic(data: Dict[str, Any]) -> TanzoProfile:
     """
-    Validate a profile using Pydantic models.
+    Validate data using Pydantic models.
     
     Args:
-        profile_data (Dict[str, Any]): Profile data as a dictionary.
+        data: The data to validate
         
     Returns:
-        List[str]: List of validation errors, empty if valid.
+        TanzoProfile: A validated TanzoProfile object
     """
-    try:
-        TanzoProfile(**profile_data)
-        return []
-    except Exception as e:
-        return [str(e)]
+    return TanzoProfile.model_validate(data)
 
 
-def load_profile(file_path: Union[str, Path]) -> Dict[str, Any]:
+def validate_tanzo_profile(
+    data: Dict[str, Any], 
+    use_jsonschema: bool = True,
+    use_pydantic: bool = True
+) -> TanzoProfile:
     """
-    Load a profile from a YAML or JSON file.
+    Validate a TanzoLang profile using both jsonschema and Pydantic.
     
     Args:
-        file_path (Union[str, Path]): Path to the profile file.
+        data: The profile data to validate
+        use_jsonschema: Whether to validate with jsonschema
+        use_pydantic: Whether to validate with Pydantic
         
     Returns:
-        Dict[str, Any]: The loaded profile as a dictionary.
-        
+        TanzoProfile: A validated TanzoProfile object
+    
     Raises:
-        ValueError: If the file format is not supported or file doesn't exist.
+        jsonschema.exceptions.ValidationError: If jsonschema validation fails
+        pydantic.ValidationError: If Pydantic validation fails
     """
-    file_path = Path(file_path)
-    if not file_path.exists():
-        raise ValueError(f"File {file_path} does not exist")
+    if use_jsonschema:
+        validate_with_jsonschema(data)
     
-    with open(file_path, "r") as f:
-        if file_path.suffix.lower() in [".yaml", ".yml"]:
-            return yaml.safe_load(f)
-        elif file_path.suffix.lower() == ".json":
-            return json.load(f)
-        else:
-            raise ValueError(f"Unsupported file format: {file_path.suffix}")
+    if use_pydantic:
+        return validate_with_pydantic(data)
+    
+    # If we don't use Pydantic validation but need to return a TanzoProfile
+    return TanzoProfile.model_validate(data)
 
 
-def validate_profile(
-    profile_path: Union[str, Path], use_pydantic: bool = True
-) -> List[str]:
+def load_profile_from_yaml(file_path: Union[str, Path]) -> TanzoProfile:
     """
-    Validate a profile file against the TanzoLang schema.
+    Load and validate a TanzoLang profile from a YAML file.
     
     Args:
-        profile_path (Union[str, Path]): Path to the profile file.
-        use_pydantic (bool, optional): Whether to use Pydantic validation. Defaults to True.
+        file_path: Path to the YAML file
         
     Returns:
-        List[str]: List of validation errors, empty if valid.
-        
-    Raises:
-        ValueError: If the file format is not supported or file doesn't exist.
+        TanzoProfile: A validated TanzoProfile object
     """
-    profile_data = load_profile(profile_path)
+    with open(file_path, "r") as yaml_file:
+        data = yaml.safe_load(yaml_file)
     
-    # Run schema validation
-    schema_errors = validate_profile_against_schema(profile_data)
+    return validate_tanzo_profile(data)
+
+
+def load_profile_from_json(file_path: Union[str, Path]) -> TanzoProfile:
+    """
+    Load and validate a TanzoLang profile from a JSON file.
     
-    # Run Pydantic validation if requested
-    pydantic_errors = []
-    if use_pydantic and not schema_errors:
-        pydantic_errors = validate_profile_with_pydantic(profile_data)
+    Args:
+        file_path: Path to the JSON file
+        
+    Returns:
+        TanzoProfile: A validated TanzoProfile object
+    """
+    with open(file_path, "r") as json_file:
+        data = json.load(json_file)
     
-    return schema_errors + pydantic_errors
+    return validate_tanzo_profile(data)

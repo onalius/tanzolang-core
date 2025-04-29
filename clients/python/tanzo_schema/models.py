@@ -1,150 +1,121 @@
 """
-Pydantic models for the TanzoLang schema.
+Pydantic models for Tanzo Schema.
+
+This module contains Pydantic models that represent the structure and validation
+rules of the TanzoLang schema.
 """
 
+import enum
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
-from pydantic import BaseModel, Field, field_validator
-
-
-class Trait(BaseModel):
-    """Model representing a personality trait."""
-    
-    value: int = Field(..., ge=0, le=100, description="Trait value on scale of 0-100")
-    variance: Optional[int] = Field(None, ge=0, le=50, description="Variance for simulation")
-    description: Optional[str] = None
+from pydantic import BaseModel, Field, conlist, field_validator
 
 
-class Attribute(BaseModel):
-    """Model representing a character attribute."""
-    
-    value: int = Field(..., ge=0, le=100, description="Attribute value on scale of 0-100")
-    variance: Optional[int] = Field(None, ge=0, le=50, description="Variance for simulation")
-    notes: Optional[str] = None
+class DistributionType(str, enum.Enum):
+    """Statistical distribution types for simulations."""
+
+    NORMAL = "normal"
+    UNIFORM = "uniform"
+    EXPONENTIAL = "exponential"
 
 
-class Interest(BaseModel):
-    """Model representing an interest."""
-    
-    name: str
-    level: Optional[int] = Field(None, ge=1, le=10, description="Interest level from 1-10")
+class ProfileType(str, enum.Enum):
+    """Types of Tanzo profiles."""
+
+    FULL = "full"
+    ARCHETYPE_ONLY = "archetype_only"
+    SIMULATION = "simulation"
 
 
-class KeyEvent(BaseModel):
-    """Model representing a key event in a character's backstory."""
-    
-    age: Optional[int] = None
-    description: str
-    impact: Optional[str] = None
+class TraitScore(BaseModel):
+    """Model for trait and skill scores with optional simulation parameters."""
 
+    base: float = Field(..., description="Base score for the trait", ge=0, le=10)
+    range: Optional[Tuple[float, float]] = Field(
+        None, description="Range of possible values [min, max]"
+    )
+    distribution: Optional[DistributionType] = Field(
+        None, description="Statistical distribution for simulation"
+    )
 
-class CognitiveStyle(BaseModel):
-    """Model for cognitive style attributes."""
-    
-    analytical: Optional[Attribute] = None
-    creative: Optional[Attribute] = None
-    practical: Optional[Attribute] = None
-
-
-class CommunicationStyle(BaseModel):
-    """Model for communication style attributes."""
-    
-    formal: Optional[Attribute] = None
-    casual: Optional[Attribute] = None
-    direct: Optional[Attribute] = None
-    verbose: Optional[Attribute] = None
-
-
-class SocialBehavior(BaseModel):
-    """Model for social behavior attributes."""
-    
-    collaborative: Optional[Attribute] = None
-    competitive: Optional[Attribute] = None
-    supportive: Optional[Attribute] = None
-    challenging: Optional[Attribute] = None
-
-
-class ProblemSolvingBehavior(BaseModel):
-    """Model for problem-solving behavior attributes."""
-    
-    systematic: Optional[Attribute] = None
-    intuitive: Optional[Attribute] = None
-    innovative: Optional[Attribute] = None
-    cautious: Optional[Attribute] = None
-
-
-class Behaviors(BaseModel):
-    """Model for character behaviors."""
-    
-    social: Optional[SocialBehavior] = None
-    problem_solving: Optional[ProblemSolvingBehavior] = None
-
-
-class Backstory(BaseModel):
-    """Model for character backstory information."""
-    
-    background: Optional[str] = None
-    key_events: Optional[List[KeyEvent]] = None
-
-
-class Attributes(BaseModel):
-    """Model for character attributes."""
-    
-    cognitive_style: Optional[CognitiveStyle] = None
-    communication_style: Optional[CommunicationStyle] = None
-    interests: Optional[List[Interest]] = None
-    values: Optional[List[str]] = None
-
-
-class Traits(BaseModel):
-    """Model for the Big Five personality traits."""
-    
-    openness: Trait
-    conscientiousness: Trait
-    extraversion: Trait
-    agreeableness: Trait
-    neuroticism: Trait
-
-
-class DigitalArchetype(BaseModel):
-    """Model for the digital archetype definition."""
-    
-    traits: Traits
-    attributes: Attributes
-    behaviors: Optional[Behaviors] = None
-    backstory: Optional[Backstory] = None
-
-
-class SimulationParameters(BaseModel):
-    """Model for Monte-Carlo simulation parameters."""
-    
-    variance: Optional[float] = Field(None, ge=0, le=1, description="Variance factor")
-    contexts: Optional[List[str]] = None
-
-
-class Metadata(BaseModel):
-    """Model for profile metadata."""
-    
-    version: str
-    name: str
-    description: Optional[str] = None
-    author: Optional[str] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    
-    @field_validator('version')
-    def validate_version(cls, v: str) -> str:
-        """Validate the version format."""
-        import re
-        if not re.match(r'^\d+\.\d+\.\d+$', v):
-            raise ValueError('Version must be in the format X.Y.Z')
+    @field_validator("range")
+    @classmethod
+    def validate_range(cls, v):
+        """Validate that the range values are within 0-10 and min <= max."""
+        if v is None:
+            return v
+        
+        min_val, max_val = v
+        if not (0 <= min_val <= 10 and 0 <= max_val <= 10):
+            raise ValueError("Range values must be between 0 and 10")
+        if min_val > max_val:
+            raise ValueError("Minimum value must be less than or equal to maximum value")
         return v
 
 
+class Skill(BaseModel):
+    """Model for skills in a Tanzo profile."""
+
+    name: str = Field(..., description="Name of the skill")
+    proficiency: TraitScore = Field(..., description="Proficiency level for this skill")
+    category: Optional[str] = Field(None, description="Skill category")
+    experience_years: Optional[float] = Field(
+        None, description="Years of experience with this skill", ge=0
+    )
+
+
+class Archetype(BaseModel):
+    """Model for a digital archetype in a Tanzo profile."""
+
+    name: str = Field(..., description="Name of the digital archetype")
+    description: Optional[str] = Field(None, description="Description of the digital archetype")
+    core_traits: Dict[str, TraitScore] = Field(
+        ..., description="Core personality traits of the archetype"
+    )
+    skills: List[Skill] = Field(..., description="Skills possessed by the archetype", min_length=1)
+    interests: Optional[List[str]] = Field(None, description="Interests of the archetype")
+    values: Optional[List[str]] = Field(None, description="Core values of the archetype")
+
+    @field_validator("core_traits")
+    @classmethod
+    def validate_core_traits(cls, v):
+        """Validate that required core traits are present."""
+        required_traits = {"intelligence", "creativity", "sociability"}
+        missing_traits = required_traits - set(v.keys())
+        if missing_traits:
+            raise ValueError(f"Missing required core traits: {', '.join(missing_traits)}")
+        return v
+
+
+class SimulationParameters(BaseModel):
+    """Model for simulation parameters in a Tanzo profile."""
+
+    variation_factor: Optional[float] = Field(
+        None, description="Factor for variation in simulations", ge=0, le=1
+    )
+    seed: Optional[int] = Field(None, description="Random seed for reproducible simulations")
+    iterations: Optional[int] = Field(
+        100, description="Number of simulation iterations", ge=1
+    )
+    environments: Optional[List[str]] = Field(None, description="Simulation environments")
+
+
+class Metadata(BaseModel):
+    """Model for metadata in a Tanzo profile."""
+
+    author: Optional[str] = None
+    created_at: Optional[datetime] = None
+    tags: Optional[List[str]] = None
+
+
 class TanzoProfile(BaseModel):
-    """Root model for a complete TanzoLang profile."""
-    
-    metadata: Metadata
-    digital_archetype: DigitalArchetype
-    simulation_parameters: Optional[SimulationParameters] = None
+    """Top-level model for a complete Tanzo profile."""
+
+    version: str = Field(..., description="The TanzoLang schema version", pattern=r"^\d+\.\d+\.\d+$")
+    profile_type: ProfileType = Field(..., description="Type of Tanzo profile")
+    archetype: Archetype = Field(..., description="Digital archetype definition")
+    simulation_parameters: Optional[SimulationParameters] = Field(
+        None, description="Parameters for simulation runs"
+    )
+    metadata: Optional[Metadata] = Field(None, description="Additional metadata")

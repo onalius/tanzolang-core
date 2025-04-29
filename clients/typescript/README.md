@@ -1,8 +1,10 @@
-# TanzoLang TypeScript SDK
+# Tanzo Schema TypeScript SDK
 
-TypeScript client for working with TanzoLang profiles using Zod.
+TypeScript SDK for working with TanzoLang schema using Zod for validation.
 
 ## Installation
 
 ```bash
 npm install tanzo-schema
+# or
+yarn add tanzo-schema

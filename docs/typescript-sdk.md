@@ -1,10 +1,10 @@
-# TanzoLang TypeScript SDK
+# TypeScript SDK Reference
 
-The TanzoLang TypeScript SDK provides a Zod-based library for working with TanzoLang profiles in TypeScript.
+The Tanzo Schema TypeScript SDK provides Zod schemas and validation utilities for working with TanzoLang profiles in TypeScript/JavaScript applications.
 
 ## Installation
 
-You can install the SDK using npm:
-
 ```bash
 npm install tanzo-schema
+# or
+yarn add tanzo-schema
