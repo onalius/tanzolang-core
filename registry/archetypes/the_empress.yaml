@@ -1,0 +1,119 @@
+version: 1.0.1
+archetype:
+  name: The Empress
+  description: The archetype of nurturing, abundance, and creative expression
+  symbolism:
+    primary_elements:
+      - earth
+      - water
+    colors:
+      - green
+      - gold
+      - pink
+    objects:
+      - throne
+      - cornucopia
+      - crown
+      - garden
+    directions:
+      - south
+    time_of_day: dawn
+    season: spring
+    planet: Venus
+    animals:
+      - dove
+      - deer
+      - rabbit
+  attributes:
+    - name: nurturing
+      value: 0.95
+      description: The ability to care for and support others
+    - name: creativity
+      value: 0.9
+      description: The power to create and bring forth new ideas
+    - name: abundance
+      value: 0.92
+      description: Manifesting plenty and prosperity
+    - name: sensuality
+      value: 0.85
+      description: Appreciation for beauty and physical pleasures
+    - name: fertility
+      value:
+        distribution: normal
+        mean: 0.9
+        stdDev: 0.04
+      description: The potential for growth and development
+  behavioral_traits:
+    positive:
+      - Caring
+      - Generous
+      - Creative
+      - Empathetic
+      - Supportive
+    underdeveloped:
+      - Detached
+      - Withholding
+      - Unimaginative
+      - Self-focused
+      - Indifferent
+    overexpressed:
+      - Smothering
+      - Overprotective
+      - Overindulgent
+      - Possessive
+      - Overly sentimental
+    mirrored:
+      - Manipulative
+      - Self-sacrificing
+      - Overly accommodating
+      - Materialistic
+      - Seeks validation through giving
+  alignments:
+    zodiac:
+      - Taurus
+      - Libra
+    tarot: The Empress
+    element: Earth
+    chakra: Heart
+    kabbalah: Malkuth (Kingdom)
+    numerology: '3'
+  journey:
+    stages:
+      - name: Awakening
+        description: Discovering one's own creative and nurturing abilities
+      - name: Manifestation
+        description: Bringing ideas and projects into reality
+      - name: Fulfillment
+        description: Experiencing the joy and satisfaction of creation
+    trials:
+      - name: Overextension
+        description: Balancing giving with receiving to avoid depletion
+      - name: Dependency
+        description: Cultivating independence while remaining supportive
+      - name: Attachment
+        description: Letting go of outcomes and embracing impermanence
+    scars:
+      - name: Loss
+        description: Experiencing the pain of failed creations or relationships
+      - name: Rejection
+        description: Encountering resistance or disapproval despite efforts
+  implementation_notes:
+    strengths:
+      - Excels in fostering growth and nurturing environments
+      - Inspires creativity and a sense of abundance in others
+      - Creates harmonious and supportive atmospheres
+    challenges:
+      - May struggle with setting boundaries
+      - Could become too focused on others at the expense of self
+      - Risk of over-identifying with the caregiver role
+    activation_triggers:
+      - Opportunities for creative expression or innovation
+      - Situations requiring empathy and support
+      - When nurturing or cultivating growth is needed
+      - Environments that value beauty and harmony
+lastUpdated: '2025-05-02T22:59:30.178Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T22:59:30.178Z'
+    commitMessage: 'Update archetypes item: the_empress'
