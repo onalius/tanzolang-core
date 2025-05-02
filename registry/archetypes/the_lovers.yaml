@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: The Lovers
+  description: The archetype of union, harmony, and the transformative power of love
+  symbolism:
+    primary_elements:
+      - water
+    colors:
+      - red
+      - pink
+      - gold
+    objects:
+      - rose
+      - heart
+      - ring
+      - dove
+    directions:
+      - south
+    time_of_day: dawn
+    season: spring
+    planet: Venus
+    animals:
+      - swan
+      - dove
+  attributes:
+    - name: connection
+      value: 0.95
+      description: The ability to form deep, meaningful bonds
+    - name: harmony
+      value: 0.9
+      description: Balance and peace within relationships
+    - name: passion
+      value: 0.88
+      description: Intense enthusiasm or desire for life and love
+    - name: empathy
+      value: 0.87
+      description: The capacity to understand and share the feelings of others
+    - name: commitment
+      value:
+        distribution: normal
+        mean: 0.86
+        stdDev: 0.06
+      description: Dedication to sustaining relationships and promises
+  behavioral_traits:
+    positive:
+      - Compassionate
+      - Loyal
+      - Charismatic
+      - Devoted
+      - Supportive
+    underdeveloped:
+      - Indifferent
+      - Unfaithful
+      - Detached
+      - Uncommitted
+      - Self-centered
+    overexpressed:
+      - Overbearing
+      - Jealous
+      - Obsessive
+      - Over-dependent
+      - Sacrificing self for others
+    mirrored:
+      - Manipulative
+      - Clingy
+      - Codependent
+      - Overly romanticized
+      - Avoids conflict for harmony
+  alignments:
+    zodiac:
+      - Gemini
+      - Libra
+    tarot: The Lovers
+    element: Air
+    chakra: Heart
+    kabbalah: Tiferet (Beauty)
+    numerology: '6'
+  journey:
+    stages:
+      - name: Attraction
+        description: The initial draw and chemistry between entities
+      - name: Union
+        description: Coming together in harmony and balance
+      - name: Transformation
+        description: The change that love brings to individuals and relationships
+    trials:
+      - name: Temptation
+        description: Challenges that test loyalty and commitment
+      - name: Miscommunication
+        description: Navigating misunderstandings and differences
+      - name: Sacrifice
+        description: Balancing individual needs with those of the relationship
+    scars:
+      - name: Heartbreak
+        description: The pain and growth resulting from loss or separation
+      - name: Betrayal
+        description: Experiences of broken trust and its aftermath
+  implementation_notes:
+    strengths:
+      - Excellent at fostering deep, meaningful connections
+      - Inspires unity and cooperation among individuals and groups
+      - Encourages emotional growth and understanding
+    challenges:
+      - May struggle with maintaining personal boundaries
+      - Could become overly dependent on others for validation
+      - Risk of idealizing relationships to the detriment of reality
+    activation_triggers:
+      - Situations requiring emotional insight and compassion
+      - Opportunities for resolving conflicts or building alliances
+      - When expressions of love and unity are needed
+      - Times of significant change or transformation in relationships
+lastUpdated: '2025-05-02T23:05:39.137Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:05:39.137Z'
+    commitMessage: 'Update archetypes item: the_lovers'
