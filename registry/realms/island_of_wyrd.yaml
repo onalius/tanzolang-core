@@ -1,0 +1,65 @@
+version: 1.0.1
+realm:
+  name: IslandOfWyrd
+  display_name: Island of Wyrd
+  description: A mysterious isle where the fabric of fate is woven and unwoven
+  symbolism:
+    elemental_theme: water/fire
+    colors:
+      - twilight purple
+      - fiery orange
+      - deep sea green
+    textures:
+      - smooth pebbles
+      - tangled vines
+      - shifting sands
+    sounds:
+      - crashing waves
+      - crackling flames
+      - distant chants
+    associated_objects:
+      - spinning wheel
+      - runic stones
+      - ephemeral vines
+  influence:
+    nurtures_archetypes:
+      - The Weaver
+      - The Seer
+      - The Trickster
+    challenges_archetypes:
+      - The Warrior
+      - The Lover
+    behavioral_impact:
+      - trait: intuition
+        impact: 1.3
+      - trait: adaptability
+        impact: 1.1
+      - trait: steadfastness
+        impact: 0.7
+  experiences:
+    - name: Tides of Destiny
+      description: Experiencing the ebb and flow of one's own fate
+      potential_trials:
+        - EmbraceOfChange
+        - SurrenderToTheCurrent
+    - name: Fires of Transformation
+      description: Undergoing a profound metamorphosis through trials by fire
+      potential_trials:
+        - TrialByFlame
+        - RebirthFromAshes
+    - name: Veil of Illusions
+      description: Unraveling the truths hidden behind deceptive appearances
+      potential_trials:
+        - IllusionDispel
+        - TruthUnmasking
+    - name: Web of Fate
+      description: Weaving and altering the threads of destiny
+      potential_trials:
+        - ThreadSelection
+        - KnotResolution
+lastUpdated: '2025-05-02T23:32:46.291Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:32:46.291Z'
+    commitMessage: 'Update realms item: island_of_wyrd'
