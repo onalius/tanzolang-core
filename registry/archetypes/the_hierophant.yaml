@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: The Hierophant
+  description: The archetype of tradition, spiritual authority, and guidance
+  symbolism:
+    primary_elements:
+      - air
+    colors:
+      - white
+      - gold
+      - red
+    objects:
+      - keys
+      - throne
+      - staff
+      - crown
+    directions:
+      - east
+    time_of_day: dawn
+    season: spring
+    planet: Jupiter
+    animals:
+      - eagle
+      - bull
+  attributes:
+    - name: tradition
+      value: 0.9
+      description: Upholding and respecting established customs and beliefs
+    - name: spiritual_guidance
+      value: 0.92
+      description: Offering wisdom and support in spiritual matters
+    - name: authority
+      value: 0.88
+      description: The power to lead and direct others with wisdom
+    - name: wisdom
+      value: 0.85
+      description: Deep understanding of spiritual truths and practices
+    - name: conformity
+      value:
+        distribution: normal
+        mean: 0.8
+        stdDev: 0.1
+      description: Adherence to societal norms and expectations
+  behavioral_traits:
+    positive:
+      - Wise
+      - Supportive
+      - Enlightened
+      - Trustworthy
+      - Traditional
+    underdeveloped:
+      - Uninformed
+      - Irresponsible
+      - Isolated
+      - Untrustworthy
+      - Nonconformist
+    overexpressed:
+      - Dogmatic
+      - Controlling
+      - Rigid
+      - Conservative
+      - Resistant to change
+    mirrored:
+      - Hypocritical
+      - Judgmental
+      - Superficial
+      - Overbearing
+      - Pretends knowledge to maintain status
+  alignments:
+    zodiac:
+      - Taurus
+      - Sagittarius
+    tarot: The Hierophant
+    element: Air
+    chakra: Crown
+    kabbalah: Chokmah (Wisdom)
+    numerology: '5'
+  journey:
+    stages:
+      - name: Initiation
+        description: Embracing traditional wisdom and spiritual teachings
+      - name: Mastery
+        description: Becoming a conduit of divine knowledge and guidance
+      - name: Legacy
+        description: Passing on traditions and spiritual insights to the next generation
+    trials:
+      - name: Dogmatism
+        description: Balancing adherence to tradition with openness to new ideas
+      - name: Authority Misuse
+        description: Ensuring power is used for the good of the community
+      - name: Blind Faith
+        description: Encouraging questioning and understanding rather than mere acceptance
+    scars:
+      - name: Resentment
+        description: Experiences of opposition from those rejecting authority
+      - name: Stagnation
+        description: Times when tradition has stifled growth or innovation
+  implementation_notes:
+    strengths:
+      - Offers structure and guidance in spiritual and moral questions
+      - Provides a stabilizing influence in chaotic times
+      - Encourages adherence to beneficial traditions and wisdom
+    challenges:
+      - May resist necessary change and innovation
+      - Could impose beliefs on others without room for discussion
+      - Risk of becoming too rigid or authoritarian
+    activation_triggers:
+      - Situations requiring spiritual or moral leadership
+      - Moments of uncertainty where guidance is needed
+      - Calls for maintaining or restoring tradition and order
+      - Opportunities to teach and share wisdom
+lastUpdated: '2025-05-02T23:00:31.668Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:00:31.668Z'
+    commitMessage: 'Update archetypes item: the_hierophant'
