@@ -1,0 +1,67 @@
+version: 1.0.1
+realm:
+  name: TheBloomCircuit
+  display_name: The Bloom Circuit
+  description: >-
+    A vibrant realm of perpetual growth and transformation where life energies
+    intertwine
+  symbolism:
+    elemental_theme: water/wood
+    colors:
+      - emerald
+      - vibrant pink
+      - deep violet
+    textures:
+      - soft petals
+      - rich loam
+      - flowing water
+    sounds:
+      - rustling leaves
+      - gentle streams
+      - distant chimes
+    associated_objects:
+      - blooming flowers
+      - intricate vines
+      - dew-covered leaves
+  influence:
+    nurtures_archetypes:
+      - The Gardener
+      - The Healer
+      - The Dreamer
+    challenges_archetypes:
+      - The Warrior
+      - The Cynic
+    behavioral_impact:
+      - trait: creativity
+        impact: 1.3
+      - trait: adaptability
+        impact: 1.2
+      - trait: aggression
+        impact: 0.7
+  experiences:
+    - name: Dance of Blossoms
+      description: Witnessing the synchronized emergence of life and color
+      potential_trials:
+        - EmbracingChange
+        - HarmonyInDiversity
+    - name: Whispering Canopy
+      description: Listening to the secrets shared by the trees and plants
+      potential_trials:
+        - UnderstandingNature
+        - PatienceInListening
+    - name: The Verdant Path
+      description: Walking a winding trail that reveals hidden beauty and wisdom
+      potential_trials:
+        - JourneyOfDiscovery
+        - BalanceInMotion
+    - name: Cycle of Renewal
+      description: Experiencing the continuous renewal and decay of life
+      potential_trials:
+        - AcceptanceOfCycles
+        - LettingGoOfTheOld
+lastUpdated: '2025-05-02T23:32:02.192Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:32:02.192Z'
+    commitMessage: 'Update realms item: the_bloom_circuit'
