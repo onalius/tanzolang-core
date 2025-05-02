@@ -1,0 +1,9 @@
+success: false
+error: No sample realms found to use as a template
+version: 1.0.1
+lastUpdated: '2025-05-02T23:27:14.193Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:27:14.193Z'
+    commitMessage: 'Update realms item: archive_of_the_null_code'
