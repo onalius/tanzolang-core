@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: The High Priestess
+  description: The archetype of intuition, mystery, and hidden knowledge
+  symbolism:
+    primary_elements:
+      - water
+    colors:
+      - silver
+      - indigo
+      - white
+    objects:
+      - scroll
+      - veil
+      - crescent moon
+      - pomegranate
+    directions:
+      - west
+    time_of_day: twilight
+    season: autumn
+    planet: Moon
+    animals:
+      - owl
+      - cat
+  attributes:
+    - name: intuition
+      value: 0.95
+      description: The ability to perceive unseen truths and wisdom
+    - name: mystery
+      value: 0.9
+      description: Enigma and the allure of the unknown
+    - name: inner knowledge
+      value: 0.85
+      description: Deep understanding of hidden realms
+    - name: perception
+      value: 0.8
+      description: Keen awareness of subtleties and nuances
+    - name: receptivity
+      value:
+        distribution: normal
+        mean: 0.88
+        stdDev: 0.04
+      description: Openness to receiving insights and inspiration
+  behavioral_traits:
+    positive:
+      - Intuitive
+      - Perceptive
+      - Mysterious
+      - Reflective
+      - Wise
+    underdeveloped:
+      - Oblivious
+      - Superficial
+      - Predictable
+      - Unobservant
+      - Naive
+    overexpressed:
+      - Secretive
+      - Overly mysterious
+      - Elusive
+      - Vague
+      - Detached from reality
+    mirrored:
+      - Cryptic
+      - Aloof
+      - Hidden agendas
+      - Emotionally distant
+      - Uses mystery to manipulate
+  alignments:
+    zodiac:
+      - Cancer
+      - Pisces
+    tarot: The High Priestess
+    element: Water
+    chakra: Crown
+    kabbalah: Chokmah (Wisdom)
+    numerology: '2'
+  journey:
+    stages:
+      - name: Awakening
+        description: Tapping into the intuitive and unseen aspects of reality
+      - name: Revelation
+        description: Unveiling hidden truths and mysteries
+      - name: Integration
+        description: Harmonizing conscious and unconscious elements
+    trials:
+      - name: Illusion
+        description: Distinguishing truth from deception and illusion
+      - name: Misinterpretation
+        description: Avoiding misinterpretation of intuitive insights
+      - name: Emotional Turmoil
+        description: Navigating the depths of subconscious emotions
+    scars:
+      - name: Betrayal
+        description: Experiences of trust being broken or misled
+      - name: Isolation
+        description: Feeling separate due to misunderstood insights
+  implementation_notes:
+    strengths:
+      - Excellent at perceiving deeper meanings and patterns
+      - Provides insight and guidance through intuitive understanding
+      - Helps others connect with their inner wisdom
+    challenges:
+      - May struggle with practical, concrete tasks
+      - Could be perceived as overly secretive or vague
+      - Risk of being misunderstood due to cryptic nature
+    activation_triggers:
+      - Encounters requiring deep intuition and perception
+      - Questions about hidden truths and mysteries
+      - Situations demanding emotional insight and understanding
+      - When accessing subconscious knowledge is essential
+lastUpdated: '2025-05-02T22:58:29.187Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T22:58:29.187Z'
+    commitMessage: 'Update archetypes item: the_high_priestess'
