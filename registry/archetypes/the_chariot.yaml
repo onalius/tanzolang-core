@@ -1,0 +1,119 @@
+version: 1.0.1
+archetype:
+  name: The Chariot
+  description: The archetype of determination, control, and forward momentum
+  symbolism:
+    primary_elements:
+      - fire
+      - air
+    colors:
+      - red
+      - gold
+      - black
+    objects:
+      - chariot
+      - reins
+      - armor
+      - wheels
+    directions:
+      - east
+      - forward
+    time_of_day: midday
+    season: summer
+    planet: Mars
+    animals:
+      - horse
+      - eagle
+  attributes:
+    - name: determination
+      value: 0.9
+      description: The unwavering drive to achieve and succeed
+    - name: control
+      value: 0.85
+      description: Mastery over one's environment and emotions
+    - name: ambition
+      value: 0.92
+      description: A strong desire to achieve greatness and recognition
+    - name: courage
+      value: 0.88
+      description: The bravery to face challenges head-on
+    - name: focus
+      value:
+        distribution: normal
+        mean: 0.87
+        stdDev: 0.06
+      description: The ability to maintain concentration on goals and tasks
+  behavioral_traits:
+    positive:
+      - Driven
+      - Assertive
+      - Confident
+      - Goal-oriented
+      - Resilient
+    underdeveloped:
+      - Hesitant
+      - Indecisive
+      - Passive
+      - Distracted
+      - Uncertain
+    overexpressed:
+      - Aggressive
+      - Domineering
+      - Reckless
+      - Overbearing
+      - Impatient
+    mirrored:
+      - Overcompetitive
+      - Controlling
+      - Stubborn
+      - Obsessive
+      - Manipulative to maintain control
+  alignments:
+    zodiac:
+      - Aries
+      - Leo
+    tarot: The Chariot
+    element: Fire
+    chakra: Solar Plexus
+    kabbalah: Gevurah (Strength)
+    numerology: '7'
+  journey:
+    stages:
+      - name: Ascent
+        description: Building momentum and gathering resources for the journey
+      - name: Charge Forward
+        description: Breaking through barriers with confidence and power
+      - name: Victory
+        description: Achieving goals through sheer willpower and determination
+    trials:
+      - name: Conflict
+        description: Overcoming obstacles and opponents through strategy and strength
+      - name: Control
+        description: Balancing the forces within to maintain direction and focus
+      - name: Persistence
+        description: Continuing onward despite fatigue and doubt
+    scars:
+      - name: Burnout
+        description: The risk of exhaustion from relentless pursuit
+      - name: Overreach
+        description: Experiencing setbacks from pushing too far too fast
+  implementation_notes:
+    strengths:
+      - Excellent at motivating and leading others
+      - Capable of making decisive, impactful moves
+      - Inspires confidence and resilience in challenging times
+    challenges:
+      - May struggle with adapting to new, unforeseen circumstances
+      - Could be perceived as overly aggressive or controlling
+      - Risk of ignoring emotional needs in favor of goals
+    activation_triggers:
+      - Situations requiring strong leadership and decisive action
+      - Times of competition or challenging objectives
+      - When resilience and perseverance are needed
+      - Circumstances demanding clear direction and control
+lastUpdated: '2025-05-02T23:06:36.675Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:06:36.675Z'
+    commitMessage: 'Update archetypes item: the_chariot'
