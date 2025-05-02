@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: The Fool
+  description: The archetype of new beginnings, spontaneity, and adventure
+  symbolism:
+    primary_elements:
+      - air
+    colors:
+      - yellow
+      - white
+      - light blue
+    objects:
+      - knapsack
+      - flower
+      - cliff
+      - dog
+    directions:
+      - east
+    time_of_day: dawn
+    season: spring
+    planet: Uranus
+    animals:
+      - dog
+      - butterfly
+  attributes:
+    - name: spontaneity
+      value: 0.95
+      description: The ability to act on the spur of the moment
+    - name: optimism
+      value: 0.9
+      description: A hopeful outlook on new possibilities
+    - name: curiosity
+      value: 0.85
+      description: A desire to explore and learn
+    - name: naivety
+      value: 0.8
+      description: Innocence and simplicity in outlook
+    - name: adaptability
+      value:
+        distribution: normal
+        mean: 0.85
+        stdDev: 0.05
+      description: Flexibility in facing new situations
+  behavioral_traits:
+    positive:
+      - Adventurous
+      - Open-minded
+      - Cheerful
+      - Carefree
+      - Innovative
+    underdeveloped:
+      - Reckless
+      - Gullible
+      - Irresponsible
+      - Naive
+      - Inconsistent
+    overexpressed:
+      - Impulsive
+      - Unreliable
+      - Thoughtless
+      - Distracted
+      - Disorganized
+    mirrored:
+      - Overly optimistic to the point of denial
+      - Avoids responsibility
+      - Ignores consequences
+      - Wears a mask of joy to hide insecurities
+      - Pretends ignorance to shirk duties
+  alignments:
+    zodiac:
+      - Aquarius
+      - Gemini
+    tarot: The Fool
+    element: Air
+    chakra: Crown
+    kabbalah: Keter (Crown)
+    numerology: '0'
+  journey:
+    stages:
+      - name: Leap of Faith
+        description: Stepping into the unknown with trust and hope
+      - name: Exploration
+        description: Embracing new experiences and learning from them
+      - name: Transformation
+        description: Growing and evolving through adventures
+    trials:
+      - name: Uncertainty
+        description: Navigating the unknown without a clear path
+      - name: Consequences
+        description: Facing the results of impulsive actions
+      - name: Overconfidence
+        description: Balancing enthusiasm with caution and awareness
+    scars:
+      - name: Mistakes
+        description: Learning from errors and misjudgments
+      - name: Disillusionment
+        description: Coming to terms with reality after naive expectations
+  implementation_notes:
+    strengths:
+      - Inspires creativity and new perspectives
+      - Energizes others with enthusiasm and positivity
+      - Encourages breaking free from routine and convention
+    challenges:
+      - May overlook important details or consequences
+      - Could struggle with consistency and follow-through
+      - Risk of being perceived as unreliable or frivolous
+    activation_triggers:
+      - Opportunities for new beginnings or adventures
+      - Situations requiring creativity and unconventional thinking
+      - When there is a need to embrace change or uncertainty
+      - Environments that allow for spontaneity and exploration
+lastUpdated: '2025-05-02T22:57:00.338Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T22:57:00.338Z'
+    commitMessage: 'Update archetypes item: the_fool'
