@@ -1,9 +1,67 @@
-success: false
-error: No sample realms found to use as a template
-version: 1.0.1
-lastUpdated: '2025-05-02T23:27:14.193Z'
+version: 1.0.2
+realm:
+  name: ArchiveOfTheNullCode
+  display_name: Archive of the Null Code
+  description: >-
+    A cryptic domain of unstructured data where order and chaos coexist within
+    digital shadows
+  symbolism:
+    elemental_theme: void/electric
+    colors:
+      - glitch green
+      - obsidian black
+      - neon pink
+    textures:
+      - static interference
+      - smooth glass
+      - tangled wires
+    sounds:
+      - electronic hum
+      - binary beeping
+      - distant echoes of data streams
+    associated_objects:
+      - corrupted files
+      - holographic displays
+      - quantum processors
+  influence:
+    nurtures_archetypes:
+      - The Hacker
+      - The Architect
+      - The Visionary
+    challenges_archetypes:
+      - The Traditionalist
+      - The Innocent
+    behavioral_impact:
+      - trait: innovation
+        impact: 1.3
+      - trait: adaptability
+        impact: 1.2
+      - trait: stability
+        impact: 0.6
+  experiences:
+    - name: Decrypting the Void
+      description: Unraveling the secrets concealed within chaos
+      potential_trials:
+        - BreakingTheCipher
+        - UnveilingTheHidden
+    - name: Echoes of the Machine
+      description: Interpreting the silent language of digital entities
+      potential_trials:
+        - UnderstandingTheSignal
+        - CommunicationBreakdown
+    - name: Navigating the Datastream
+      description: Traversing the ethereal pathways of virtual reality
+      potential_trials:
+        - AvoidingDataTraps
+        - FindingTheCore
+    - name: Glitch in Reality
+      description: Experiencing the distortion between digital and physical worlds
+      potential_trials:
+        - OvercomingIllusions
+        - EmbracingParadox
+lastUpdated: '2025-05-02T23:31:09.843Z'
 history:
-  - version: 1.0.1
-    previousVersion: 1.0.0
-    timestamp: '2025-05-02T23:27:14.193Z'
+  - version: 1.0.2
+    previousVersion: 1.0.1
+    timestamp: '2025-05-02T23:31:09.844Z'
     commitMessage: 'Update realms item: archive_of_the_null_code'
