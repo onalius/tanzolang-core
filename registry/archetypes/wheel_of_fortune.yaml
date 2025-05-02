@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: Wheel of Fortune
+  description: The archetype of cycles, fate, and the ever-changing nature of life
+  symbolism:
+    primary_elements:
+      - air
+    colors:
+      - gold
+      - indigo
+      - white
+    objects:
+      - wheel
+      - dice
+      - hourglass
+      - spinning top
+    directions:
+      - west
+    time_of_day: noon
+    season: autumn
+    planet: Jupiter
+    animals:
+      - eagle
+      - snake
+  attributes:
+    - name: adaptability
+      value: 0.92
+      description: The capacity to adjust to new conditions
+    - name: fortune
+      value: 0.88
+      description: Influence of luck and fate in one's life
+    - name: change
+      value: 0.9
+      description: Embracing the constant ebb and flow of life
+    - name: unpredictability
+      value: 0.85
+      description: Acceptance of life's inherent uncertainty
+    - name: opportunity
+      value:
+        distribution: normal
+        mean: 0.87
+        stdDev: 0.06
+      description: Recognizing and seizing chances as they arise
+  behavioral_traits:
+    positive:
+      - Flexible
+      - Optimistic
+      - Resilient
+      - Opportunistic
+      - Open-minded
+    underdeveloped:
+      - Rigid
+      - Pessimistic
+      - Stagnant
+      - Hesitant
+      - Narrow-focused
+    overexpressed:
+      - Reckless
+      - Inconsistent
+      - Fickle
+      - Impulsive
+      - Erratic
+    mirrored:
+      - Chaotic
+      - Unreliable
+      - Capricious
+      - Distracted by possibilities
+      - Avoids stability and routine
+  alignments:
+    zodiac:
+      - Sagittarius
+      - Aquarius
+    tarot: Wheel of Fortune
+    element: Air
+    chakra: Solar Plexus
+    kabbalah: Chesed (Mercy)
+    numerology: '10'
+  journey:
+    stages:
+      - name: Turning Point
+        description: A moment of significant change or decision
+      - name: Embracing Change
+        description: Accepting and adapting to new circumstances
+      - name: Fortuitous Breakthrough
+        description: A surprising event that opens new paths
+    trials:
+      - name: Uncertainty
+        description: Navigating the unknown without fear
+      - name: Loss of Control
+        description: Letting go of the need to control outcomes
+      - name: Luck vs. Effort
+        description: Balancing reliance on fate with personal agency
+    scars:
+      - name: Misfortune
+        description: Experiences of unexpected setbacks or bad luck
+      - name: Complacency
+        description: The danger of becoming passive in the face of fate
+  implementation_notes:
+    strengths:
+      - Excellent at recognizing and leveraging opportunities
+      - Provides a fresh perspective and innovative solutions
+      - Encourages others to embrace change and unpredictability
+    challenges:
+      - May struggle with consistency and follow-through
+      - Could be perceived as unreliable or capricious
+      - Risk of overlooking the need for stability and routine
+    activation_triggers:
+      - Situations requiring adaptation to change
+      - Opportunities needing quick decision-making
+      - When a fresh perspective or innovative approach is needed
+      - Times of significant transition or turning points
+lastUpdated: '2025-05-02T23:08:23.462Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:08:23.462Z'
+    commitMessage: 'Update archetypes item: wheel_of_fortune'
