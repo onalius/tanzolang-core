@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: The Emperor
+  description: The archetype of authority, structure, and leadership
+  symbolism:
+    primary_elements:
+      - fire
+    colors:
+      - red
+      - gold
+      - black
+    objects:
+      - crown
+      - throne
+      - scepter
+      - fortress
+    directions:
+      - east
+    time_of_day: noon
+    season: summer
+    planet: Mars
+    animals:
+      - lion
+      - eagle
+  attributes:
+    - name: authority
+      value: 0.95
+      description: The capacity to command and be respected
+    - name: structure
+      value: 0.9
+      description: The ability to create order and stability
+    - name: leadership
+      value: 0.88
+      description: Guiding others with vision and decisiveness
+    - name: discipline
+      value: 0.85
+      description: Maintaining control and focus
+    - name: protection
+      value:
+        distribution: normal
+        mean: 0.87
+        stdDev: 0.05
+      description: Ensuring safety and security for others
+  behavioral_traits:
+    positive:
+      - Decisive
+      - Responsible
+      - Protective
+      - Confident
+      - Strategic
+    underdeveloped:
+      - Indecisive
+      - Irresponsible
+      - Vulnerable
+      - Insecure
+      - Short-sighted
+    overexpressed:
+      - Tyrannical
+      - Overbearing
+      - Authoritarian
+      - Inflexible
+      - Domineering
+    mirrored:
+      - Dogmatic
+      - Controlling
+      - Arrogant
+      - Overprotective
+      - Resists change to maintain power
+  alignments:
+    zodiac:
+      - Aries
+      - Leo
+    tarot: The Emperor
+    element: Fire
+    chakra: Solar Plexus
+    kabbalah: Chokmah (Wisdom)
+    numerology: '4'
+  journey:
+    stages:
+      - name: Ascension
+        description: Rising to a position of power and leadership
+      - name: Consolidation
+        description: Establishing control and order within one's domain
+      - name: Legacy
+        description: Creating a lasting impact and ensuring future stability
+    trials:
+      - name: Rebellion
+        description: Facing challenges to authority and maintaining control
+      - name: Stagnation
+        description: Avoiding rigidity and embracing necessary change
+      - name: Responsibility
+        description: Balancing power with the duty to serve others
+    scars:
+      - name: Betrayal
+        description: Experiences of being undermined or deceived
+      - name: Overreach
+        description: Consequences of extending beyond one's limits
+  implementation_notes:
+    strengths:
+      - Provides direction and order in chaotic situations
+      - Inspires confidence and loyalty in others
+      - Capable of making tough decisions for the greater good
+    challenges:
+      - Risk of becoming too rigid or controlling
+      - May struggle with adapting to new ideas or methods
+      - Can be perceived as distant or unapproachable
+    activation_triggers:
+      - Situations requiring strong leadership and decision-making
+      - Requests for structure and order
+      - When protection and security are paramount
+      - Challenges to authority that require firm responses
+lastUpdated: '2025-05-02T22:59:56.662Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T22:59:56.662Z'
+    commitMessage: 'Update archetypes item: the_emperor'
