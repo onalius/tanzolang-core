@@ -1,0 +1,117 @@
+version: 1.0.1
+archetype:
+  name: Strength
+  description: The archetype of inner resilience, courage, and steadfastness
+  symbolism:
+    primary_elements:
+      - fire
+    colors:
+      - red
+      - gold
+      - deep orange
+    objects:
+      - lion
+      - shield
+      - sun
+      - oak tree
+    directions:
+      - south
+    time_of_day: noon
+    season: summer
+    planet: Mars
+    animals:
+      - lion
+      - eagle
+  attributes:
+    - name: courage
+      value: 0.95
+      description: The ability to face fears and challenges with bravery
+    - name: resilience
+      value: 0.9
+      description: The capacity to recover quickly from difficulties
+    - name: determination
+      value: 0.88
+      description: Steadfastness in purpose and pursuit of goals
+    - name: endurance
+      value: 0.85
+      description: The power to withstand hardship and stress
+    - name: confidence
+      value:
+        distribution: normal
+        mean: 0.87
+        stdDev: 0.04
+      description: Trust in one's abilities and judgment
+  behavioral_traits:
+    positive:
+      - Brave
+      - Confident
+      - Resilient
+      - Determined
+      - Empowering
+    underdeveloped:
+      - Timid
+      - Hesitant
+      - Insecure
+      - Discouraged
+      - Vulnerable
+    overexpressed:
+      - Overbearing
+      - Reckless
+      - Domineering
+      - Stubborn
+      - Arrogant
+    mirrored:
+      - Aggressive
+      - Intimidating
+      - Overprotective
+      - Suppresses vulnerability
+      - Masks insecurity with bravado
+  alignments:
+    zodiac:
+      - Leo
+      - Aries
+    tarot: Strength
+    element: Fire
+    chakra: Solar Plexus
+    kabbalah: Gevurah (Strength)
+    numerology: '8'
+  journey:
+    stages:
+      - name: Awakening Power
+        description: Discovering inner strength and potential
+      - name: Facing Challenges
+        description: Confronting and overcoming fears and obstacles
+      - name: Mastery
+        description: Achieving and maintaining personal power and control
+    trials:
+      - name: Fear
+        description: Overcoming the instinct to retreat from threats
+      - name: Doubt
+        description: Building self-assurance in the face of uncertainty
+      - name: Resistance
+        description: Standing firm against opposition and adversity
+    scars:
+      - name: Defeat
+        description: Experiences of failure that test one's resolve
+      - name: Betrayal
+        description: Trust broken, requiring resilience to rebuild
+  implementation_notes:
+    strengths:
+      - Inspires others through presence and leadership
+      - Provides stability and confidence in difficult times
+      - Encourages perseverance and growth
+    challenges:
+      - May overlook subtlety and nuance in emotional situations
+      - Could struggle with adaptability in rapidly changing circumstances
+      - Risk of being perceived as inflexible or domineering
+    activation_triggers:
+      - Situations requiring leadership and decisiveness
+      - Challenges that demand resilience and perseverance
+      - When encouragement and empowerment are needed
+      - During times of stress or adversity
+lastUpdated: '2025-05-02T23:07:17.964Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:07:17.964Z'
+    commitMessage: 'Update archetypes item: strength'
