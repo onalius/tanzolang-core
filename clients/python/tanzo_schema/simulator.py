@@ -6,7 +6,7 @@ import random
 from typing import Dict, Any, List, Union, Optional, Tuple
 import numpy as np
 
-from tanzo_schema.models import (
+from clients.python.tanzo_schema.models import (
     TanzoProfile,
     Attribute,
     NormalDistribution,
@@ -17,7 +17,7 @@ from tanzo_schema.models import (
     KabbalahTypology,
     PurposeQuadrantTypology,
 )
-from tanzo_schema.validator import validate_profile
+from clients.python.tanzo_schema.validator import validate_profile
 
 
 def sample_distribution(distribution: Union[NormalDistribution, UniformDistribution, DiscreteDistribution]) -> Any:

@@ -11,7 +11,7 @@ from typing import Dict, Any, Union
 import yaml
 from pydantic import BaseModel
 
-from tanzo_schema.models import TanzoProfile
+from clients.python.tanzo_schema.models import TanzoProfile
 
 
 def to_dict(obj: Union[BaseModel, Dict[str, Any]]) -> Dict[str, Any]:

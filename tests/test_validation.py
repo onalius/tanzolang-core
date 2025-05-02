@@ -18,7 +18,7 @@ class TestValidation:
     
     def test_validation_on_valid_profile(self):
         """Test validation with a valid profile"""
-        example_path = ROOT_DIR / "examples" / "Kai_profile.yaml"
+        example_path = ROOT_DIR / "examples" / "legacy" / "Kai_profile.yaml"
         is_valid, errors = validate_tanzo_profile(example_path)
         
         assert is_valid, f"Validation should pass but failed with: {errors}"
@@ -26,7 +26,7 @@ class TestValidation:
     
     def test_validation_on_minimal_profile(self):
         """Test validation with a minimal profile"""
-        example_path = ROOT_DIR / "examples" / "digital_archetype_only.yaml"
+        example_path = ROOT_DIR / "examples" / "profiles" / "digital_archetype_only.yaml"
         is_valid, errors = validate_tanzo_profile(example_path)
         
         assert is_valid, f"Validation should pass but failed with: {errors}"
@@ -108,7 +108,7 @@ class TestValidation:
         }
         
         # This should not raise an exception
-        profile = TanzoProfile.model_validate(valid_profile)
+        profile = TanzoProfile.parse_obj(valid_profile)
         assert profile.profile.name == "Test Profile"
         
         # Test with an invalid value
@@ -116,4 +116,4 @@ class TestValidation:
         invalid_profile["archetype"]["type"] = "unknown"  # Invalid enum value
         
         with pytest.raises(Exception):
-            TanzoProfile.model_validate(invalid_profile)
+            TanzoProfile.parse_obj(invalid_profile)

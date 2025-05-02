@@ -5,13 +5,13 @@ Validation utilities for TanzoLang profiles
 import json
 import os
 from pathlib import Path
-from typing import Dict, Union, Any, Optional
+from typing import Dict, Union, Any, Optional, Tuple
 
 import yaml
 import jsonschema
 from jsonschema import ValidationError
 
-from tanzo_schema.models import TanzoProfile
+from clients.python.tanzo_schema.models import TanzoProfile
 
 
 def load_schema() -> Dict[str, Any]:
@@ -182,3 +182,52 @@ def validate_profile(profile_path: Union[str, Path]) -> TanzoProfile:
             print(warning)
     
     return profile
+
+
+def validate_tanzo_profile(profile_input: Union[str, Path, Dict[str, Any]]) -> Tuple[bool, Optional[list]]:
+    """
+    Validate a TanzoLang profile and return a success flag and any errors
+    
+    Args:
+        profile_input: Path to the profile file, a raw string, or profile dict
+        
+    Returns:
+        Tuple[bool, Optional[list]]: (is_valid, list_of_errors_or_None)
+    """
+    try:
+        # Handle different input types
+        if isinstance(profile_input, (str, Path)) and os.path.exists(str(profile_input)):
+            # It's a file path
+            data = validate_file(profile_input)
+        elif isinstance(profile_input, str):
+            # It's a raw string - try to parse as YAML
+            try:
+                data = yaml.safe_load(profile_input)
+            except yaml.YAMLError as e:
+                return False, [f"Invalid YAML content: {str(e)}"] 
+        elif isinstance(profile_input, dict):
+            # It's already a dictionary
+            data = profile_input
+        else:
+            return False, ["Invalid input type, expected file path, YAML string, or dictionary"]
+            
+        # Validate against JSON schema
+        schema = load_schema()
+        jsonschema.validate(data, schema)
+        
+        # Convert to Pydantic model for additional validation
+        profile = TanzoProfile.parse_obj(data)
+        
+        # Check registry references (warnings only)
+        registry_warnings = check_registry_references(profile)
+        if registry_warnings:
+            # Don't fail validation, but print warnings
+            for warning in registry_warnings:
+                print(warning)
+        
+        return True, None
+        
+    except (ValidationError, FileNotFoundError, ValueError) as e:
+        return False, [str(e)]
+    except Exception as e:
+        return False, [f"Unexpected error during validation: {str(e)}"]

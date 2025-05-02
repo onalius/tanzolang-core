@@ -7,7 +7,7 @@ import random
 import numpy as np
 from dataclasses import dataclass
 
-from tanzo_schema.models import TanzoProfile, Behavior
+from clients.python.tanzo_schema.models import TanzoProfile, Behavior
 
 
 @dataclass

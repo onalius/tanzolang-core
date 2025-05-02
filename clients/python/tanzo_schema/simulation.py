@@ -11,7 +11,7 @@ from typing import Dict, List, Any, Optional, Tuple
 
 import numpy as np
 
-from tanzo_schema.models import TanzoProfile, Trait
+from clients.python.tanzo_schema.models import TanzoProfile, Trait
 
 
 @dataclass

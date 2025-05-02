@@ -7,7 +7,7 @@ import json
 import yaml
 from pathlib import Path
 
-from tanzo_schema.models import TanzoProfile, Archetype
+from clients.python.tanzo_schema.models import TanzoProfile, Archetype
 
 
 def export_profile_shorthand(profile: TanzoProfile) -> str:
@@ -79,8 +79,8 @@ def export_profile_yaml(profile: TanzoProfile, path: Optional[Union[str, Path]] 
     Returns:
         str: The YAML string representation of the profile
     """
-    # Convert to dict first
-    profile_dict = profile.model_dump()
+    # Convert to dict first and ensure enum values are converted to strings
+    profile_dict = json.loads(profile.model_dump_json())
     
     # Convert to YAML
     yaml_str = yaml.dump(profile_dict, sort_keys=False, default_flow_style=False)

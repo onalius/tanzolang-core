@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Union
 
 import yaml
 
-from tanzo_schema.models import TanzoProfile
+from clients.python.tanzo_schema.models import TanzoProfile
 
 
 def export_profile(profile: TanzoProfile, format: str = "shorthand") -> str:
@@ -30,9 +30,11 @@ def export_profile(profile: TanzoProfile, format: str = "shorthand") -> str:
     if format == "shorthand":
         return _export_shorthand(profile)
     elif format == "json":
-        return json.dumps(profile.model_dump(), indent=2)
+        return profile.model_dump_json(indent=2)
     elif format == "yaml":
-        return yaml.dump(profile.model_dump(), sort_keys=False)
+        # Convert to dict using JSON to ensure enum values are strings
+        profile_dict = json.loads(profile.model_dump_json())
+        return yaml.dump(profile_dict, sort_keys=False)
     else:
         raise ValueError(f"Unknown export format: {format}")
 
