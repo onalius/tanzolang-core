@@ -1,0 +1,119 @@
+version: 1.0.1
+archetype:
+  name: The Sovereign
+  description: The archetype of authority, leadership, and protection
+  symbolism:
+    primary_elements:
+      - sky
+      - lightning
+    colors:
+      - gold
+      - royal blue
+      - white
+    objects:
+      - thunderbolt
+      - scepter
+      - throne
+      - eagle
+    directions:
+      - east
+    time_of_day: noon
+    season: summer
+    planet: Jupiter
+    animals:
+      - eagle
+      - bull
+  attributes:
+    - name: leadership
+      value: 0.95
+      description: The strength to lead and govern with authority
+    - name: protection
+      value: 0.9
+      description: The instinct to guard and shelter those under one's care
+    - name: justice
+      value: 0.85
+      description: The commitment to fairness and lawfulness
+    - name: power
+      value: 0.92
+      description: The capacity to exert control and influence
+    - name: charisma
+      value:
+        distribution: normal
+        mean: 0.88
+        stdDev: 0.04
+      description: The ability to inspire loyalty and devotion
+  behavioral_traits:
+    positive:
+      - Authoritative
+      - Charismatic
+      - Protective
+      - Just
+      - Commanding
+    underdeveloped:
+      - Indecisive
+      - Passive
+      - Weak-willed
+      - Uninspiring
+      - Unjust
+    overexpressed:
+      - Tyrannical
+      - Overbearing
+      - Domineering
+      - Dictatorial
+      - Arrogant
+      - Megalomaniacal
+    mirrored:
+      - Controlling
+      - Manipulative
+      - Intimidating
+      - Overprotective
+      - Rigid
+  alignments:
+    zodiac:
+      - Sagittarius
+      - Leo
+    tarot: The Emperor
+    element: Air
+    chakra: Solar Plexus
+    kabbalah: Chesed (Mercy)
+    numerology: '4'
+  journey:
+    stages:
+      - name: Ascension
+        description: Rising to a position of power and influence
+      - name: Reign
+        description: Exercising authority and governance over a realm
+      - name: Legacy
+        description: Leaving a lasting impact and ensuring a succession
+    trials:
+      - name: Rebellion
+        description: Facing challenges to one's authority and rule
+      - name: Corruption
+        description: Resisting the lure of absolute power and its pitfalls
+      - name: Succession
+        description: Ensuring a stable transition of power
+    scars:
+      - name: Betrayal
+        description: Experiences of trust broken by those close
+      - name: Hubris
+        description: The fall that comes from excessive pride and arrogance
+  implementation_notes:
+    strengths:
+      - Excellent at leading and organizing groups
+      - Provides strong, decisive guidance
+      - Inspires confidence and trust in others
+    challenges:
+      - May overlook individual needs in favor of the greater good
+      - Could struggle with delegation and empowering others
+      - Risk of being perceived as overbearing or autocratic
+    activation_triggers:
+      - Situations requiring strong leadership and decision-making
+      - Calls for protection and defense of a group
+      - When order and structure need to be established
+      - Challenges to authority or leadership arise
+lastUpdated: '2025-05-02T23:09:35.187Z'
+history:
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-02T23:09:35.187Z'
+    commitMessage: 'Update archetypes item: zeus'
