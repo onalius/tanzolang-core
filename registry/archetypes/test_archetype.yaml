@@ -1,8 +1,8 @@
 version: "1.0.0"
 archetype:
-  name: "Test Archetype"
-  description: "A test archetype to verify GitHub sync"
+  name: "Test Archetype Updated"
+  description: "A test archetype to verify GitHub sync - updated"
   attributes:
     - name: "test_attribute"
       description: "A test attribute"
-      value: 5
+      value: 10
