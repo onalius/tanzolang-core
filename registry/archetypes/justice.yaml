@@ -1,69 +1,133 @@
-version: "0.1.0"
+version: 1.0.1
 archetype:
-  name: "Justice"
-  description: "The archetype of fairness, truth, and law."
+  name: Justice
+  description: The archetype of fairness, truth, and law. As the eleventh card in the Major Arcana of the Tarot, Justice embodies the principle of moral righteousness and the quest for equilibrium.
   
   symbolism:
     primary_elements:
-      - "air"
+      - air
     colors:
-      - "blue"
-      - "white"
+      - blue
+      - white
     objects:
-      - "scales"
-      - "sword"
+      - scales
+      - sword
+      - blindfold
+    directions:
+      - north
+    time_of_day: noon
+    season: autumn
+    planet: Venus
     animals:
-      - "owl"
+      - owl
+      - elephant
   
   attributes:
-    - name: "fairness"
+    - name: fairness
       value: 0.95
-      description: "The ability to judge situations impartially"
+      description: The ability to judge situations impartially and balance competing interests
     
-    - name: "truth"
+    - name: truth
       value: 0.9
-      description: "Commitment to honesty and factual accuracy"
+      description: Commitment to honesty and factual accuracy
+    
+    - name: accountability
+      value: 0.92
+      description: Recognition of cause and effect in actions
+    
+    - name: integrity
+      value: 0.88
+      description: Adherence to moral and ethical principles
+    
+    - name: analysis
+      value:
+        distribution: normal
+        mean: 0.87
+        stdDev: 0.05
+      description: The ability to critically evaluate evidence and arguments
   
   behavioral_traits:
     positive:
-      - "Objective"
-      - "Analytical"
+      - Objective
+      - Analytical
+      - Righteous
+      - Impartial
+      - Ethical
     
     underdeveloped:
-      - "Indecisive"
-      - "Biased"
+      - Indecisive
+      - Biased
+      - Unprincipled
+      - Unfair
+      - Careless
     
     overexpressed:
-      - "Rigid"
-      - "Judgmental"
+      - Rigid
+      - Judgmental
+      - Unyielding
+      - Critical
+      - Self-righteous
     
     mirrored:
-      - "Vindictive"
-      - "Hypocritical"
+      - Vindictive (punishment over fairness)
+      - Hypocritical (judging others by different standards)
+      - Cold (justice without compassion)
+      - Manipulative (twisting facts to suit agenda)
   
+  # New elements from TomoTanzo format
   shadow:
-    - "Rigid judgmental behavior"
-    - "Unyielding fairness leading to lack of empathy"
+    - Rigid judgmental behavior
+    - Unyielding fairness leading to lack of empathy
+    - Excessive critical nature
+    - Self-righteousness masking underlying biases
+  
+  archetypeDimensions:
+    maturity:
+      immature: Impulsiveness, biased decisions, seeing issues in black and white
+      mature: Equanimity, thoughtful deliberation, consideration of nuance
+    
+    expression:
+      constructive: Advocacy for justice, fair mediations, balanced perspective
+      destructive: Vindictiveness, harsh punishments, inability to forgive
   
   drives:
-    - "To uphold truth and justice"
-    - "To correct imbalances"
+    - To uphold truth and justice
+    - To correct imbalances
+    - To enforce moral and ethical standards
   
-  narrativeRole: "In stories, the Justice archetype serves as the arbiter or mediator."
+  narrativeRole: |
+    In stories, the Justice archetype serves as the arbiter or mediator, embodying the pursuit 
+    of fairness and the upholder of laws. This character restores balance in chaotic situations, 
+    instilling moral order and reconciling wrongs. Often depicted as judges, lawyers, or 
+    authority figures who must make difficult but fair decisions.
   
   examples:
-    - "Athena from Greek mythology"
-    - "King Solomon from biblical narratives"
+    - Athena from Greek mythology, as the goddess of wisdom and justice
+    - King Solomon from biblical narratives, known for his wise judgments
+    - Atticus Finch from To Kill a Mockingbird, who embodies fairness and integrity
+    - The character of Lady Justice, blindfolded with scales, represents Western legal ideals
   
-  integration: "To integrate the Justice archetype, balance fairness with compassion."
+  integration: |
+    To integrate the Justice archetype into one's personality healthily, it is crucial to balance 
+    fairness with compassion and empathy. Recognize the importance of understanding multiple 
+    perspectives and exercise judgment without being overly critical. Cultivate the ability to 
+    forgive and learn from mistakes, both personally and in others.
   
   quotes:
-    - "Justice will not be served until those who are unaffected are as outraged as those who are."
-    - "Fairness does not mean everyone gets the same. Fairness means everyone gets what they need."
+    - |
+      Justice will not be served until those who are unaffected are as outraged as those who are. - Benjamin Franklin
+    - |
+      Fairness does not mean everyone gets the same. Fairness means everyone gets what they need. - Rick Riordan
+    - |
+      The arc of the moral universe is long, but it bends towards justice. - Martin Luther King Jr.
+    - |
+      Justice is truth in action. - Benjamin Disraeli
+    - |
+      Injustice anywhere is a threat to justice everywhere. - Martin Luther King Jr.
 
-lastUpdated: "2025-05-04T14:30:00.000Z"
+lastUpdated: '2025-05-04T14:30:00.000Z'
 history:
-  - version: "0.1.0"
-    previousVersion: null
-    timestamp: "2025-05-04T14:30:00.000Z"
-    commitMessage: "Create archetype: Justice"
+  - version: 1.0.1
+    previousVersion: 1.0.0
+    timestamp: '2025-05-04T14:30:00.000Z'
+    commitMessage: 'Create archetype: Justice'
