@@ -7,8 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from clients.python.tanzo_schema import TanzoProfile, simulate_profile
-from clients.python.tanzo_schema.simulation import _apply_variance, _should_activate_capability
+from clients.python.tanzo_schema.models import TanzoProfile
+from clients.python.tanzo_schema.simulator import simulate_profile
+from clients.python.tanzo_schema.simulator import extract_typologies
 
 # Root directory of the repo
 ROOT_DIR = Path(__file__).parent.parent
@@ -16,6 +17,36 @@ ROOT_DIR = Path(__file__).parent.parent
 
 class TestSimulation:
     """Tests for the simulation functions"""
+    
+    def test_simulation_with_typologies(self):
+        """Test simulation with a profile that includes typologies"""
+        # Load a profile with typologies
+        example_path = ROOT_DIR / "examples" / "profiles" / "hermit_with_typologies.yaml"
+        with open(example_path, "r") as f:
+            import yaml
+            profile_data = yaml.safe_load(f)
+        
+        profile = TanzoProfile.model_validate(profile_data)
+        
+        # Verify typologies exist before simulation
+        assert profile.profile.typologies is not None, "Typologies should be present"
+        assert profile.profile.typologies.zodiac is not None, "Zodiac typology should be present"
+        assert profile.profile.typologies.kabbalah is not None, "Kabbalah typology should be present"
+        assert profile.profile.typologies.purpose_quadrant is not None, "Purpose quadrant typology should be present"
+        
+        # Extract typologies and verify their content
+        typologies = extract_typologies(profile)
+        assert "zodiac" in typologies, "Zodiac should be extracted"
+        assert "sun" in typologies["zodiac"], "Sun sign should be extracted"
+        assert typologies["zodiac"]["sun"] == "Virgo", "Sun sign should be Virgo"
+        
+        assert "kabbalah" in typologies, "Kabbalah should be extracted"
+        assert "primary_sefira" in typologies["kabbalah"], "Primary sefira should be extracted"
+        assert typologies["kabbalah"]["primary_sefira"] == "Binah", "Primary sefira should be Binah"
+        
+        assert "purpose_quadrant" in typologies, "Purpose quadrant should be extracted"
+        assert "passion" in typologies["purpose_quadrant"], "Passion should be extracted"
+        assert typologies["purpose_quadrant"]["passion"] == "Seeking inner truth", "Passion should match"
     
     def test_apply_variance(self):
         """Test that variance is applied correctly"""

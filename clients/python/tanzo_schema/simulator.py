@@ -93,16 +93,24 @@ def extract_typologies(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
         result['zodiac'] = {
             'sun': typologies.zodiac.sun,
             'moon': typologies.zodiac.moon,
-            'rising': typologies.zodiac.rising
+            'rising': typologies.zodiac.rising,
+            'description': typologies.zodiac.description,
+            'reference': typologies.zodiac.reference
         }
+        # Filter out None values
+        result['zodiac'] = {k: v for k, v in result['zodiac'].items() if v is not None}
     
     # Extract kabbalah typology if present
     if hasattr(typologies, 'kabbalah') and typologies.kabbalah:
         result['kabbalah'] = {
             'primary_sefira': typologies.kabbalah.primary_sefira,
             'secondary_sefira': typologies.kabbalah.secondary_sefira,
-            'path': typologies.kabbalah.path
+            'path': typologies.kabbalah.path,
+            'description': typologies.kabbalah.description,
+            'reference': typologies.kabbalah.reference
         }
+        # Filter out None values
+        result['kabbalah'] = {k: v for k, v in result['kabbalah'].items() if v is not None}
     
     # Extract purpose quadrant typology if present
     if hasattr(typologies, 'purpose_quadrant') and typologies.purpose_quadrant:
@@ -110,19 +118,39 @@ def extract_typologies(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
             'passion': typologies.purpose_quadrant.passion,
             'expertise': typologies.purpose_quadrant.expertise,
             'contribution': typologies.purpose_quadrant.contribution,
-            'sustainability': typologies.purpose_quadrant.sustainability
+            'sustainability': typologies.purpose_quadrant.sustainability,
+            'reference': typologies.purpose_quadrant.reference
         }
+        # Filter out None values
+        result['purpose_quadrant'] = {k: v for k, v in result['purpose_quadrant'].items() if v is not None}
     
-    # Extract any custom typologies
-    for name, typology in typologies.__dict__.items():
-        if name not in ['zodiac', 'kabbalah', 'purpose_quadrant'] and typology is not None:
-            custom_typology = {}
-            for key, value in typology.__dict__.items():
-                if value is not None:
-                    custom_typology[key] = value
-            
-            if custom_typology:  # Only add if not empty
-                result[name] = custom_typology
+    # Extract any custom typologies using model_dump for clean conversion
+    try:
+        # Use model_dump when available (newer Pydantic versions)
+        typology_dict = typologies.model_dump(exclude_none=True)
+        for name, typology in typology_dict.items():
+            if name not in ['zodiac', 'kabbalah', 'purpose_quadrant'] and typology is not None:
+                if isinstance(typology, dict) and typology:  # Only add if not empty
+                    result[name] = typology
+    except AttributeError:
+        # Fallback for older Pydantic versions or if model_dump doesn't exist
+        for name, typology in typologies.__dict__.items():
+            if name not in ['zodiac', 'kabbalah', 'purpose_quadrant', '__fields_set__', '__annotations__'] and typology is not None:
+                try:
+                    # Try to use dict() or __dict__ for conversion
+                    if hasattr(typology, 'dict'):
+                        custom_typology = typology.dict(exclude_none=True)
+                    elif hasattr(typology, '__dict__'):
+                        custom_typology = {k: v for k, v in typology.__dict__.items() 
+                                        if not k.startswith('_') and v is not None}
+                    else:
+                        custom_typology = {}
+                        
+                    if custom_typology:  # Only add if not empty
+                        result[name] = custom_typology
+                except Exception:
+                    # Skip this typology if we can't convert it
+                    pass
     
     return result
 
@@ -158,13 +186,14 @@ def simulate_profile_once(profile: TanzoProfile) -> Dict[str, Dict[str, Any]]:
     return result
 
 
-def simulate_profile(profile_path: str, iterations: int = 100) -> Dict[str, Any]:
+def simulate_profile(profile_path: str, iterations: int = 100, include_typology_details: bool = True) -> Dict[str, Any]:
     """
     Perform multiple simulations of a TanzoLang profile
     
     Args:
         profile_path: Path to the profile file
         iterations: Number of simulation iterations to run
+        include_typology_details: Whether to include detailed typology information in the summary
         
     Returns:
         Dict[str, Any]: Summary statistics for the simulations
@@ -178,6 +207,7 @@ def simulate_profile(profile_path: str, iterations: int = 100) -> Dict[str, Any]
     # Prepare summary statistics
     summary = {
         "profile_name": profile.profile.name,
+        "profile_description": profile.profile.description,
         "iterations": iterations,
         "archetypes": {}
     }
@@ -185,7 +215,57 @@ def simulate_profile(profile_path: str, iterations: int = 100) -> Dict[str, Any]
     # Add typologies if present (these don't need statistics as they're deterministic)
     typologies = extract_typologies(profile)
     if typologies:
-        summary["typologies"] = typologies
+        # Include basic typology information in the summary
+        summary["typologies"] = {}
+        
+        # Process typology systems with consistent format
+        for system_name, system_data in typologies.items():
+            # Create a more readable summary for each typology system
+            if system_name == "zodiac" and "sun" in system_data:
+                summary_text = f"Sun: {system_data['sun']}"
+                if "moon" in system_data:
+                    summary_text += f", Moon: {system_data['moon']}"
+                if "rising" in system_data:
+                    summary_text += f", Rising: {system_data['rising']}"
+                system_summary = {
+                    "summary": summary_text,
+                    "primary": system_data.get("sun", "")
+                }
+                
+            elif system_name == "kabbalah" and "primary_sefira" in system_data:
+                summary_text = f"Primary: {system_data['primary_sefira']}"
+                if "secondary_sefira" in system_data:
+                    summary_text += f", Secondary: {system_data['secondary_sefira']}"
+                system_summary = {
+                    "summary": summary_text,
+                    "primary": system_data.get("primary_sefira", "")
+                }
+                
+            elif system_name == "purpose_quadrant":
+                summary_parts = []
+                if "passion" in system_data:
+                    summary_parts.append(f"Passion: {system_data['passion']}")
+                if "expertise" in system_data:
+                    summary_parts.append(f"Expertise: {system_data['expertise']}")
+                summary_text = ", ".join(summary_parts)
+                system_summary = {
+                    "summary": summary_text,
+                    "primary": "Purpose Alignment"  # Generic primary for this system
+                }
+                
+            else:
+                # Generic handling for other typology systems
+                system_summary = {
+                    "summary": f"Custom typology: {system_name}",
+                    "primary": "Custom"
+                }
+            
+            # Include the simplified summary
+            summary["typologies"][system_name] = system_summary
+            
+            # Include full details if requested
+            if include_typology_details:
+                summary["typologies"][system_name]["details"] = system_data
     
     # For each archetype
     for archetype in profile.profile.archetypes:
