@@ -5,14 +5,27 @@ import shutil
 # Create package data directories if they don't exist
 os.makedirs('clients/python/tanzo_schema/schema', exist_ok=True)
 
-# Copy schema files to the package data directory
-shutil.copy('spec/tanzo-schema.json', 'clients/python/tanzo_schema/schema/tanzo-schema.json')
+# Copy schema files to the package data directory - copy both formats if available
+if os.path.exists('spec/tanzo-schema.json'):
+    shutil.copy('spec/tanzo-schema.json', 'clients/python/tanzo_schema/schema/tanzo-schema.json')
+if os.path.exists('spec/tanzo-schema.yaml'):
+    shutil.copy('spec/tanzo-schema.yaml', 'clients/python/tanzo_schema/schema/tanzo-schema.yaml')
 
 # Copy example profiles to tests directory for test discovery
 os.makedirs('tests/test_data', exist_ok=True)
-for example_file in ['examples/Kai_profile.yaml', 'examples/digital_archetype_only.yaml', 'examples/Hermit_profile.yaml']:
+
+# Define both possible locations for example files
+example_paths = [
+    # Old paths
+    'examples/Kai_profile.yaml', 'examples/digital_archetype_only.yaml', 'examples/Hermit_profile.yaml',
+    # New paths in profiles subdirectory
+    'examples/profiles/digital_archetype_only.yaml', 'examples/profiles/hermit.yaml', 'examples/profiles/hermit_with_typologies.yaml'
+]
+
+# Copy files that exist
+for example_file in example_paths:
     if os.path.exists(example_file):
-        shutil.copy(example_file, f"tests/test_data/{os.path.basename(example_file)}")
+        shutil.copy(example_file, f"tests/test_data/{os.path.basename(example_file).lower()}")
 
 setup(
     name="tanzo-schema",
@@ -21,13 +34,13 @@ setup(
     author="Onalius Team",
     author_email="info@onalius.com",
     url="https://github.com/onalius/tanzo-lang-core",
-    packages=find_packages(include=["tanzo_schema", "tanzo_schema.*", "cli", "cli.*"]),
+    packages=find_packages(include=["clients", "clients.*", "cli", "cli.*"]),
     package_dir={
-        "tanzo_schema": "clients/python/tanzo_schema",
+        "clients": "clients",
         "cli": "cli"
     },
     package_data={
-        "tanzo_schema": ["schema/*.json", "schema/*.yaml"],
+        "clients.python.tanzo_schema": ["schema/*.json", "schema/*.yaml"],
     },
     include_package_data=True,
     entry_points={

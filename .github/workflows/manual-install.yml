@@ -20,6 +20,9 @@ jobs:
           pip install --upgrade pip
           pip install numpy==1.26.4 --only-binary=:all:
           pip install -e .[dev]
-          python -c "import tanzo_schema; print(f'TanzoSchema imported successfully: {tanzo_schema.__file__}')"
+          # Explain the expected import path after installation
+          python -c "from clients.python import tanzo_schema; print(f'TanzoSchema imported successfully: {tanzo_schema.__file__}')"
           python -c "from cli.tanzo_cli import cli; print('CLI imported successfully')"
-          pytest -qvs tests/test_cli.py
+          
+          # Use PYTHONPATH to ensure module discovery works properly
+          PYTHONPATH=$PWD pytest -qvs tests/test_cli.py
